@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryManagement.Api", "InventoryManagement.Api\InventoryManagement.Api.csproj", "{BCB69337-78C8-4A25-BDDA-84299AA90C90}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryManagement.Domain", "InventoryManagement.Domain\InventoryManagement.Domain.csproj", "{110EFA10-5603-4BB7-A35E-CD052E32E826}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BCB69337-78C8-4A25-BDDA-84299AA90C90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCB69337-78C8-4A25-BDDA-84299AA90C90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCB69337-78C8-4A25-BDDA-84299AA90C90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCB69337-78C8-4A25-BDDA-84299AA90C90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{110EFA10-5603-4BB7-A35E-CD052E32E826}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{110EFA10-5603-4BB7-A35E-CD052E32E826}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{110EFA10-5603-4BB7-A35E-CD052E32E826}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{110EFA10-5603-4BB7-A35E-CD052E32E826}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
