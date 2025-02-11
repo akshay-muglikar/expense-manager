@@ -19,13 +19,23 @@ builder.Services.AddDbContext<ApplicationDbContext>(
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
+builder.Services.AddAutoMapper(typeof(Program)); // Register AutoMapper
 builder.Services.AddControllers();
 // Add Swagger for API documentation
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddDomainDependencies();
 builder.Services.AddApiDependencies();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+        });
+});
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -43,6 +53,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowAllOrigins");
 app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();

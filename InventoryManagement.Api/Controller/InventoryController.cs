@@ -1,4 +1,6 @@
 using System;
+using AutoMapper;
+using InventoryManagement.Api.Contracts;
 using InventoryManagement.Api.UseCase;
 using InventoryManagement.Domain.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -10,12 +12,13 @@ namespace InventoryManagement.Api.Controller;
 public class ItemController : ControllerBase
 {
     private readonly ItemService _itemService;
+    private readonly IMapper _mapper;
 
-    public ItemController(ItemService itemService)
+    public ItemController(ItemService itemService, IMapper mapper)
     {
         _itemService = itemService;
+        _mapper = mapper;
     }
-
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -34,10 +37,11 @@ public class ItemController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add(Item item)
+    public async Task<IActionResult> Add(ItemModel itemModel)
     {
-        await _itemService.AddAsync(item);
-        return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
+       
+        await _itemService.AddAsync(_mapper.Map<Item>(itemModel));
+        return Created();
     }
 
     [HttpPut("{id}")]
