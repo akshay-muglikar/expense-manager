@@ -1,4 +1,6 @@
 using System;
+using AutoMapper;
+using InventoryManagement.Api.Contracts;
 using InventoryManagement.Api.UseCase;
 using InventoryManagement.Domain.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +12,12 @@ namespace InventoryManagement.Api.Controller;
 public class BillController : ControllerBase
 {
     private readonly BillService _billService;
+    private readonly IMapper _mapper;
 
-    public BillController(BillService billService)
+    public BillController(BillService billService, IMapper mapper)
     {
         _billService = billService;
+        _mapper = mapper;
     }
 
     [HttpGet("{id}")]
@@ -34,10 +38,10 @@ public class BillController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add(Bill bill)
+    public async Task<IActionResult> Add(BillModel bill)
     {
-        await _billService.AddAsync(bill);
-        return CreatedAtAction(nameof(GetById), new { id = bill.Id }, bill);
+        bill = await _billService.AddAsync(_mapper.Map<Bill>(bill));
+        return Ok(bill);
     }
 
     [HttpPut("{id}")]
