@@ -1,0 +1,67 @@
+<div>
+  <div>
+    <select style="height: 50px;width: 300px" class="col-md-4" [(ngModel)]="filter" (ngModelChange)="onSelectChange()">
+      <option value="0">Today</option>
+      <option value="7">Last 7 days</option>
+      <option value="30">Last 30 days</option>
+      <option value="-1">Custom</option>
+
+    </select>
+    <span [hidden]="hideCustomDate">
+      <input style="height: 50px;margin-left: 10px;" type="date" [(ngModel)]="startDateText">
+      <input style="height: 50px; margin-left: 10px;" type="date" [(ngModel)]="endDateText">
+      <button (click)="onCustomDateSet()" style="margin-left: 10px;" mat-mini-fab
+        aria-label="Example icon button with a menu icon">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </span>
+  </div>
+  <div>
+    <mat-progress-bar mode="query" style="height: 5px;" [hidden]="hideFormLoading"></mat-progress-bar>
+  </div>
+  <div class="row row-cols-1 row-cols-md-4 g-4" style="    padding-bottom: 10px;
+    padding-top: 10px;">
+    <div class="col">
+      <div class="card h-100 text-center shadow">
+        <div class="card-body">
+          <div class="display-4 text-primary mb-2">
+            <i class="bi bi-people"></i>
+          </div>
+          <h2 class="card-title mb-3">{{dashboardStats.billCount}}</h2>
+          <p class="card-text text-muted">Total Bills</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 text-center shadow">
+        <div class="card-body">
+          <div class="display-4 text-success mb-2">
+            <i class="bi bi-graph-up"></i>
+          </div>
+          <h2 class="card-title mb-3">{{dashboardStats.revenue}}</h2>
+          <p class="card-text text-muted">Revenue</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 text-center shadow">
+        <div class="card-body">
+          <div class="display-4 text-warning mb-2">
+            <i class="bi bi-star"></i>
+          </div>
+          <h2 class="card-title mb-3">{{dashboardStats.expenses}}</h2>
+          <p class="card-text text-muted">expenses</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div>
+
+  <ag-grid-angular style="height: 32em;" [rowData]="allItems" [columnDefs]="colDefs" [pagination]="true"
+    (gridReady)="onGridReady($event)" />
+</div>

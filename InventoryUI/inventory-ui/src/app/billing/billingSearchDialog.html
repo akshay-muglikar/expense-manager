@@ -1,0 +1,26 @@
+<mat-dialog-content >
+    <mat-label>Search Bill</mat-label>
+    <!-- <select style="width: 500px; height: 30px;" [(ngModel)]="selectedBill" name="food">
+        @for (bill of bills; track bill.name; let index = $index) {
+          <option value="{{bill.id}}" label="{{bill.name + ' - ' + bill.mobile +' - '+ bill.billDate}}"></option>
+        }
+    </select> -->
+
+    <input type="text" style="width: 500px;"
+        placeholder="Pick one" [(ngModel)]="selectedBill"
+        matInput (input)="filterOptions(selectedBill())"
+        [matAutocomplete]="auto">
+            <mat-autocomplete 
+            #auto="matAutocomplete"
+            [displayWith]="getTitle.bind(this)">
+        <mat-option 
+            *ngFor="let item of filtereditems" 
+            [value]="item.id">
+            {{item.name + ' - ' + item.mobile}}
+        </mat-option>
+    </mat-autocomplete> 
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button [mat-dialog-close]="selectedBill()" cdkFocusInitial>Ok</button>
+</mat-dialog-actions>

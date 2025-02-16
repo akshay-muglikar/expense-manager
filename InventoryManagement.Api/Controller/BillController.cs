@@ -31,21 +31,21 @@ public class BillController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] DateTime? start, [FromQuery] DateTime? end)
     {
-        var bills = await _billService.GetAllAsync();
+        var bills = await _billService.GetAllAsync(start, end);
         return Ok(bills);
     }
 
     [HttpPost]
     public async Task<IActionResult> Add(BillModel bill)
     {
-        bill = await _billService.AddAsync(_mapper.Map<Bill>(bill));
+        bill = await _billService.AddAsync(bill);
         return Ok(bill);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Bill bill)
+    public async Task<IActionResult> Update(int id, BillModel bill)
     {
         await _billService.UpdateAsync(bill);
         return NoContent();
@@ -56,6 +56,13 @@ public class BillController : ControllerBase
     {
         await _billService.DeleteAsync(id);
         return NoContent();
+    }
+
+    [HttpGet("{id}/download")]
+    public async Task<IActionResult> Download(int id)
+    {
+        return Ok(await _billService.GeneratePdf(id));
+        
     }
 }
 

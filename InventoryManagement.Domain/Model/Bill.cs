@@ -12,7 +12,6 @@ public class Bill
     public int Advance {get; set;}
     public DateTimeOffset BillDate{get; set;} = DateTimeOffset.Now;
     public  BillStatus status { get; set;} = BillStatus.NEW;
-    public virtual List<BillItem> BillItems {get; set;} = new();
     public string? User {get; set;}
 }
 

@@ -1,0 +1,30 @@
+
+<header class="p-2 bg-dark text-white">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+      <img src="logo.png" width="50" height="50">
+      <h4>Shop</h4>
+    </div>
+  </div>
+</header>
+
+<div class="row">
+  
+<div class="col-md-3" style="width: 127px;margin-top: 5px;background-color: #f8f9fa;text-align: center;">
+ 
+  <ul class="nav nav-pills row">
+    @for(inroute of routes; track inroute.path; let idx = $index){
+      <li class="nav-item">
+        <a (click)="onclickRoute(idx)" routerLink="{{inroute.path}}"   class="nav-link {{idx==selected?'active':''}}" aria-current="page">
+          <mat-icon>{{inroute.icon}}</mat-icon> {{inroute.label}}
+        </a>
+      </li>
+  }
+  </ul>
+  <hr>
+</div>
+<div class="col" style="margin-top: 5px;">
+  <router-outlet></router-outlet>
+  </div>
+</div>
+

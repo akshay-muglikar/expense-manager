@@ -16,7 +16,7 @@ public class ApplicationDbContext: DbContext
     {
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-       // optionsBuilder.UseSqlite("Test.db");
+       //optionsBuilder.UseSqlite("Test.db");
     }
 
 
@@ -33,16 +33,20 @@ public class ApplicationDbContext: DbContext
 
             // Bill table relationships
             modelBuilder.Entity<Bill>()
-                .HasMany(b => b.BillItems)
-                .WithOne(bi => bi.Bill)
-                .HasForeignKey(bi => bi.BillId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasKey(x => x.Id);
 
+    
             // BillItem relationships
             modelBuilder.Entity<BillItem>()
                 .HasOne(bi => bi.Item)
                 .WithMany()
                 .HasForeignKey(bi => bi.ItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<BillItem>()
+                .HasOne(bi => bi.Bill)
+                .WithMany()
+                .HasForeignKey(bi => bi.BillId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Item table (no specific relationships)

@@ -9,10 +9,9 @@ public class BillModel
     public string Name {get; set;}
     public string Mobile {get; set;}
     public int Discount {get; set;}
-    public int CalculatedBillAmount {get; set;}
     public int Advance {get; set;}
     public DateTimeOffset BillDate{get; set;} = DateTimeOffset.Now;
-    public  BillStatus status { get; set;} = BillStatus.NEW;
+    public  string Status { get; set;}
     public virtual List<BillItemModel> BillItems {get; set;} = new();
 
 

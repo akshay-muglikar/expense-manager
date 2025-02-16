@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using InventoryManagement.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,22 +17,24 @@ public class BillRepository : IBillRepository
     public async Task<Bill> GetByIdAsync(int id)
     {
         return await _context.Bills
-            .Include(b => b.BillItems)
-            .ThenInclude(bi => bi.Item)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
 
     public async Task<IEnumerable<Bill>> GetAllAsync()
     {
         return await _context.Bills
-            .Include(b => b.BillItems)
-            .ThenInclude(bi => bi.Item)
             .ToListAsync();
+    }
+    public async Task<List<Bill>> GetAllAsync(DateTime? start, DateTime? end)
+    {
+        return (await _context.Bills.ToListAsync()).Where(
+            x=>x.BillDate!=null && x.BillDate.DateTime>start.Value && x.BillDate.DateTime<end.Value
+        ).ToList();
     }
 
     public async Task AddAsync(Bill bill)
     {
-        _context.Bills.Add(bill);
+        await _context.Bills.AddAsync(bill);
         await _context.SaveChangesAsync();
     }
 
@@ -49,6 +52,24 @@ public class BillRepository : IBillRepository
             _context.Bills.Remove(bill);
             await _context.SaveChangesAsync();
         }
+    }
+
+    public async Task AddBillItems(List<BillItem> billItems)
+    {
+        await _context.BillItems.AddRangeAsync(billItems);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RemoveBillItems(int billId)
+    {
+        var items = _context.BillItems.Where(bi => bi.BillId == billId).ToList();
+        _context.BillItems.RemoveRange(items);
+            
+    }
+
+    public async Task<List<BillItem>> getBillItems(int id)
+    {
+        return await _context.BillItems.Include(x=>x.Item).Where(x=>x.BillId ==id).ToListAsync();
     }
 }
 

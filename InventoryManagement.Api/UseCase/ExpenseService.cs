@@ -18,9 +18,13 @@ public class ExpenseService
         return await _expenseRepository.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<Expense>> GetAllAsync()
+    public async Task<IEnumerable<Expense>> GetAllAsync(DateTime? start, DateTime? end)
     {
-        return await _expenseRepository.GetAllAsync();
+        if(start==null && end==null){
+            return await _expenseRepository.GetAllAsync();
+        }else{
+            return await _expenseRepository.GetFilteredAsync(start, end);
+        }
     }
 
     public async Task AddAsync(Expense expense)

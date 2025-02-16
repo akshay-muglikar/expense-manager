@@ -27,9 +27,9 @@ public class ExpenseController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] DateTime? start, [FromQuery] DateTime? end)
     {
-        var expenses = await _expenseService.GetAllAsync();
+        var expenses = await _expenseService.GetAllAsync(start, end);
         return Ok(expenses);
     }
 
@@ -37,7 +37,7 @@ public class ExpenseController : ControllerBase
     public async Task<IActionResult> Add(Expense expense)
     {
         await _expenseService.AddAsync(expense);
-        return CreatedAtAction(nameof(GetById), new { id = expense.Id }, expense);
+        return Created();
     }
 
     [HttpPut("{id}")]

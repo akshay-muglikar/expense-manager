@@ -1,0 +1,95 @@
+<div class="row" style="height: 35em;">
+
+    <div class="col-md-3">
+        <div style="padding: 10px;">
+            <div class="card text-center shadow">
+
+                <div class="card-body">
+                    <div class="display-4 text-success mb-2">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h2 class="card-title mb-3">{{items.length}}</h2>
+                    <p class="card-text text-muted">Total Items</p>
+                </div>
+
+            </div>
+        </div>
+        <div style="padding: 10px;">
+
+            <div class="card text-center shadow">
+                <div class="card-body">
+                    <div class="display-4 text-success mb-2">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h2 class="card-title mb-3">{{uniqueCarCount}}</h2>
+                    <p class="card-text text-muted">Cars</p>
+                </div>
+            </div>
+        </div>
+        <div style="padding: 10px;">
+
+            <div class="card text-center shadow">
+                <div class="card-body">
+                    <div class="display-4 text-success mb-2">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h2 class="card-title mb-3">{{commanCount}}</h2>
+                    <p class="card-text text-muted">Miscellaneous</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-5">
+        Inventory
+        <mat-progress-bar mode="query" [hidden]="!showGrid"></mat-progress-bar>
+
+        <div class="example-header">
+            <span>Search :</span>
+            <input type="text" id="filter-text-box" placeholder="Search..." (input)="onFilterTextBoxChanged()" />
+        </div>
+
+        <ag-grid-angular style="height: 32em;" [rowData]="items" [columnDefs]="colDefs" [rowSelection]="rowSelection"
+        (rowSelected)="onRowSelected($event)" [pagination]="true" (gridReady)="onGridReady($event)" />
+
+
+    </div>
+
+
+    <div class="col-md-3">
+
+        Item Details
+        <mat-progress-bar mode="query" [hidden]="showFormLoading"></mat-progress-bar>
+
+        <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+            <label for="Name">Name</label>
+            <input id="Name" formControlName="Name" required />
+
+            <label for="Quantity">Quantity</label>
+            <input id="Quantity" type="number" formControlName="Quantity" required/>
+
+            <label for="Category">Category</label>
+            <input id="Category" formControlName="Category" />
+
+            <label for="Car">Car</label>
+            <input id="Car" formControlName="Car" />
+
+
+            <label for="Type">Type</label>
+            <input id="Type" formControlName="Type" />
+
+            <label for="Description">Description</label>
+            <input id="Description" formControlName="Description" />
+
+            <label for="Price">Price</label>
+            <input id="Price" formControlName="Price" required/>
+
+            <button type="submit" [disabled]="!itemForm.valid">Submit</button>
+
+        </form>
+
+    </div>
+
+
+</div>

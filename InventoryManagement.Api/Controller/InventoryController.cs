@@ -45,9 +45,9 @@ public class ItemController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Item item)
+    public async Task<IActionResult> Update(int id, ItemModel itemModel)
     {
-        await _itemService.UpdateAsync(item);
+        await _itemService.UpdateAsync(_mapper.Map<Item>(itemModel));
         return NoContent();
     }
 

@@ -1,0 +1,39 @@
+.bill-action-button{
+    margin-left: 10px;
+}
+form {
+    margin: 10px auto;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  
+  input {
+    margin: 3px 0;
+    padding: 8px;
+  }
+  
+  button {
+    margin-top: 5px;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  input{
+    border: 0;
+    border-bottom: 1px solid;
+  }
+
+.tab-item{
+    width: 300px;
+}
+td input{
+    padding: 0px;
+}
+input:focus-visible{
+    outline: none;
+    border-bottom: 1px solid;
+}

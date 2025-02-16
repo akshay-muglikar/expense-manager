@@ -11,6 +11,7 @@ public interface IExpenseRepository
     Task AddAsync(Expense expense);
     Task UpdateAsync(Expense expense);
     Task DeleteAsync(int id);
+    Task<List<Expense>> GetFilteredAsync(DateTime? start, DateTime? end);
 }
 
 public class ExpenseRepository : IExpenseRepository
@@ -52,6 +53,10 @@ public class ExpenseRepository : IExpenseRepository
             _context.Expenses.Remove(expense);
             await _context.SaveChangesAsync();
         }
+    }
+    public async Task<List<Expense>> GetFilteredAsync(DateTime? start, DateTime? end){
+        var expenses = await GetAllAsync();
+        return expenses.Where(x=>x.Date.DateTime>=start.Value && x.Date.DateTime<=end.Value).ToList();
     }
 }
 

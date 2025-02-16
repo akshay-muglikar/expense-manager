@@ -98,12 +98,16 @@ namespace InventoryManagement.Domain.Migrations
                     b.Property<int>("Amount")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTimeOffset>("Date")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("User")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("User")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -139,26 +143,25 @@ namespace InventoryManagement.Domain.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Car")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Category")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Price")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Type")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -169,9 +172,9 @@ namespace InventoryManagement.Domain.Migrations
             modelBuilder.Entity("InventoryManagement.Domain.Model.BillItem", b =>
                 {
                     b.HasOne("InventoryManagement.Domain.Model.Bill", "Bill")
-                        .WithMany("BillItems")
+                        .WithMany()
                         .HasForeignKey("BillId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("InventoryManagement.Domain.Model.Item", "Item")
@@ -187,11 +190,6 @@ namespace InventoryManagement.Domain.Migrations
                     b.Navigation("Bill");
 
                     b.Navigation("Item");
-                });
-
-            modelBuilder.Entity("InventoryManagement.Domain.Model.Bill", b =>
-                {
-                    b.Navigation("BillItems");
                 });
 
             modelBuilder.Entity("InventoryManagement.Domain.Model.Item", b =>
