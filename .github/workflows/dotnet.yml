@@ -26,14 +26,11 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
-    - name: Publish
-      run: dotnet publish -c Release -o build_output
-    - name: Commit and Push Build Artifacts
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add build_output
-        git commit -m "Add build artifacts"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish Application
+      run: dotnet publish -c Release -o publish_output
+    - name: Upload Published Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: published-app
+        path: publish_output
+
