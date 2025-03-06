@@ -14,6 +14,7 @@ public static class DependecyConfiguration
         // Register Repositories
         services.AddScoped<IExpenseRepository, ExpenseRepository>();
         services.AddScoped<IBillRepository, BillRepository>();
+        services.AddScoped<ILoginReporsitory, LoginRepository>();
 
         return services;
     }

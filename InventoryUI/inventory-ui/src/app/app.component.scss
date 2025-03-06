@@ -1,1 +1,24 @@
 
+html{
+    min-height:100%;/* make sure it is at least as tall as the viewport */
+}
+body{
+    height:100%; /* force the BODY element to match the height of the HTML element */
+}
+a {
+    cursor: pointer;
+}
+.c-nav-link{
+    margin-right: 10px;
+}
+.c-nav-link:hover
+{
+    background-color: #D3D3D3;
+    border-radius: 10px;
+}
+
+.c-nav-link .link-secondary{
+    background-color: #D3D3D3;
+    border-radius: 10px;
+
+}

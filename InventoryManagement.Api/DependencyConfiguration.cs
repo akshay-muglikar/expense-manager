@@ -8,6 +8,7 @@ public static class DependencyConfiguration
     public static IServiceCollection AddApiDependencies(this IServiceCollection services){
 
         services.AddScoped<BillService>();
+         services.AddScoped<LoginService>();
         services.AddScoped<ItemService>();
         services.AddScoped<ExpenseService>();
         return services;

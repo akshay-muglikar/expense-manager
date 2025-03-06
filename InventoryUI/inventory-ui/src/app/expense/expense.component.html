@@ -1,28 +1,32 @@
 <div class="row">
-
-  
-
-
-
-
+<div class="col-md-1"></div>
  <div class="col-md-6">
     <ag-grid-angular style="height: 32em;" [rowData]="expenses" [rowSelection]="rowSelection" [columnDefs]="colDefs" 
     [pagination]="true" (gridReady)="onGridReady($event)" (rowSelected)="onRowSelected($event)" />
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-3">
          
         <div>
             <div>Expense Detail</div>
-            <input [(ngModel)]="selectedExpense.description" placeholder="expense details" />
+            <input [(ngModel)]="selectedExpense.description" placeholder="Expense details" />
         </div>
         <div>
             <div>Amount</div>
             <input [(ngModel)]="selectedExpense.amount" placeholder="expense amount" />
         </div>
         <div>
-            <button style="margin-top: 10px;" class="btn btn-success" (click)="addExpense()" type="submit">Submit</button>
-            <button style="margin-top: 10px;margin-left: 10px;" class="btn btn-danger" (click)="clear()" >Clear</button>
+            <button mat-raised-button
+            class="btn-custom" style="margin-top: 10px;"
+            (click)="addExpense()">
+            Add 
+            </button>
+            <button mat-raised-button
+            class="btn-custom"
+            style="margin-top: 10px;margin-left: 10px;"
+            (click)="clear()">
+            Clear 
+                </button>
         </div>
     </div>
 

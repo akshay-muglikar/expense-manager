@@ -1,30 +1,33 @@
-
-<header class="p-2 bg-dark text-white">
+<header class="p-2 border-bottom">
   <div class="container">
     <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-      <img src="logo.png" width="50" height="50">
-      <h4>Shop</h4>
+      <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
+        <img src="logo.png" width="50" height="50">
+      </a>
+      <div class="me-lg-auto m-2"><h4>Shop</h4></div>
+      <ul class="nav col-12 col-lg-auto mb-2 justify-content-center mb-md-0" style="margin-right: 10px;">
+       
+        @for(inroute of routes; track inroute.path; let idx = $index){
+          <li class="c-nav-link"><a (click)="onclickRoute(idx)" class="nav-link px-2 {{idx==selected?'link-secondary':'link-dark'}}">
+            {{inroute.label}}
+          </a></li>
+      }
+       
+      </ul>
+
+      <div class="dropdown text-end">
+        <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+          <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+        </a>
+        <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
+          <li><a class="dropdown-item" href="#">Sign out</a></li>
+        </ul>
+      </div>
     </div>
   </div>
 </header>
 
-<div class="row">
-  
-<div class="col-md-3" style="width: 127px;margin-top: 5px;background-color: #f8f9fa;text-align: center;">
- 
-  <ul class="nav nav-pills row">
-    @for(inroute of routes; track inroute.path; let idx = $index){
-      <li class="nav-item">
-        <a (click)="onclickRoute(idx)" routerLink="{{inroute.path}}"   class="nav-link {{idx==selected?'active':''}}" aria-current="page">
-          <mat-icon>{{inroute.icon}}</mat-icon> {{inroute.label}}
-        </a>
-      </li>
-  }
-  </ul>
-  <hr>
-</div>
-<div class="col" style="margin-top: 5px;">
+<div  style="margin-top: 5px;padding: 0px 30px 0px 30px">
   <router-outlet></router-outlet>
-  </div>
 </div>
 

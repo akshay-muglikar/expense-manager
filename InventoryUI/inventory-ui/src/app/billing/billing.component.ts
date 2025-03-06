@@ -46,7 +46,7 @@ export class BillingComponent {
   readonly searchBillId = signal('');
   
   selectedBill!: Bill;
-  tabs :Tab[]  = [new Tab('New Bill',)];
+  tabs :Tab[]  = [];
 
 
   openDialog(): void {
@@ -112,6 +112,7 @@ setTabName() {
     return item?.name ;
   }
   ngOnInit(): void {
+    this.addTab();
     console.log(this.tabs);
     this.getItems();
     
@@ -125,6 +126,7 @@ setTabName() {
     if(bill == undefined || bill==null){
       this.tabs.push(new Tab('New Bill'));
       this.selectedTab = this.tabs.length-1;
+      this.addBillItem();
     }else{
       this.tabs.push(new Tab(bill.name));
       this.tabs[this.tabs.length-1].bill = bill;

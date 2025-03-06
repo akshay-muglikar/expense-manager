@@ -1,21 +1,38 @@
+using System.Text;
 using InventoryManagement.Api;
 using InventoryManagement.Domain;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => {
-        options.UseSqlite("Data Source=Test.db");
-        DbContextOptions<ApplicationDbContext> op = (DbContextOptions<ApplicationDbContext>)options.Options;
+            options.UseMySql("Server=inventory-db.cfuuyka0k7lf.ap-south-1.rds.amazonaws.com;Port=3306;Database=inventory;User Id=admin;Password=Lkjhg99(;",
+            ServerVersion.AutoDetect("Server=inventory-db.cfuuyka0k7lf.ap-south-1.rds.amazonaws.com;Port=3306;Database=inventory;User Id=admin;Password=Lkjhg99(;"));
+            DbContextOptions<ApplicationDbContext> op = (DbContextOptions<ApplicationDbContext>)options.Options;
         ApplicationDbContext applicationDbContext = new ApplicationDbContext(op);
         applicationDbContext.Database.Migrate();
     }
 );
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "http://localhost:5050",
+            ValidAudience = "http://localhost:4200",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("JwtSettings:SecretKeyNew123JwtSettings:SecretKeyNew123"))
+        };
+    });
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -55,6 +72,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseCors("AllowAllOrigins");
 app.MapControllers();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.Run();

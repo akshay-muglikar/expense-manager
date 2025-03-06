@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
 import {MatToolbarModule} from '@angular/material/toolbar';
 
@@ -14,7 +14,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 })
 export class AppComponent {
   title = 'inventory-ui';
-  selected=0;
+  selected=1;
   routes :RoutDetails[] = [
     new RoutDetails('','Dashboard', 'home'),
     new RoutDetails('bill','Billing', 'receipt'),
@@ -22,8 +22,10 @@ export class AppComponent {
     new RoutDetails('inventory','Inventory', 'inventory'),
 
   ]
+  constructor(private router: Router){}
   onclickRoute(index:number){
     this.selected = index;
+    this.router.navigate([this.routes[this.selected].path])
   }
 }
 

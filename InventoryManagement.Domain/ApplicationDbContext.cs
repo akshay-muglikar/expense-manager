@@ -10,14 +10,16 @@ public class ApplicationDbContext: DbContext
     public DbSet<BillItem> BillItems { get; set; }
     public DbSet<Expense> Expenses { get; set; }
     public DbSet<History> Histories { get; set; }
+    public DbSet<User> Users { get; set; }
 
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-       //optionsBuilder.UseSqlite("Test.db");
-    }
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+    //    optionsBuilder.UseMySql("Server=inventory-db.cfuuyka0k7lf.ap-south-1.rds.amazonaws.com;Port=3306;Database=inventory;User Id=admin;Password=Lkjhg99(;",
+    //    ServerVersion.AutoDetect("Server=inventory-db.cfuuyka0k7lf.ap-south-1.rds.amazonaws.com;Port=3306;Database=inventory;User Id=admin;Password=Lkjhg99(;"));
+    // }
 
 
      protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -55,6 +57,9 @@ public class ApplicationDbContext: DbContext
 
             // History table (generic entity, no relationships)
             modelBuilder.Entity<History>()
+                .HasKey(x=>x.Id);
+            
+             modelBuilder.Entity<User>()
                 .HasKey(x=>x.Id);
 
         }

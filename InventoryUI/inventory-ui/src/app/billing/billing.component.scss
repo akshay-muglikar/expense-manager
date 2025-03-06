@@ -24,7 +24,9 @@ form {
 
   input{
     border: 0;
-    border-bottom: 1px solid;
+    border-bottom-width: 1px;
+    border-bottom-style: groove;
+
   }
 
 .tab-item{
@@ -36,4 +38,39 @@ td input{
 input:focus-visible{
     outline: none;
     border-bottom: 1px solid;
+}
+.nav-link.active{
+    background-color: grey;
+}
+.nav-link{
+    color: black;
+}
+button {
+    color: black !important;
+}
+.btn-secondary {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+.btn-custom{
+    background-color: #fff;
+    border-radius: 13px;
+    margin-left: 9px;
+}
+.btn-custom:hover{
+    background-color: #d3d3d3;
+    border-radius: 13px;
+}
+.nav-item{
+    cursor: pointer;
+    
+}
+.nav-link:hover{
+    box-shadow: var(--mdc-protected-button-hover-container-elevation-shadow, var(--mat-sys-level2));
+}
+thead td {
+    background-color: #fafafa !important;
+    border-right-width: 1px;
+    border-top-width: 1px;
 }

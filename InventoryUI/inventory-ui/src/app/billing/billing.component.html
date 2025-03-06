@@ -1,13 +1,37 @@
 
-<ul class="nav nav-tabs" style="margin-top: 15px;">
+<div class="row" style="min-height: 100vh;">
+    <div class="col-md-2 shadow" style="margin-top: 5px;background-color: #f8f9fa;text-align: center;">
+        
+          <ul class="nav nav-pills row">
+            @for(tab of tabs; track tab.name; let index = $index){
+              <li class="nav-item">
+                <a (click)="setSelectedTab(index)"  class="nav-link {{index==selectedTab?'active':''}}" aria-current="page">
+                    {{tab.name}} <mat-icon style="float: left;">receipt</mat-icon> 
+                </a>
+              </li>
+          }
+          <li class="nav-item">
+            <a (click)="addTab()" class="nav-link" aria-current="page">
+                <mat-icon>add</mat-icon>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a (click)="openDialog()" class="nav-link" aria-current="page">
+                <mat-icon>search</mat-icon>
+            </a>
+          </li>
+          </ul>
+</div>
+<div class="col-md-10">
+<!-- <ul class="nav nav-tabs" style="margin-top: 15px;">
 @for (tab of tabs; track tab.name; let index = $index) {
     <li class="nav-item tab-item">
-        <div class="nav-link {{index==selectedTab?'active':''}}" aria-current="page">
+        <div class="nav-link  {{index==selectedTab?'active':''}}" aria-current="page">
         <div class="row">
             <div class="col-md-9" (click)="setSelectedTab(index)" style="width: 75%;">
                 {{tab.name}} <mat-icon style="float: left;">receipt</mat-icon> 
             </div>
-            <div class="col-md-3" style="float: right;">  <mat-icon style="float: right;" (click)="removeTab(index)" >close</mat-icon>
+            <div class="col-md-3" style="float: right;">  
             </div>
         </div>
         </div>
@@ -23,32 +47,30 @@
             <mat-icon>search</mat-icon>
         </div>
     </li>
-</ul>   
-<div class="container" style="margin-top:10px ;">
+</ul>    -->
+<div class="container" style="margin-top:5px ;">
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
             
             <button mat-raised-button
-                    class="bill-action-button"
+            class="btn-custom"
                     (click)="onSubmit()">
             Complete <mat-icon>done</mat-icon>
             </button>
 
             <button mat-raised-button
-            class="bill-action-button"
-            [disabled]="tabs.length === 1"
-            style="right: 0px;"
-            (click)="removeTab(selectedTab)">
-                Discard <mat-icon>delete</mat-icon>
-                </button>
-
-            <button mat-raised-button
-            class="bill-action-button"
-            
+            class="btn-custom"
             style="right: 0px;"
             (click)="downloadBill()">
                 Download <mat-icon>download</mat-icon>
                 </button>
+
+            <button mat-raised-button style="float: right;"
+            class="btn-custom"
+                (click)="removeTab(selectedTab)">
+                Close <mat-icon>close</mat-icon>
+                </button>
+
         </div>
     </div>
 
@@ -56,33 +78,26 @@
     <div class="row">
         <div class="col-md-12">
             <div>
-                <label for="Name" style="margin-right: 20px;">Name: </label>
-                <input class ="col-md-9" [(ngModel)]="tabs[selectedTab].bill.name" matInput id="Name" width="100" (focusout)="setTabName()" />
+                <input placeholder="Customer name" class ="col-md-9" [(ngModel)]="tabs[selectedTab].bill.name" matInput id="Name" width="100" (focusout)="setTabName()" />
                 <label for="Date" style="margin-left: 20px;">Date: {{tabs[selectedTab].bill.billDate?.toLocaleString()}}</label>
             </div>
             <div>
-                <label for="Mobile" style="margin-right: 15px;">Mobile: </label>
-                <input id="Mobile" [(ngModel)]="tabs[selectedTab].bill.mobile" class ="col-md-9"  />
+                <input placeholder="Customer mobile" id="Mobile" [(ngModel)]="tabs[selectedTab].bill.mobile" class ="col-md-9"  />
             </div>
         </div>
 
 
 
     </div>
-    <div class="row">
-        <div style="padding: 10px;font-weight: 500;">
-            <button (click)="addBillItem()" style="margin-left: 10px;" mat-raised-button>
-                <mat-icon >add</mat-icon> Add Item
-            </button>
-        
-        </div>
+    <div class="row" style="margin-top: 5px;">
+       
         <table class="table">
             <thead>
                 <tr>
-                <td scope="col" [width]="100">Action</td>
-                <td scope="col" [width]="25">#</td>
+                <td class="" scope="col" [width]="100">Action
+                </td>
                 <td scope="col"[width]="400">Item</td>
-                <td scope="col" [width]="150">Quantity</td>
+                <td scope="col" [width]="150">Qty</td>
                 <td scope="col" [width]="150">Price</td>
                 </tr>
             </thead>
@@ -90,9 +105,8 @@
                 @for (item of tabs[selectedTab].bill.billItems; track $index) {
                     <tr>
                         <td>
-                            <mat-icon (click)="tabs[selectedTab].bill.billItems.splice($index, 1)">delete</mat-icon>
+                            <mat-icon style="cursor: pointer;" (click)="tabs[selectedTab].bill.billItems.splice($index, 1)">delete</mat-icon>
                         </td>
-                        <th scope="row">{{$index+1}}</th>
                         <td>
                             <input type="text" class="col-md-10"
                             placeholder="Pick one" [(ngModel)]="item.item"
@@ -123,14 +137,14 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td></td>
-                    <td>Advance payment</td>
-                    <td><input [(ngModel)]="tabs[selectedTab].bill.Advance"></td>
+                    <td> <button (click)="addBillItem()" style="margin-left: 10px;" mat-raised-button>
+                        <mat-icon >add</mat-icon> Add Item
+                    </button></td>
+                    <td> Advance payment : <input placeholder="Advance payment" [(ngModel)]="tabs[selectedTab].bill.Advance"></td>
                     <td><b>Discount</b></td>
-                    <td><input [(ngModel)]="tabs[selectedTab].bill.discount"></td>
+                    <td><input placeholder="Discount" [(ngModel)]="tabs[selectedTab].bill.discount"></td>
                 </tr>
                 <tr>
-                    <td></td>
                     <td></td>
                     <td></td>
                     <td><b>Total</b></td>
@@ -140,4 +154,5 @@
         </table>
 
     </div>
+</div>
 </div>

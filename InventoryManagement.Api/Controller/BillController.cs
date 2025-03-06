@@ -3,10 +3,12 @@ using AutoMapper;
 using InventoryManagement.Api.Contracts;
 using InventoryManagement.Api.UseCase;
 using InventoryManagement.Domain.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.Api.Controller;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class BillController : ControllerBase
