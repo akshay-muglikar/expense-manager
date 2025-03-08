@@ -10,15 +10,20 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("Database");
+
+// Add MySQL DbContext (if using EF Core)
+
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => {
-            options.UseMySql("Server=inventory-db.cfuuyka0k7lf.ap-south-1.rds.amazonaws.com;Port=3306;Database=inventory;User Id=admin;Password=Lkjhg99(;",
-            ServerVersion.AutoDetect("Server=inventory-db.cfuuyka0k7lf.ap-south-1.rds.amazonaws.com;Port=3306;Database=inventory;User Id=admin;Password=Lkjhg99(;"));
+            options.UseMySql(connectionString,
+            ServerVersion.AutoDetect(connectionString));
             DbContextOptions<ApplicationDbContext> op = (DbContextOptions<ApplicationDbContext>)options.Options;
         ApplicationDbContext applicationDbContext = new ApplicationDbContext(op);
         applicationDbContext.Database.Migrate();
     }
 );
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

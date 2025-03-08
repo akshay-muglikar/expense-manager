@@ -11,14 +11,17 @@ public class BillService
 {
     private readonly IBillRepository _billRepository;
     private readonly IItemRepository _itemRepository;
+    private readonly string _user;
 
     private readonly IMapper _mapper;
 
-    public BillService(IBillRepository billRepository, IMapper mapper, IItemRepository itemRepository)
+    public BillService(IBillRepository billRepository, IMapper mapper, IItemRepository itemRepository,
+    UserServiceProvider userService)
     {
         _billRepository = billRepository;
         _mapper = mapper;
         _itemRepository = itemRepository;
+        _user = userService?.GetUsername();
     }
 
 
@@ -57,11 +60,11 @@ public class BillService
             Advance = billmodel.Advance,
             BillDate = billmodel.BillDate,
             status = status,
-            User = "admin"
+            User = _user
         };
         bill.CalculatedBillAmount = billmodel.BillItems.Sum(bi => int.Parse(bi.Amount)*bi.Quantity) - bill.Discount;
 
-        await _billRepository.AddAsync(bill);
+        await _billRepository.AddAsync(bill, _user);
         List<BillItem> billItems = new();
         foreach(var billItem in billmodel.BillItems){
             var item = await _itemRepository.GetByIdAsync(billItem.ItemId);
@@ -70,7 +73,7 @@ public class BillService
                    Name = billItem.OtherItem,
                    Price = int.Parse(billItem.Amount),
                };
-               await _itemRepository.AddAsync(item);
+               await _itemRepository.AddAsync(item, _user);
             }
             if(item == null)
                 throw new Exception("Item not found");  
@@ -103,12 +106,12 @@ public class BillService
         bill.Advance = billModel.Advance;
         bill.BillDate = billModel.BillDate;
         bill.status = status;
-        bill.User = "admin";
+        bill.User = _user;
 
 
         bill.CalculatedBillAmount = billModel.BillItems.Sum(bi =>int.Parse(bi.Amount)*bi.Quantity) - bill.Discount;
 
-        await _billRepository.UpdateAsync(bill);
+        await _billRepository.UpdateAsync(bill, _user);
 
           List<BillItem> billItems = new();
         foreach(var billItem in billModel.BillItems){
@@ -118,7 +121,7 @@ public class BillService
                    Name = billItem.OtherItem,
                    Price = int.Parse(billItem.Amount),
                };
-               await _itemRepository.AddAsync(item);
+               await _itemRepository.AddAsync(item, _user);
             
             }
             if(item == null)
@@ -137,7 +140,7 @@ public class BillService
 
     public async Task DeleteAsync(int id)
     {
-        await _billRepository.DeleteAsync(id);
+        await _billRepository.DeleteAsync(id, _user);
     }
 
     public async Task<Stream> GeneratePdf(int id)

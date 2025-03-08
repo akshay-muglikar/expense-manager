@@ -12,10 +12,10 @@ public static class DependecyConfiguration
         services.AddScoped<IItemRepository, ItemRepository>();
 
         // Register Repositories
+        services.AddScoped<IHistoryRepository, HistoryRepository>();
         services.AddScoped<IExpenseRepository, ExpenseRepository>();
         services.AddScoped<IBillRepository, BillRepository>();
         services.AddScoped<ILoginReporsitory, LoginRepository>();
-
         return services;
     }
 }

@@ -1,10 +1,10 @@
 <header class="p-2 border-bottom">
   <div class="container">
     <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-      <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
-        <img src="logo.png" width="50" height="50">
-      </a>
-      <div class="me-lg-auto m-2"><h4>Shop</h4></div>
+      <span class="d-flex app-name-header align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
+        <img class="header-logo-image" src="logo.png" >
+      </span>
+      <div class="me-lg-auto app-name-header m-2"><h4>Shop</h4></div>
       <ul class="nav col-12 col-lg-auto mb-2 justify-content-center mb-md-0" style="margin-right: 10px;">
        
         @for(inroute of routes; track inroute.path; let idx = $index){
@@ -27,7 +27,7 @@
   </div>
 </header>
 
-<div  style="margin-top: 5px;padding: 0px 30px 0px 30px">
+<div class="app-body">
   <router-outlet></router-outlet>
 </div>
 

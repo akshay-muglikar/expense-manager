@@ -17,8 +17,8 @@ public class ApplicationDbContext: DbContext
     {
     }
     // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-    //    optionsBuilder.UseMySql("Server=inventory-db.cfuuyka0k7lf.ap-south-1.rds.amazonaws.com;Port=3306;Database=inventory;User Id=admin;Password=Lkjhg99(;",
-    //    ServerVersion.AutoDetect("Server=inventory-db.cfuuyka0k7lf.ap-south-1.rds.amazonaws.com;Port=3306;Database=inventory;User Id=admin;Password=Lkjhg99(;"));
+    //    optionsBuilder.UseMySql("Server=localhost;Database=test;User ID=root;Password=NewPassword",
+    //    ServerVersion.AutoDetect("Server=localhost;Database=test;User ID=root;Password=NewPassword"));
     // }
 
 

@@ -1,4 +1,5 @@
 using System;
+using InventoryManagement.Api.Provider;
 using InventoryManagement.Domain.Model;
 using InventoryManagement.Domain.Repository;
 
@@ -7,10 +8,12 @@ namespace InventoryManagement.Api.UseCase;
 public class ExpenseService
 {
     private readonly IExpenseRepository _expenseRepository;
+    private string _user;
 
-    public ExpenseService(IExpenseRepository expenseRepository)
+    public ExpenseService(IExpenseRepository expenseRepository, UserServiceProvider userServiceProvider)
     {
         _expenseRepository = expenseRepository;
+        _user = userServiceProvider?.GetUsername();
     }
 
     public async Task<Expense> GetByIdAsync(int id)
@@ -30,18 +33,18 @@ public class ExpenseService
     public async Task AddAsync(Expense expense)
     {
         // Add any additional validation or processing logic if needed
-        await _expenseRepository.AddAsync(expense);
+        await _expenseRepository.AddAsync(expense, _user);
     }
 
     public async Task UpdateAsync(Expense expense)
     {
         // Update business logic if required
-        await _expenseRepository.UpdateAsync(expense);
+        await _expenseRepository.UpdateAsync(expense, _user);
     }
 
     public async Task DeleteAsync(int id)
     {
-        await _expenseRepository.DeleteAsync(id);
+        await _expenseRepository.DeleteAsync(id, _user);
     }
 }
 

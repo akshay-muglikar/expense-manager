@@ -32,7 +32,7 @@ form {
 .tab-item{
     width: 300px;
 }
-td input{
+input{
     padding: 0px;
 }
 input:focus-visible{
@@ -74,3 +74,17 @@ thead td {
     border-right-width: 1px;
     border-top-width: 1px;
 }
+.mobile-tabs {
+    display: none;
+}
+@media only screen and (max-width: 765px) {
+    .mobile-tabs {
+        display: flex;
+    }
+}
+@media only screen and (max-width: 765px) {
+    .large-tab {
+        display: none;
+    }
+}
+  

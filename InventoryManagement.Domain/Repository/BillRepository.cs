@@ -8,10 +8,12 @@ namespace InventoryManagement.Domain.Repository;
 public class BillRepository : IBillRepository
 {
     private readonly ApplicationDbContext _context;
+    private readonly IHistoryRepository _historyRepository;
 
-    public BillRepository(ApplicationDbContext context)
+    public BillRepository(ApplicationDbContext context, IHistoryRepository historyRepository)
     {
         _context = context;
+        _historyRepository = historyRepository;
     }
 
     public async Task<Bill> GetByIdAsync(int id)
@@ -32,24 +34,28 @@ public class BillRepository : IBillRepository
         ).ToList();
     }
 
-    public async Task AddAsync(Bill bill)
+    public async Task AddAsync(Bill bill, string user)
     {
         await _context.Bills.AddAsync(bill);
+        await _historyRepository.AddAsync(bill, "add",user);
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(Bill bill)
+    public async Task UpdateAsync(Bill bill, string user)
     {
         _context.Bills.Update(bill);
+        await _historyRepository.AddAsync(bill,"update" ,user);
+
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id, string user)
     {
         var bill = await _context.Bills.FindAsync(id);
         if (bill != null)
         {
             _context.Bills.Remove(bill);
+            await _historyRepository.AddAsync(bill, "delete", user);
             await _context.SaveChangesAsync();
         }
     }
