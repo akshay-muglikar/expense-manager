@@ -10,7 +10,6 @@ namespace InventoryManagement.Api.Provider;
 
 public class InvoiceDocument : IDocument
 {
-    public static Image LogoImage { get; } = Image.FromFile("logo.png");
     public static CultureInfo indiaCulture = new CultureInfo("en-IN");
 
 
@@ -28,16 +27,16 @@ public class InvoiceDocument : IDocument
         container
             .Page(page =>
             {
-                page.Margin(50);
+                page.ContinuousSize(58, Unit.Millimetre);
+                page.Margin(5);
 
                 page.Header().Element(ComposeHeader);
                 page.Content().Element(ComposeContent);
 
                 page.Footer().AlignCenter().Text(text =>
                 {
-                    text.CurrentPageNumber();
-                    text.Span(" / ");
-                    text.TotalPages();
+                
+                    //text.Span("Powered By : ");
                 });
             });
     }
@@ -55,7 +54,7 @@ public class InvoiceDocument : IDocument
                 column.Spacing(10);
                 column.Item().Row(row2=>{
                      row2.RelativeItem().Text($"Invoice #{Model.InvoiceNumber}")
-                        .FontSize(15).SemiBold().FontColor(Colors.Blue.Medium);
+                        .FontSize(14).SemiBold().FontColor(Colors.Blue.Medium);
                 });
                 column.Item().Row(row2=>{
                     row2.RelativeItem().Text(text =>
@@ -73,7 +72,7 @@ public class InvoiceDocument : IDocument
     {
         container.PaddingVertical(10).Column(column =>
         {
-            column.Spacing(20);
+            column.Spacing(10);
 
             column.Item().Row(row =>
             {
@@ -87,7 +86,7 @@ public class InvoiceDocument : IDocument
 
 
             int totalPrice = Model.InvoiceAmount;
-            column.Item().PaddingRight(5).AlignRight().Text($"total: {totalPrice.ToString("C", InvoiceDocument.indiaCulture)}").SemiBold();
+            column.Item().PaddingRight(5).AlignRight().Text($"Bill Total: {totalPrice.ToString("C", InvoiceDocument.indiaCulture)}").SemiBold();
 
            
             if (!string.IsNullOrWhiteSpace(Model.Comments))
@@ -103,8 +102,8 @@ public class InvoiceDocument : IDocument
         {
             table.ColumnsDefinition(columns =>
             {
-                columns.ConstantColumn(25);
-                columns.RelativeColumn(3);
+                //columns.RelativeColumn();
+                //columns.RelativeColumn();
                 columns.RelativeColumn();
                 columns.RelativeColumn();
                 columns.RelativeColumn();
@@ -112,24 +111,24 @@ public class InvoiceDocument : IDocument
 
             table.Header(header =>
             {
-                header.Cell().Text("#");
-                header.Cell().Text("Product").Style(headerStyle);
-                header.Cell().AlignRight().Text("Unit price").Style(headerStyle);
-                header.Cell().AlignRight().Text("Quantity").Style(headerStyle);
-                header.Cell().AlignRight().Text("Total").Style(headerStyle);
+                //header.Cell().Text("#");
+                header.Cell().Text("Name").Style(headerStyle);
+                //header.Cell().AlignCenter().Text("Rate").Style(headerStyle);
+                header.Cell().AlignCenter().Text("Qty").Style(headerStyle);
+                header.Cell().AlignCenter().Text("Amount").Style(headerStyle);
 
-                header.Cell().ColumnSpan(5).PaddingTop(5).BorderBottom(1).BorderColor(Colors.Black);
+                header.Cell().ColumnSpan(3).PaddingTop(5).BorderBottom(1).BorderColor(Colors.Black);
             });
 
             foreach (var item in Model.Items)
             {
                 var index = Model.Items.IndexOf(item) + 1;
 
-                table.Cell().Element(CellStyle).Text($"{index}");
+                //table.Cell().Element(CellStyle).Text($"{index}");
                 table.Cell().Element(CellStyle).Text(item.Name);
-                table.Cell().Element(CellStyle).AlignRight().Text($"{item.Price.ToString("C", InvoiceDocument.indiaCulture)}");
-                table.Cell().Element(CellStyle).AlignRight().Text($"{item.Quantity}");
-                table.Cell().Element(CellStyle).AlignRight().Text($"{(item.Price * item.Quantity).ToString("C", InvoiceDocument.indiaCulture)}");
+                //table.Cell().Element(CellStyle).AlignCenter().Text($"{item.Price.ToString("C", InvoiceDocument.indiaCulture)}");
+                table.Cell().Element(CellStyle).AlignCenter().Text($"{item.Quantity}");
+                table.Cell().Element(CellStyle).AlignCenter().Text($"{(item.Price * item.Quantity).ToString()}");
 
                 static IContainer CellStyle(IContainer container) => container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
             }
@@ -141,7 +140,7 @@ public class InvoiceDocument : IDocument
         container.ShowEntire().Background(Colors.Grey.Lighten3).Padding(10).Column(column =>
         {
             column.Spacing(5);
-            column.Item().Text("Comments").FontSize(14).SemiBold();
+            column.Item().Text("Comments").FontSize(13).SemiBold();
             column.Item().Text("                 ");
         });
     }
@@ -162,9 +161,9 @@ public class AddressComponent : IComponent
         {
             column.Spacing(2);
 
-            column.Item().Text(Address.CompanyName).FontSize(20).SemiBold().AlignCenter();
+            column.Item().Text(Address.CompanyName).FontSize(17).SemiBold().AlignCenter();
             column.Item().PaddingBottom(5).LineHorizontal(1);
-            column.Item().Text($"{Address.Street}, {Address.City}, {Address.State} {Address.Phone}").AlignCenter();
+            column.Item().Text($"{Address.Street}, {Address.City}, {Address.State} {Address.Phone}").AlignCenter().FontSize(12);
         });
     }
 }

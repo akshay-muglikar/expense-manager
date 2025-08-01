@@ -19,6 +19,17 @@ public class ItemRepository : IItemRepository
     {
         return await _context.Items.FindAsync(id);
     }
+    public async Task<List<Item>> GetByIdAsync(List<int> ids)
+    {
+        return await _context.Items.Where(x=>ids.Contains(x.Id)).ToListAsync();
+    }
+
+    public async Task Update(Item item)
+    {
+        _context.Update(item);
+        await _context.SaveChangesAsync();  
+    }
+
 
     public async Task<IEnumerable<Item>> GetAllAsync()
     {

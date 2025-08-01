@@ -8,13 +8,19 @@ public class Bill
     public string Name {get; set;}
     public string Mobile {get; set;}
     public int Discount {get; set;}
-    public int CalculatedBillAmount {get; set;}
-    public int Advance {get; set;}
+    public int Advance { get; set; } = 0;
+    public PaymentMode PaymentMode {get; set;} =  PaymentMode.UPI;
+    public String PaymentUser {get; set;}
     public DateTimeOffset BillDate{get; set;} = DateTimeOffset.Now;
-    public  BillStatus status { get; set;} = BillStatus.NEW;
+    public  BillStatus Status { get; set;} = BillStatus.PENDING;
     public string? User {get; set;}
 }
 
 public enum BillStatus {
-    NEW,PAID,DRAFT,PENDING,DELETED
+    PENDING, COMPLETED, DELETED
+}
+
+public enum PaymentMode
+{
+    CARD,UPI,CASH
 }

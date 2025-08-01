@@ -1,0 +1,38 @@
+<div class="history-container">
+  <mat-progress-bar *ngIf="loading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
+
+  <div class="history-header">
+    <h2>Bill History</h2>
+    <p class="text-secondary">Manage and review all bills</p>
+  </div>
+
+  <div class="search-card mb-3">
+    <div class="search-form">
+      <mat-form-field class="search-input">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput type="text" id="filter-text-box" 
+               placeholder="Search bills..." 
+               (input)="onFilterTextBoxChanged()" />
+      </mat-form-field>
+
+      <div class="stat-badge">
+        <mat-icon class="text-primary">receipt</mat-icon>
+        <div class="stat-content">
+          <div class="stat-value">{{bills.length}}</div>
+          <div class="stat-label">Total Bills</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-card">
+    <ag-grid-angular class="ag-theme-material"
+      [rowData]="bills"
+      [columnDefs]="colDefs"
+      (rowSelected)="onRowSelected($event)"
+      [pagination]="true"
+      (gridReady)="onGridReady($event)"
+      [defaultColDef]="defaultColDef"
+    ></ag-grid-angular>
+  </div>
+</div>

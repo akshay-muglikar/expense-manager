@@ -5,11 +5,9 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { FormsModule } from '@angular/forms';
-import { BillingService } from '../common/BillingService';
 import { ExpenseService } from '../common/ExpenseService';
 import { formatDate } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { Bill } from '../billing/billing.component'
 import type { ColDef, RowSelectionOptions } from 'ag-grid-community'; // Column Definition Type Interface
 import {
   GridApi, GridReadyEvent
@@ -17,7 +15,8 @@ import {
 import { AgGridAngular } from 'ag-grid-angular';
 import { Expense } from '../expense/expense.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-
+import { BillModel } from '../models/bill.model';
+import { BillService } from '../services/bill.service';
 @Component({
   selector: 'app-dashboard',
   imports: [AgGridAngular, MatProgressBarModule, MatSelectModule, MatIconModule, FormsModule, MatDatepickerModule, MatFormFieldModule, MatInputModule],
@@ -31,9 +30,9 @@ export class DashboardComponent {
     return this.expenses.reduce((n, { amount }) => n + Number(amount), 0);
   }
   calculate() {
-    let sum = this.bills.reduce((n, { calculatedBillAmount }) => n + calculatedBillAmount, 0);
+    //let sum = this.bills.reduce((n, { calculatedBillAmount }) => n + calculatedBillAmount, 0);
     let expense = this.calculateExpense()
-    return sum - expense;
+    return  expense;
   }
   private gridApi!: GridApi;
   isHighlighted: any;
@@ -44,7 +43,7 @@ export class DashboardComponent {
 
   startDateText:string='';
   endDateText:string ='';
-  bills: Bill[] = []
+  bills: BillModel[] = []
   expenses: Expense[] = [];
   allItems: DashboardItems[] = [];
   dashboardStats:DashboardStats = {billCount:0,revenue:0,expenses:0}
@@ -55,7 +54,7 @@ export class DashboardComponent {
     { field: "price", width: 80 },
     { field: "date", width: 200 }
   ];
-  constructor(private billService: BillingService, private expenseService: ExpenseService) {
+  constructor(private billService: BillService, private expenseService: ExpenseService) {
     this.onSelectChange();
   }
   ngOnInit() {
@@ -117,7 +116,7 @@ export class DashboardComponent {
           this.allItems.push({
             type: 'Bill',
             name: x.name + ' - ' + x.mobile,
-            price: x.calculatedBillAmount?.toString() ?? "0",
+            price: '0',//x.calculatedBillAmount?.toString() ?? "0",
             date: formatDate(x.billDate ?? new Date(), 'dd MMM yyyy HH:mm', 'en-US')
           }) 
         });

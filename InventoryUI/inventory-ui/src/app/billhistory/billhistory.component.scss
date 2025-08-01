@@ -1,0 +1,99 @@
+.history-container {
+  padding: var(--spacing-lg);
+
+  .history-header {
+    margin-bottom: var(--spacing-lg);
+    
+    h2 {
+      color: var(--text-primary);
+      font-size: var(--font-size-xl);
+      margin-bottom: var(--spacing-sm);
+    }
+  }
+
+  .search-card {
+    background: var(--background-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    
+    .search-form {
+      display: flex;
+      gap: var(--spacing-md);
+      align-items: center;
+      
+      @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .search-input {
+        flex: 1;
+        min-width: 200px;
+      }
+    }
+  }
+
+  .grid-card {
+    background: var(--background-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    
+    ag-grid-angular {
+      width: 100%;
+      height: 600px;
+      
+      ::ng-deep {
+        .ag-root-wrapper {
+          border: none;
+        }
+        
+        .ag-header {
+          background: var(--background-light);
+          border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .ag-header-cell {
+          color: var(--text-secondary);
+          font-weight: 500;
+          padding: var(--spacing-sm) var(--spacing-md);
+        }
+        
+        .ag-row {
+          border-bottom: 1px solid rgba(0,0,0,0.05);
+          
+          &:hover {
+            background-color: var(--background-light);
+          }
+        }
+        
+        .ag-cell {
+          padding: var(--spacing-sm) var(--spacing-md);
+        }
+        
+        .ag-row-odd {
+          background-color: rgba(0,0,0,0.01);
+        }
+        
+        .action-cell {
+          display: flex;
+          gap: var(--spacing-xs);
+          
+          button {
+            padding: var(--spacing-xs) var(--spacing-sm);
+          }
+        }
+      }
+    }
+  }
+
+  .loading-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+}

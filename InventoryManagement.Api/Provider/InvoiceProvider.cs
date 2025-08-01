@@ -1,5 +1,6 @@
-using System;
+using System.Linq;
 using InventoryManagement.Api.Contracts;
+using InventoryManagement.Api.Utility;
 using InventoryManagement.Domain.Model;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
@@ -38,7 +39,7 @@ public class InvoiceProvider
                 },
                 Items = items,
                 Comments = "test",
-                InvoiceAmount = bill.CalculatedBillAmount,
+                InvoiceAmount = BillUtility.Calculate(items, bill.Discount, bill.Advance),
                 Discount = bill.Discount
             };
         var document= new InvoiceDocument(model);
@@ -47,6 +48,7 @@ public class InvoiceProvider
         Console.WriteLine(tempfile);
         return File.Open(tempfile, FileMode.Open);
 
-
     }
+
+    
 }

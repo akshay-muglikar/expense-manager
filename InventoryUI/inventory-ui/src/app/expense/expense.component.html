@@ -1,34 +1,81 @@
-<div class="row">
-<div class="col-md-1"></div>
- <div class="col-md-6">
-    <ag-grid-angular style="height: 32em;" [rowData]="expenses" [rowSelection]="rowSelection" [columnDefs]="colDefs" 
-    [pagination]="true" (gridReady)="onGridReady($event)" (rowSelected)="onRowSelected($event)" />
+<div class="expense-container">
+  <mat-progress-bar *ngIf="loading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
+
+  <!-- Grid Column -->
+  <div class="grid-column">
+    <div class="header">
+      <h2>Expenses</h2>
+      <p class="text-secondary">Manage your expenses</p>
     </div>
 
-    <div class="col-md-3">
-         
-        <div>
-            <div>Expense Detail</div>
-            <input [(ngModel)]="selectedExpense.description" placeholder="Expense details" />
-        </div>
-        <div>
-            <div>Amount</div>
-            <input [(ngModel)]="selectedExpense.amount" placeholder="expense amount" />
-        </div>
-        <div>
-            <button mat-raised-button
-            class="btn-custom" style="margin-top: 10px;"
-            (click)="addExpense()">
-            Add 
-            </button>
-            <button mat-raised-button
-            class="btn-custom"
-            style="margin-top: 10px;margin-left: 10px;"
-            (click)="clear()">
-            Clear 
-                </button>
-        </div>
+    <div class="summary-card">
+      <mat-icon class="summary-icon">account_balance_wallet</mat-icon>
+      <div class="summary-content">
+        <div class="summary-title">Total Expenses</div>
+        <div class="summary-value">₹{{totalExpenses | number:'1.0-0'}}</div>
+      </div>
     </div>
 
+    <div class="search-container">
+      <mat-form-field appearance="outline">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput 
+               type="text" 
+               id="filter-text-box" 
+               placeholder="Search expenses..." 
+               (input)="onFilterTextBoxChanged()" />
+      </mat-form-field>
+    </div>
 
+    <div class="grid-card">
+      <ag-grid-angular 
+        class="ag-theme-material"
+        [rowData]="expenses" 
+        [columnDefs]="colDefs"
+        [defaultColDef]="defaultColDef"
+        [rowSelection]="rowSelection"
+        (rowSelected)="onRowSelected($event)"
+        [pagination]="true"
+        (gridReady)="onGridReady($event)">
+      </ag-grid-angular>
+    </div>
+  </div>
+
+  <!-- Form Column -->
+  <div class="form-column">
+    <div class="header">
+      <h2>Expense Details</h2>
+      <p class="text-secondary">Add or edit expense information</p>
+    </div>
+
+    <div class="form-card">
+      <div class="form-group">
+        <label>Description</label>
+        <input [(ngModel)]="selectedExpense.description" 
+               placeholder="Enter expense details" />
+      </div>
+
+      <div class="form-group">
+        <label>Amount</label>
+        <input [(ngModel)]="selectedExpense.amount" 
+               type="number"
+               placeholder="Enter amount" />
+      </div>
+
+      <div class="actions">
+        <button mat-raised-button 
+                class="btn btn-primary" 
+                (click)="addExpense()">
+          <mat-icon>add</mat-icon>
+          Add
+        </button>
+        <button mat-raised-button 
+                class="btn btn-secondary" 
+                (click)="clear()">
+          <mat-icon>clear</mat-icon>
+          Clear
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

@@ -17,10 +17,8 @@ public class ApplicationDbContext: DbContext
     {
     }
     // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-    //    optionsBuilder.UseMySql("Server=localhost;Database=test;User ID=root;Password=NewPassword",
-    //    ServerVersion.AutoDetect("Server=localhost;Database=test;User ID=root;Password=NewPassword"));
-    // }
-
+    //     optionsBuilder.UseSqlite("Test.db");
+    //  }
 
      protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

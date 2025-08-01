@@ -1,28 +1,54 @@
 using System.Text;
 using InventoryManagement.Api;
+using InventoryManagement.Api.Config;
 using InventoryManagement.Domain;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("Database");
+var userDatabaseConnectionString = builder.Configuration.GetConnectionString("UserDatabase");
+builder.Services.Configure<InventoryConfig>(builder.Configuration);
+
+builder.Services.AddHttpContextAccessor();
 
 // Add MySQL DbContext (if using EF Core)
-
-builder.Services.AddDbContext<ApplicationDbContext>(
+builder.Services.AddDbContext<IdentityDbContext>(
     options => {
-            options.UseMySql(connectionString,
-            ServerVersion.AutoDetect(connectionString));
-            DbContextOptions<ApplicationDbContext> op = (DbContextOptions<ApplicationDbContext>)options.Options;
-        ApplicationDbContext applicationDbContext = new ApplicationDbContext(op);
+        options.UseSqlite(userDatabaseConnectionString); 
+        DbContextOptions<IdentityDbContext> op = (DbContextOptions<IdentityDbContext>)options.Options;
+        IdentityDbContext applicationDbContext = new IdentityDbContext(op);
+        //applicationDbContext.Database.EnsureCreated();
         applicationDbContext.Database.Migrate();
     }
 );
+
+builder.Services.AddDbContext<ApplicationDbContext>(ConfigureApplicationDbContext);
+
+void ConfigureApplicationDbContext(IServiceProvider serviceProvider, DbContextOptionsBuilder options)
+{
+    // get clientid from url
+    var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
+    var httpContext = httpContextAccessor.HttpContext;
+
+    // Get the clientId from the path parameter
+
+    var clientId = httpContext?.User?.FindFirst("client_id")?.Value;
+    if(httpContext?.Request?.RouteValues?.TryGetValue("clientId", out var clientIdValue)??false){
+        clientId = clientIdValue.ToString();
+    }
+    var clientIdConnectionString = connectionString.Replace("{clientId}", clientId);
+    if(clientId!=null)
+    {
+        options.UseSqlite(clientIdConnectionString);
+        DbContextOptions<ApplicationDbContext> op = (DbContextOptions<ApplicationDbContext>)options.Options;
+        ApplicationDbContext applicationDbContext = new ApplicationDbContext(op);
+        //applicationDbContext.Database.EnsureCreated();
+        applicationDbContext.Database.Migrate();
+    }
+}
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -64,6 +90,27 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "API Example",
         Version = "v1"
+    });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
     });
 });
 var app = builder.Build();

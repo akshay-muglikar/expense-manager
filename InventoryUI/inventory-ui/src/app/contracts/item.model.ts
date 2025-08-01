@@ -4,7 +4,6 @@ export class Item {
     category: string;
     car: string;
     quantity: number;
-    type: string;
     description: string;
     price: number;
   
@@ -13,7 +12,6 @@ export class Item {
       category: string,
       car: string,
       quantity: number,
-      type: string,
       description: string,
       price: number,
       id: number
@@ -22,7 +20,6 @@ export class Item {
       this.category = category;
       this.car = car;
       this.quantity = quantity;
-      this.type = type;
       this.description = description;
       this.price = price;
       this.id = id;

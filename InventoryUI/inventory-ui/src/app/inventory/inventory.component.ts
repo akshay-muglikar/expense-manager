@@ -1,19 +1,36 @@
 import { Component, inject } from '@angular/core';
-import { AgGridAngular } from 'ag-grid-angular'; // Angular Data Grid Component
-import type { ColDef, RowSelectionOptions } from 'ag-grid-community'; // Column Definition Type Interface
-import {
-  GridApi,GridReadyEvent
-} from "ag-grid-community";
+import { AgGridAngular } from 'ag-grid-angular';
+import { ColDef, RowSelectionOptions, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Item } from '../contracts/item.model';
-import {InventoryService} from '../common/InventoryService/InventoryService';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatDividerModule} from '@angular/material/divider';
+import { InventoryService } from '../common/InventoryService/InventoryService';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatCardModule } from '@angular/material/card';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-inventory',
-  imports: [AgGridAngular, ReactiveFormsModule, MatProgressBarModule,MatDividerModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    AgGridAngular,
+    ReactiveFormsModule,
+    MatProgressBarModule,
+    MatDividerModule,
+    MatIconModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTabsModule,
+    MatCardModule
+  ],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.scss'
 })
@@ -21,13 +38,57 @@ export class InventoryComponent {
   private gridApi!: GridApi;
   private _snackBar = inject(MatSnackBar);
 
-  showFormLoading = true; 
+  showFormLoading = false; 
+  loading = false;
+  defaultColDef = {
+    sortable: true,
+    filter: true,
+    resizable: true
+  };
+  
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-      { field: "name", width: 150 },
-      { field: "car",width: 120 },
-      { field: "price", width: 80 },
-      { field: "quantity", width: 70 },
+    { 
+      field: "updatedDate",
+      headerName: "Last Updated",
+      flex: 1,
+      minWidth: 150,
+      valueFormatter: (params) => {
+        return params.value ? new Date(params.value).toLocaleDateString() : '';
+      },
+      sortable: true,
+      sort: 'desc' as const,
+      sortIndex: 0
+    },
+    { 
+      field: "name",
+      headerName: "Name",
+      flex: 2,
+      minWidth: 150
+    },
+    { 
+      field: "car",
+      headerName: "Car Model",
+      flex: 1,
+      minWidth: 120
+    },
+    { 
+      field: "price",
+      headerName: "Price",
+      type: 'numericColumn',
+      flex: 1,
+      minWidth: 100,
+      valueFormatter: (params) => {
+        return params.value ? '₹' + params.value.toLocaleString() : '';
+      }
+    },
+    { 
+      field: "quantity",
+      headerName: "Quantity",
+      type: 'numericColumn',
+      flex: 1,
+      minWidth: 100
+    }
   ];
   rowSelection: RowSelectionOptions | "single" | "multiple" = {
     mode: "singleRow",
@@ -39,6 +100,9 @@ export class InventoryComponent {
   constructor(private fb: FormBuilder, private inventoryService:InventoryService) {}
   uniqueCarCount = 0;
   commanCount=0;
+  selectedTabIndex = 0;
+  totalInventoryValue = 0;
+
   onFilterTextBoxChanged() {
     this.gridApi.setGridOption(
       "quickFilterText",
@@ -76,55 +140,86 @@ export class InventoryComponent {
       this.itemForm.controls['Car'].setValue(itemselected.car) 
       this.itemForm.controls['Name'].setValue(itemselected.name) 
       this.itemForm.controls['Quantity'].setValue(itemselected.quantity) 
-      this.itemForm.controls['Category'].setValue(itemselected.car) 
-      this.itemForm.controls['Type'].setValue(itemselected.car) 
       this.itemForm.controls['Description'].setValue(itemselected.car) 
       this.itemForm.controls['Price'].setValue(itemselected.price??0) 
-
+      this.selectedTabIndex =1;
     }else{
       this.selectedRowId=0;
     }
   }
 
+  resetForm(): void {
+    this.selectedRowId = 0;
+    this.itemForm.reset();
+    this.gridApi?.deselectAll();
+  }
+
+  // Update getItems to handle loading state
+  getItems(): void {
+    this.loading = true;
+    this.showGrid = false;
+    this.inventoryService.getInventory().subscribe({
+      next: (items) => {
+        this.items = items;
+        this.showGrid = true;
+        this.SetStats();
+      },
+      error: (error: Error) => {
+        this._snackBar.open('Error loading items', 'Close', { duration: 3000 });
+        console.error('Error loading items:', error);
+      },
+      complete: () => {
+        this.loading = false;
+      }
+    });
+  }
+
   onSubmit(): void {
     if (this.itemForm.valid) {
-      this.showFormLoading = false;
+      this.showFormLoading = true;
       const itemData = this.itemForm.value as Item;
-      if(this.selectedRowId==0){
-        this.inventoryService.addToInventory(itemData).subscribe(() => {
-          this.items.push(itemData);
-          this.showFormLoading = true;
-          this.itemForm.reset();
+      
+      const action = this.selectedRowId === 0 ? 
+        this.inventoryService.addToInventory(itemData) :
+        this.inventoryService.updateInventory({ ...itemData, id: this.selectedRowId });
+
+      action.subscribe({
+        next: () => {
+          this._snackBar.open(
+            this.selectedRowId === 0 ? 'Item added successfully' : 'Item updated successfully',
+            'Close',
+            { duration: 3000 }
+          );
+          this.resetForm();
           this.getItems();
-          this.openSnackBar('Item added successfully');
-        });
-      }
-      else{
-        itemData.id = this.selectedRowId;
-        this.inventoryService.updateInventory(itemData).subscribe(() => {
-          this.showFormLoading = true;
-          this.itemForm.reset();
-          this.getItems();
-          this.openSnackBar('Item updated successfully');
-        });
-      }
+        },
+        error: (error: Error) => {
+          this._snackBar.open('Error saving item', 'Close', { duration: 3000 });
+          console.error('Error saving item:', error);
+        },
+        complete: () => {
+          this.showFormLoading = false;
+        }
+      });
     }
-  }
-  getItems() {
-    this.inventoryService.getInventory().subscribe((items) => {
-      this.items = items;
-      this.SetStats();
-    });
   }
 
   openSnackBar(message: string) {
     this._snackBar.open(message, 'Close', {duration: 4000});
   }
 
+  onTabChange(index: number) {
+    this.selectedTabIndex = index;
+    // Reset form and selection when switching away from add/edit tab
+    if (index !== 1 && this.selectedRowId !== 0) {
+      this.resetForm();
+    }
+  }
+
   SetStats() {
     this.uniqueCarCount = new Set(this.items.filter(item=>item.car!='').map(item => item.car)).size;  
-    this.commanCount = this.items.length -this.uniqueCarCount ;  
-
+    this.commanCount = this.items.length -this.uniqueCarCount;
+    this.totalInventoryValue = this.items.reduce((total, item) => total + (item.price || 0) * item.quantity, 0);
   }
 }
 

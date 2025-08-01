@@ -25,4 +25,14 @@ public class LoginController: ControllerBase
         }
         return Unauthorized("Invalid credentials");
     }
+
+    [HttpGet("client")]
+    public async Task<IActionResult> GetClient()
+    {
+        var claims = User?.Claims.SingleOrDefault(c => c.Type=="client_id").Value;
+        Console.WriteLine($"-----------------{claims}");
+        var at = await _loginService.GetClient(claims);
+        Console.WriteLine($"-------------------{at?.Name??"NoName"}");
+        return Ok(at);
+    }
 }

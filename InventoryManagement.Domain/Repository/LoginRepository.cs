@@ -1,19 +1,30 @@
 using System;
+using InventoryManagement.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagement.Domain.Repository;
 
 public interface ILoginReporsitory{
-    public Task<bool> IsValid(string username, string password);
+    Task<ClientModel> GetClient(Guid guid);
+    public Task<Model.User> GetUser(string username, string password);
 }
 public class LoginRepository : ILoginReporsitory
 {
-    private readonly ApplicationDbContext _context;
-    public LoginRepository(ApplicationDbContext context){
+    private readonly IdentityDbContext _context;
+    public LoginRepository(IdentityDbContext context){
         _context = context;
     }
-    public async Task<bool> IsValid(string username, string password)
+
+    public async Task<ClientModel> GetClient(Guid guid)
     {
-        return await _context.Users.AnyAsync(x=>x.Username==username && x.Password==password);
+        Console.WriteLine($"--------------{guid}");
+        var clients = _context.Clients.AsNoTracking().ToList();
+
+        return clients.FirstOrDefault(x=> x.Id == guid);
+    }
+
+    public async Task<Model.User> GetUser(string username, string password)
+    {
+        return await _context.Users.FirstOrDefaultAsync(x => x.Username == username && x.Password == password);
     }
 }

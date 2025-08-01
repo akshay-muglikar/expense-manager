@@ -40,17 +40,29 @@ public class BillController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add(BillModel bill)
+    public async Task<IActionResult> AddBill(BillModel bill)
     {
         bill = await _billService.AddAsync(bill);
         return Ok(bill);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, BillModel bill)
+    public async Task<IActionResult> UpdateBill(int id, BillModel bill)
     {
         await _billService.UpdateAsync(bill);
         return NoContent();
+    }
+    [HttpPut("{id}/add")]
+    public async Task<IActionResult> AddBillitem(int id, BillItemModel bill)
+    {
+        await _billService.Add(id, bill);
+        return Ok();
+    }
+    [HttpPut("{id}/remove")]
+    public async Task<IActionResult> RemoveBillItem(int id, [FromQuery] int billItemId)
+    {
+        await _billService.DeleteAsync(id, billItemId);
+        return Ok();
     }
 
     [HttpDelete("{id}")]
@@ -64,7 +76,49 @@ public class BillController : ControllerBase
     public async Task<IActionResult> Download(int id)
     {
         return Ok(await _billService.GeneratePdf(id));
-        
+
+    }
+
+    [HttpGet("{id}/message")]
+    public async Task<IActionResult> Send(int id)
+    {
+        await _billService.SendMessage(id);
+        return Ok();
+
+    }
+    // [HttpGet("download/{id}/url")]
+    // public async Task<IActionResult> DownloadBillUrl(int id)
+    // {
+    //     return Ok(await _billService.GenerateDownloadLink(id));
+    // }
+
+    [AllowAnonymous]
+    [HttpGet("download/{clientId}/{id}")]
+    public async Task<IActionResult> DownloadBill(int id, Guid clientId, [FromQuery] string apiKey)
+    {
+        if (string.IsNullOrEmpty(apiKey))
+        {
+            return BadRequest();
+        }
+        return Ok(await _billService.GeneratePdf(id, clientId, apiKey));
+
+    }
+
+    [HttpPost("add-with-items")]
+    public async Task<IActionResult> AddBillWithItems([FromBody] AddBillRequest request)
+    {
+        if (request == null || request.BillItems == null || request.BillItems.Count == 0)
+            return BadRequest("Bill and BillItems are required");
+        var result = await _billService.AddBillWithItemsAsync(request);
+        return Ok(result);
+    }
+    [HttpPost("update-with-items/{id}")]
+    public async Task<IActionResult> UpdateBillWithItems([FromRoute] int id, [FromBody] AddBillRequest request)
+    {
+        if (request == null || request.BillItems == null || request.BillItems.Count == 0)
+            return BadRequest("Bill and BillItems are required");
+        var result = await _billService.UpdateBillWithItemsAsync(id,request);
+        return Ok(result);
     }
 }
 

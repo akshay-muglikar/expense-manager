@@ -13,9 +13,11 @@ namespace InventoryManagement.Api.Contracts;
          CreateMap<Bill, BillModel>();
          CreateMap<BillModel, Bill>();
 
-         CreateMap<BillItem, BillItemModel>()
-         .ForMember(x=>x.Item, opt=>opt.MapFrom(x=>x.ItemId.ToString()));
+         CreateMap<BillItem, BillItemModel>();
          CreateMap<BillItemModel, BillItem>();
-        
+
+        CreateMap<GetBillModel, Bill>();
+         CreateMap<Bill, GetBillModel>();
+
      }
  }

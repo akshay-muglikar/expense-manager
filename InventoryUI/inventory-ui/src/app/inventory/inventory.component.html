@@ -1,95 +1,133 @@
-<div class="row" style="height: 35em;">
+<div class="inventory-container">
+  <mat-progress-bar *ngIf="loading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
 
-    <div class="col-md-3">
-        <div style="padding: 10px;">
-            <div class="card text-center shadow">
+  <div class="header">
+    <h1>Inventory Management</h1>
+    <p class="text-secondary">Manage and track your inventory items</p>
+  </div>
 
-                <div class="card-body">
-                    <div class="display-4 text-success mb-2">
-                        <i class="bi bi-graph-up"></i>
-                    </div>
-                    <h2 class="card-title mb-3">{{items.length}}</h2>
-                    <p class="card-text text-muted">Total Items</p>
-                </div>
+  <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)" animationDuration="200ms">
+    <!-- Item List Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">list</mat-icon>
+        Item List
+      </ng-template>
 
+      <div class="tab-content">
+        <div class="search-container">
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix>search</mat-icon>
+            <input matInput 
+                   type="text" 
+                   id="filter-text-box" 
+                   placeholder="Search items..." 
+                   (input)="onFilterTextBoxChanged()" />
+          </mat-form-field>
+        </div>
+
+          <ag-grid-angular 
+            class="ag-theme-material"
+            [rowData]="items" 
+            [columnDefs]="colDefs"
+            [defaultColDef]="defaultColDef"
+            [rowSelection]="rowSelection"
+            (rowSelected)="onRowSelected($event)"
+            [pagination]="true"
+            (gridReady)="onGridReady($event)">
+          </ag-grid-angular>
+      </div>
+    </mat-tab>
+
+    <!-- Add/Edit Item Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">{{selectedRowId ? 'edit' : 'add'}}</mat-icon>
+        {{selectedRowId ? 'Edit Item' : 'New Item'}}
+      </ng-template>
+
+      <div class="tab-content">
+        <mat-progress-bar *ngIf="showFormLoading" mode="indeterminate"></mat-progress-bar>
+
+        <div class="form-card">
+          <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+            <div class="form-group">
+              <label for="Name">Name</label>
+              <input id="Name" formControlName="Name" placeholder="Enter item name" required />
             </div>
-        </div>
-        <div style="padding: 10px;">
 
-            <div class="card text-center shadow">
-                <div class="card-body">
-                    <div class="display-4 text-success mb-2">
-                        <i class="bi bi-graph-up"></i>
-                    </div>
-                    <h2 class="card-title mb-3">{{uniqueCarCount}}</h2>
-                    <p class="card-text text-muted">Cars</p>
-                </div>
+            <div class="form-group">
+              <label for="Quantity">Quantity</label>
+              <input id="Quantity" type="number" formControlName="Quantity" placeholder="Enter quantity" required/>
             </div>
-        </div>
-        <div style="padding: 10px;">
 
-            <div class="card text-center shadow">
-                <div class="card-body">
-                    <div class="display-4 text-success mb-2">
-                        <i class="bi bi-graph-up"></i>
-                    </div>
-                    <h2 class="card-title mb-3">{{commanCount}}</h2>
-                    <p class="card-text text-muted">Miscellaneous</p>
-                </div>
+            <div class="form-group">
+              <label for="Car">Car Model</label>
+              <input id="Car" formControlName="Car" placeholder="Enter car model"/>
             </div>
+
+            <div class="form-group">
+              <label for="Description">Description</label>
+              <input id="Description" formControlName="Description" placeholder="Enter description"/>
+            </div>
+
+            <div class="form-group">
+              <label for="Price">Price</label>
+              <input id="Price" type="number" formControlName="Price" placeholder="Enter price" required/>
+            </div>
+
+            <div class="actions">
+              <button type="button" mat-button class="btn btn-secondary" (click)="resetForm()">
+                <mat-icon>refresh</mat-icon>
+                Reset
+              </button>
+              <button type="submit" mat-raised-button class="btn btn-primary" [disabled]="!itemForm.valid">
+                <mat-icon>save</mat-icon>
+                {{selectedRowId ? 'Update' : 'Save'}}
+              </button>
+            </div>
+          </form>
         </div>
+      </div>
+    </mat-tab>
 
-    </div>
+    <!-- Stats Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">insights</mat-icon>
+        Statistics
+      </ng-template>
 
-    <div class="col-md-5">
-        Inventory
-        <mat-progress-bar mode="query" [hidden]="!showGrid"></mat-progress-bar>
+      <div class="tab-content">
+        <div class="stats-grid">
+          <mat-card class="stat-card">
+            <mat-icon class="stat-icon">inventory_2</mat-icon>
+            <div class="stat-value">{{items.length}}</div>
+            <div class="stat-label">Total Items</div>
+            <mat-progress-bar mode="determinate" [value]="100"></mat-progress-bar>
+          </mat-card>
 
-        <div class="example-header">
-            <span>Search :</span>
-            <input type="text" id="filter-text-box" placeholder="Search..." (input)="onFilterTextBoxChanged()" />
+          <mat-card class="stat-card">
+            <mat-icon class="stat-icon">directions_car</mat-icon>
+            <div class="stat-value">{{uniqueCarCount}}</div>
+            <div class="stat-label">Unique Car Models</div>
+            <mat-progress-bar mode="determinate" [value]="(uniqueCarCount / items.length) * 100"></mat-progress-bar>
+          </mat-card>
+
+          <mat-card class="stat-card">
+            <mat-icon class="stat-icon">category</mat-icon>
+            <div class="stat-value">{{commanCount}}</div>
+            <div class="stat-label">Miscellaneous Items</div>
+            <mat-progress-bar mode="determinate" [value]="(commanCount / items.length) * 100"></mat-progress-bar>
+          </mat-card>
+
+          <mat-card class="stat-card">
+            <mat-icon class="stat-icon">price_check</mat-icon>
+            <div class="stat-value">₹{{totalInventoryValue | number:'1.0-0'}}</div>
+            <div class="stat-label">Total Inventory Value</div>
+          </mat-card>
         </div>
-
-        <ag-grid-angular style="height: 32em;" [rowData]="items" [columnDefs]="colDefs" [rowSelection]="rowSelection"
-        (rowSelected)="onRowSelected($event)" [pagination]="true" (gridReady)="onGridReady($event)" />
-
-
-    </div>
-
-
-    <div class="col-md-3">
-
-        Item Details
-        <mat-progress-bar mode="query" [hidden]="showFormLoading"></mat-progress-bar>
-
-        <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
-            <label for="Name">Name</label>
-            <input id="Name" formControlName="Name" required />
-
-            <label for="Quantity">Quantity</label>
-            <input id="Quantity" type="number" formControlName="Quantity" required/>
-
-            <label for="Category">Category</label>
-            <input id="Category" formControlName="Category" />
-
-            <label for="Car">Car</label>
-            <input id="Car" formControlName="Car" />
-
-
-            <label for="Type">Type</label>
-            <input id="Type" formControlName="Type" />
-
-            <label for="Description">Description</label>
-            <input id="Description" formControlName="Description" />
-
-            <label for="Price">Price</label>
-            <input id="Price" formControlName="Price" required/>
-
-            <button type="submit" [disabled]="!itemForm.valid">Submit</button>
-
-        </form>
-
-    </div>
-
-
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 </div>

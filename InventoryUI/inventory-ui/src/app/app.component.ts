@@ -3,16 +3,25 @@ import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
 import {MatToolbarModule} from '@angular/material/toolbar';
+import { AuthService } from './common/AuthService';
+import { HeaderComponent } from './header/header.component';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MatIconModule, MatToolbarModule],
+  imports: [RouterOutlet, MatIconModule, MatToolbarModule, HeaderComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
+  logout() {
+    this.authService.logout();
+  }
+  clientName : string | undefined = "";
+  getClient() {
+    this.clientName =  this.authService.clientModel?.name
+  }
   title = 'inventory-ui';
   selected=1;
   routes :RoutDetails[] = [
@@ -22,7 +31,7 @@ export class AppComponent {
     new RoutDetails('inventory','Inventory', 'inventory'),
 
   ]
-  constructor(private router: Router){}
+  constructor(private router: Router, private authService : AuthService){}
   onclickRoute(index:number){
     this.selected = index;
     this.router.navigate([this.routes[this.selected].path])

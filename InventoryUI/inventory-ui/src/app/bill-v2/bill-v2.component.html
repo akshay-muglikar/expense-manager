@@ -1,0 +1,131 @@
+<!-- Toggle Menu -->
+<mat-progress-bar *ngIf="loading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
+
+<div class="bill-container">
+  <div class="toggle-menu mb-3">
+    <button mat-button class="btn" [class.btn-primary]="activeTab === 'bill'" [class.btn-secondary]="activeTab !== 'bill'" (click)="activeTab = 'bill'">
+      <mat-icon>receipt</mat-icon>
+      <span>Bill Entry</span>
+    </button>
+    <button mat-button class="btn" [class.btn-primary]="activeTab === 'history'" [class.btn-secondary]="activeTab !== 'history'" (click)="activeTab = 'history'">
+      <mat-icon>history</mat-icon>
+      <span>History</span>
+    </button>
+  </div>
+
+  <div *ngIf="activeTab === 'bill'" class="bill-form">
+    <div class="bill-header">
+      <h2>New Bill</h2>
+      <span class="text-secondary">{{bill.billDate?.toLocaleString()}}</span>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Customer Name</label>
+        <input [(ngModel)]="bill.name" style="width: 300px; padding: 5px;" placeholder="Enter customer name">
+      </div>
+      
+      <div class="form-group">
+        <label>Mobile Number</label>
+        <input [(ngModel)]="bill.mobile" style="width: 300px; padding: 5px;" placeholder="Enter mobile number">
+      </div>
+    </div>
+
+    <div class="items-table">
+      <div class="">
+        <table>
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Item</th>
+              <th>Quantity</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of billItems; let i = index">
+              <td>
+                <button mat-icon-button class="btn-secondary" (click)="removeItem(i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+              <td>
+                <ng-select [(ngModel)]="billItems[i].itemId" 
+                          [items]="items" 
+                          bindLabel="name" 
+                          bindValue="id"
+                          placeholder="Select item">
+                </ng-select>
+              </td>
+              <td>
+                <input type="text" [(ngModel)]="billItems[i].quantity" placeholder="Quantity">
+              </td>
+              <td>
+                <input [(ngModel)]="billItems[i].amount" placeholder="Unit Price" (ngModelChange)="calculateTotal()">
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="form-row mt-3">
+      <button mat-raised-button class="btn btn-secondary" (click)="addIteminBill()">
+        <mat-icon>add</mat-icon> Add Item
+      </button>
+    </div>
+
+    <div class="bill-summary">
+      <div class="summary-details">
+        <div class="summary-item">
+          <div class="label">Payment Mode</div>
+          <select [(ngModel)]="bill.paymentMode" class="form-control">
+            <option value="" disabled selected>Select payment mode</option>
+            <option value="CASH">Cash</option>
+            <option value="CARD">Card</option>
+            <option value="UPI">UPI</option>
+          </select>
+        </div>
+        
+        <div class="summary-item">
+          <div class="label">Discount</div>
+          <input placeholder="Enter discount" (ngModelChange)="calculateTotal()" [(ngModel)]="bill.discount" class="form-control">
+        </div>
+        
+        <div class="summary-item">
+          <div class="label">Advance</div>
+          <input placeholder="Enter advance" (ngModelChange)="calculateTotal()" [(ngModel)]="bill.advance" class="form-control">
+        </div>
+        
+        <div class="summary-item">
+          <div class="label">Grand Total</div>
+          <div class="value">{{total}}</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button *ngIf="!bill.id" mat-raised-button class="btn btn-primary" (click)="saveBillWithItems()">
+          <mat-icon>save</mat-icon> Save Bill
+        </button>
+        <button *ngIf="bill.id" mat-raised-button class="btn btn-primary" (click)="updateBillWithItems()">
+          <mat-icon>update</mat-icon> Update Bill
+        </button>
+        <button mat-raised-button class="btn btn-secondary" (click)="printBill()">
+          <mat-icon>print</mat-icon> Print
+        </button>
+          <button mat-raised-button class="btn btn-secondary" (click)="sendToWhatsapp()">
+          <mat-icon>Whatsapp</mat-icon> Whatsapp
+        </button>
+          <button mat-raised-button class="btn btn-secondary" (click)="Close()">
+          <mat-icon>close</mat-icon> Close
+        </button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="activeTab === 'history'">
+  <app-billhistory></app-billhistory>
+</div>
+
