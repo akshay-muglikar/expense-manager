@@ -14,9 +14,34 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read #This is required for actions/checkout
-
+    env:
+      ANGULAR_PROJECT_PATH: './InventoryUI/inventory-ui'
+      DOTNET_PROJECT_PATH: './InventoryManagement.Api'
+      
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Angular CLI
+        run: npm install -g @angular/cli
+  
+      - name: Install Angular dependencies
+        run: npm install
+        working-directory: ${{ env.ANGULAR_PROJECT_PATH }}
+  
+      - name: Build Angular App
+        run: ng build --configuration production
+        working-directory: ${{ env.ANGULAR_PROJECT_PATH }}
+  
+      # Copy Angular dist to .NET wwwroot
+      - name: Copy Angular dist to wwwroot
+        run: |
+          rm -rf ${{ env.DOTNET_PROJECT_PATH }}/wwwroot/*
+          cp -r ${{ env.ANGULAR_PROJECT_PATH }}/dist/browser/* ${{ env.DOTNET_PROJECT_PATH }}/wwwroot/
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
@@ -62,4 +87,5 @@ jobs:
           app-name: 'AmInventory'
           slot-name: 'Production'
           package: .
+
           
