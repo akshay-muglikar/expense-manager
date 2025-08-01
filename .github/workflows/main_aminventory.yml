@@ -8,19 +8,20 @@ on:
     branches:
       - main
   workflow_dispatch:
-
+env:
+  ANGULAR_PROJECT_PATH: ./InventoryUI/inventory-ui
+  DOTNET_PROJECT_PATH: ./InventoryManagement.Api
+  PUBLISH_DIR: ./publish
+  
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: read #This is required for actions/checkout
-    env:
-      ANGULAR_PROJECT_PATH: ./InventoryUI/inventory-ui
-      DOTNET_PROJECT_PATH: ./InventoryManagement.Api
-      PUBLISH_DIR: ./publish
       
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -38,13 +39,11 @@ jobs:
         run: ng build --configuration production
         working-directory: ${{ env.ANGULAR_PROJECT_PATH }}
 
-      # Copy Angular dist to .NET wwwroot
       - name: Copy Angular output to wwwroot
         run: |
           rm -rf ${{ env.DOTNET_PROJECT_PATH }}/wwwroot/*
           cp -r ${{ env.ANGULAR_PROJECT_PATH }}/dist/*/* ${{ env.DOTNET_PROJECT_PATH }}/wwwroot/
 
-        # Setup .NET SDK
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -94,4 +93,5 @@ jobs:
           package: .
 
           
+
 
