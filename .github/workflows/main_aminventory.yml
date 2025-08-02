@@ -8,32 +8,61 @@ on:
     branches:
       - main
   workflow_dispatch:
-
+env:
+  ANGULAR_PROJECT_PATH: ./InventoryUI/inventory-ui
+  DOTNET_PROJECT_PATH: ./InventoryManagement.Api
+  PUBLISH_DIR: ./publish
+  
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: read #This is required for actions/checkout
-
+      
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-      - name: Set up .NET Core
+      - name: Install Angular CLI
+        run: npm install -g @angular/cli
+
+      - name: Install Angular dependencies
+        run: npm install
+        working-directory: ${{ env.ANGULAR_PROJECT_PATH }}
+
+      - name: Build Angular app
+        run: ng build --configuration production
+        working-directory: ${{ env.ANGULAR_PROJECT_PATH }}
+
+      - name: Copy Angular output to wwwroot
+        run: |
+          rm -rf ${{ env.DOTNET_PROJECT_PATH }}/wwwroot/*
+          cp -r ${{ env.ANGULAR_PROJECT_PATH }}/dist/*/* ${{ env.DOTNET_PROJECT_PATH }}/wwwroot/
+
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.x'
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+      - name: Restore .NET dependencies
+        run: dotnet restore ${{ env.DOTNET_PROJECT_PATH }}
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+      - name: Build .NET project
+        run: dotnet build ${{ env.DOTNET_PROJECT_PATH }} --configuration Release
 
-      - name: Upload artifact for deployment job
+      - name: Publish .NET project
+        run: dotnet publish ${{ env.DOTNET_PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_DIR }}
+
+      - name: Upload publish folder as artifact
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ${{ env.PUBLISH_DIR }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -62,4 +91,8 @@ jobs:
           app-name: 'AmInventory'
           slot-name: 'Production'
           package: .
+
           
+
+
+
