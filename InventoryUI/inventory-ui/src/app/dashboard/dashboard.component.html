@@ -1,67 +1,79 @@
-<div>
-  <div>
-    <select style="height: 50px;width: 300px" class="col-md-4" [(ngModel)]="filter" (ngModelChange)="onSelectChange()">
-      <option value="0">Today</option>
-      <option value="7">Last 7 days</option>
-      <option value="30">Last 30 days</option>
-      <option value="-1">Custom</option>
+<div class="dashboard-container">
+  <div class="header">
+    <h1>Dashboard Overview</h1>
+    <p class="text-secondary">Monitor your business performance</p>
+  </div>
 
-    </select>
-    <span [hidden]="hideCustomDate">
-      <input style="height: 50px;margin-left: 10px;" type="date" [(ngModel)]="startDateText">
-      <input style="height: 50px; margin-left: 10px;" type="date" [(ngModel)]="endDateText">
-      <button (click)="onCustomDateSet()" style="margin-left: 10px;" mat-mini-fab
-        aria-label="Example icon button with a menu icon">
+  <div class="filters-section">
+    <mat-form-field appearance="outline">
+      <mat-label>Time Period</mat-label>
+      <mat-select [(ngModel)]="filter" (ngModelChange)="onSelectChange()">
+        <mat-option value="0">Today</mat-option>
+        <mat-option value="7">Last 7 days</mat-option>
+        <mat-option value="30">Last 30 days</mat-option>
+        <mat-option value="-1">Custom</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="custom-date-inputs" [hidden]="hideCustomDate">
+      <mat-form-field appearance="outline">
+        <mat-label>Start Date</mat-label>
+        <input matInput [matDatepicker]="startPicker" [(ngModel)]="startDateText">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>End Date</mat-label>
+        <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDateText">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+
+      <button mat-fab color="primary" (click)="onCustomDateSet()" class="refresh-btn">
         <mat-icon>refresh</mat-icon>
       </button>
-    </span>
-  </div>
-  <div>
-    <mat-progress-bar mode="query" style="height: 5px;" [hidden]="hideFormLoading"></mat-progress-bar>
-  </div>
-  <div class="row row-cols-1 row-cols-md-4 g-4" style="    padding-bottom: 10px;
-    padding-top: 10px;">
-    <div class="col">
-      <div class="card h-100 text-center shadow">
-        <div class="card-body">
-          <div class="display-4 text-primary mb-2">
-            <i class="bi bi-people"></i>
-          </div>
-          <h2 class="card-title mb-3">{{dashboardStats.billCount}}</h2>
-          <p class="card-text text-muted">Customer</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="col">
-      <div class="card h-100 text-center shadow">
-        <div class="card-body">
-          <div class="display-4 text-success mb-2">
-            <i class="bi bi-graph-up"></i>
-          </div>
-          <h2 class="card-title mb-3">{{dashboardStats.revenue}}</h2>
-          <p class="card-text text-muted">Net Sales</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="col">
-      <div class="card h-100 text-center shadow">
-        <div class="card-body">
-          <div class="display-4 text-warning mb-2">
-            <i class="bi bi-star"></i>
-          </div>
-          <h2 class="card-title mb-3">{{dashboardStats.expenses}}</h2>
-          <p class="card-text text-muted">Expense</p>
-        </div>
-      </div>
     </div>
   </div>
+  <mat-progress-bar mode="query" *ngIf="!hideFormLoading" class="loading-bar"></mat-progress-bar>
 
-</div>
+  <div class="stats-grid">
+    <mat-card class="stat-card">
+      <mat-icon class="stat-icon" color="primary">people</mat-icon>
+      <div class="stat-value">{{dashboardStats.billCount}}</div>
+      <div class="stat-label">Customers</div>
+      <mat-progress-bar mode="determinate" [value]="100" color="primary"></mat-progress-bar>
+    </mat-card>
 
-<div>
+    <mat-card class="stat-card">
+      <mat-icon class="stat-icon" color="accent">trending_up</mat-icon>
+      <div class="stat-value">₹{{dashboardStats.revenue | number:'1.0-0'}}</div>
+      <div class="stat-label">Net Sales</div>
+      <mat-progress-bar mode="determinate" [value]="80" color="accent"></mat-progress-bar>
+    </mat-card>
 
-  <ag-grid-angular style="height: 32em;" [rowData]="allItems" [columnDefs]="colDefs" [pagination]="true"
-    (gridReady)="onGridReady($event)" />
+    <mat-card class="stat-card">
+      <mat-icon class="stat-icon" color="warn">account_balance_wallet</mat-icon>
+      <div class="stat-value">₹{{dashboardStats.expenses | number:'1.0-0'}}</div>
+      <div class="stat-label">Expenses</div>
+      <mat-progress-bar mode="determinate" [value]="60" color="warn"></mat-progress-bar>
+    </mat-card>
+  </div>
+
+  <div class="grid-section">
+    <mat-card class="grid-card">
+      <div class="grid-header">
+        <h2>Transaction History</h2>
+      </div>
+      <ag-grid-angular 
+        class="ag-theme-material"
+        [rowData]="allItems" 
+        [columnDefs]="colDefs"
+        [pagination]="true"
+        (gridReady)="onGridReady($event)">
+      </ag-grid-angular>
+    </mat-card>
+  </div>
 </div>

@@ -31,9 +31,10 @@ public class BillRepository : IBillRepository
     {
         if (start == null || end == null)
             throw new ArgumentNullException("Start and end dates must be provided");
-        return (await _context.Bills.ToListAsync()).Where(
-            x => x.BillDate.DateTime > start.Value && x.BillDate.DateTime < end.Value
-        ).ToList();
+
+        return await _context.Bills
+            .Where(b => b.BillDate.DateTime >= start.Value && b.BillDate.DateTime <= end.Value)
+            .ToListAsync();
     }
 
     public async Task AddAsync(Bill bill, string user)

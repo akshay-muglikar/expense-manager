@@ -86,11 +86,6 @@ public class BillController : ControllerBase
         return Ok();
 
     }
-    // [HttpGet("download/{id}/url")]
-    // public async Task<IActionResult> DownloadBillUrl(int id)
-    // {
-    //     return Ok(await _billService.GenerateDownloadLink(id));
-    // }
 
     [AllowAnonymous]
     [HttpGet("download/{clientId}/{id}")]

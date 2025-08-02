@@ -102,7 +102,11 @@ export class InventoryComponent {
   commanCount=0;
   selectedTabIndex = 0;
   totalInventoryValue = 0;
-
+  listenToAddInventory() {
+    window.addEventListener('add-inventory', (event: any) => {
+      this.getItems();
+    });
+  }
   onFilterTextBoxChanged() {
     this.gridApi.setGridOption(
       "quickFilterText",
@@ -125,6 +129,7 @@ export class InventoryComponent {
       Description: [''],
       Price: ['0', Validators.required],
     });
+    this.listenToAddInventory();
   }
   selectedRowId :number=0;
   onRowSelected(event:any){

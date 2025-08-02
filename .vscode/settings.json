@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/08d8e9b5-1b75-42e6-8ec5-dab45e86a9ee/resourceGroups/aminventory_group/providers/Microsoft.Web/sites/aminventory",
+    "appService.deploySubpath": "InventoryManagement.Api/bin/publish"
+}

@@ -8,22 +8,24 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("Database");
-var userDatabaseConnectionString = builder.Configuration.GetConnectionString("UserDatabase");
+var connectionString = builder.Configuration.GetConnectionString("Database")
+                                        .Replace("{AppBase}", AppContext.BaseDirectory);
+var userDatabaseConnectionString = builder.Configuration.GetConnectionString("UserDatabase")
+                                        .Replace("{AppBase}", AppContext.BaseDirectory);
 builder.Services.Configure<InventoryConfig>(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
 
+Console.WriteLine($"Connection String: {connectionString}");
+Console.WriteLine($"User Database Connection String: {userDatabaseConnectionString}");
 // Add MySQL DbContext (if using EF Core)
 builder.Services.AddDbContext<IdentityDbContext>(
-    options => {
-        options.UseSqlite(userDatabaseConnectionString); 
-        DbContextOptions<IdentityDbContext> op = (DbContextOptions<IdentityDbContext>)options.Options;
-        IdentityDbContext applicationDbContext = new IdentityDbContext(op);
-        //applicationDbContext.Database.EnsureCreated();
-        applicationDbContext.Database.Migrate();
+    options =>
+    {
+        options.UseSqlite(userDatabaseConnectionString);
     }
 );
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(ConfigureApplicationDbContext);
 
@@ -34,7 +36,6 @@ void ConfigureApplicationDbContext(IServiceProvider serviceProvider, DbContextOp
     var httpContext = httpContextAccessor.HttpContext;
 
     // Get the clientId from the path parameter
-
     var clientId = httpContext?.User?.FindFirst("client_id")?.Value;
     if(httpContext?.Request?.RouteValues?.TryGetValue("clientId", out var clientIdValue)??false){
         clientId = clientIdValue.ToString();
@@ -45,7 +46,6 @@ void ConfigureApplicationDbContext(IServiceProvider serviceProvider, DbContextOp
         options.UseSqlite(clientIdConnectionString);
         DbContextOptions<ApplicationDbContext> op = (DbContextOptions<ApplicationDbContext>)options.Options;
         ApplicationDbContext applicationDbContext = new ApplicationDbContext(op);
-        //applicationDbContext.Database.EnsureCreated();
         applicationDbContext.Database.Migrate();
     }
 }
@@ -114,6 +114,13 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 var app = builder.Build();
+//configure startup task
+using (var scope = app.Services.CreateScope())
+{
+    Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "app_data"));
+    var dbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+    dbContext.Database.Migrate();
+}
 app.UseDefaultFiles();
 app.UseStaticFiles();
 // Configure the HTTP request pipeline.
@@ -129,4 +136,5 @@ app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.Run();
+app.Run($"http://0.0.0.0:{Environment.GetEnvironmentVariable("PORT") ?? "8080"}");
+

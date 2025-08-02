@@ -1,12 +1,38 @@
-<div class="col-md-4">
-<div class="form-signin">
-   
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputEmail" class="sr-only">Email address</label>
-    <input [(ngModel)]="username" type="email" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
-    <label for="inputPassword" class="sr-only">Password</label>
-    <input [(ngModel)]="password" type="password" id="inputPassword" class="form-control" placeholder="Password" required="">
-  
-    <button (click)="login()" class="btn btn-lg mt-3 btn-primary btn-block" type="submit">Sign in</button>
-</div>
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <img src="assets/logo.png" alt="Logo" class="logo">
+      <h1>Welcome Back</h1>
+      <p class="subtitle">Sign in to continue to your account</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username" type="text" placeholder="Enter your username">
+        <mat-icon matPrefix>person</mat-icon>
+        <mat-error>{{getErrorMessage('username')}}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'" 
+               placeholder="Enter your password">
+        <mat-icon matPrefix>lock</mat-icon>
+        <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+          <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+        <mat-error>{{getErrorMessage('password')}}</mat-error>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="submit" 
+              [disabled]="isSubmitting" class="submit-button">
+        @if (isSubmitting) {
+          <mat-spinner diameter="20"></mat-spinner>
+        } @else {
+          <span>Sign In</span>
+        }
+      </button>
+    </form>
+  </div>
 </div>

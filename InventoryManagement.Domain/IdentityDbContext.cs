@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using InventoryManagement.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ public class IdentityDbContext: DbContext
 {
     public DbSet<User> Users { get; set; }
     public DbSet<ClientModel> Clients { get; set; }
+    public DbSet<Contact> ContactUs { get; set; }
     public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
     {
     }
@@ -19,10 +21,12 @@ public class IdentityDbContext: DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<User>()
-                .HasKey(x=>x.Id);
+                .HasKey(x => x.Id);
 
         modelBuilder.Entity<ClientModel>()
-                .HasKey(x=>x.Id);
+                .HasKey(x => x.Id);
+        modelBuilder.Entity<Contact>()
+                .HasKey(x => x.Id);
 
     }
 }

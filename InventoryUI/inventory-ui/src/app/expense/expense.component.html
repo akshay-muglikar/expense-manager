@@ -1,6 +1,41 @@
 <div class="expense-container">
   <mat-progress-bar *ngIf="loading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
+<div class="form-column">
+    <div class="header">
+      <h2>Expense Details</h2>
+      <p class="text-secondary">Add or edit expense information</p>
+    </div>
 
+    <div class="form-card">
+      <div class="form-group">
+        <label>Description</label>
+        <input [(ngModel)]="selectedExpense.description" 
+               placeholder="Enter expense details" />
+      </div>
+
+      <div class="form-group">
+        <label>Amount</label>
+        <input [(ngModel)]="selectedExpense.amount" 
+               type="number"
+               placeholder="Enter amount" />
+      </div>
+
+      <div class="actions">
+        <button mat-raised-button 
+                class="btn btn-primary" 
+                (click)="addExpense()">
+          <mat-icon>add</mat-icon>
+          Add
+        </button>
+        <button mat-raised-button 
+                class="btn btn-secondary" 
+                (click)="clear()">
+          <mat-icon>clear</mat-icon>
+          Clear
+        </button>
+      </div>
+    </div>
+  </div>
   <!-- Grid Column -->
   <div class="grid-column">
     <div class="header">
@@ -42,40 +77,5 @@
   </div>
 
   <!-- Form Column -->
-  <div class="form-column">
-    <div class="header">
-      <h2>Expense Details</h2>
-      <p class="text-secondary">Add or edit expense information</p>
-    </div>
-
-    <div class="form-card">
-      <div class="form-group">
-        <label>Description</label>
-        <input [(ngModel)]="selectedExpense.description" 
-               placeholder="Enter expense details" />
-      </div>
-
-      <div class="form-group">
-        <label>Amount</label>
-        <input [(ngModel)]="selectedExpense.amount" 
-               type="number"
-               placeholder="Enter amount" />
-      </div>
-
-      <div class="actions">
-        <button mat-raised-button 
-                class="btn btn-primary" 
-                (click)="addExpense()">
-          <mat-icon>add</mat-icon>
-          Add
-        </button>
-        <button mat-raised-button 
-                class="btn btn-secondary" 
-                (click)="clear()">
-          <mat-icon>clear</mat-icon>
-          Clear
-        </button>
-      </div>
-    </div>
-  </div>
+  
 </div>

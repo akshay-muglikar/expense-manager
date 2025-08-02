@@ -6,8 +6,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { FormsModule } from '@angular/forms';
 import { ExpenseService } from '../common/ExpenseService';
-import { formatDate } from '@angular/common';
+import { CommonModule, DecimalPipe, formatDate } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 import type { ColDef, RowSelectionOptions } from 'ag-grid-community'; // Column Definition Type Interface
 import {
   GridApi, GridReadyEvent
@@ -19,10 +20,22 @@ import { BillModel } from '../models/bill.model';
 import { BillService } from '../services/bill.service';
 @Component({
   selector: 'app-dashboard',
-  imports: [AgGridAngular, MatProgressBarModule, MatSelectModule, MatIconModule, FormsModule, MatDatepickerModule, MatFormFieldModule, MatInputModule],
+  imports: [
+    AgGridAngular,
+    CommonModule,
+    DecimalPipe,
+    MatProgressBarModule,
+    MatSelectModule,
+    MatIconModule,
+    MatCardModule,
+    FormsModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
-  providers: [],
+  providers: [provideNativeDateAdapter()],
 
 })
 export class DashboardComponent {
@@ -49,10 +62,35 @@ export class DashboardComponent {
   dashboardStats:DashboardStats = {billCount:0,revenue:0,expenses:0}
   hideFormLoading = true;
   colDefs: ColDef[] = [
-    { field: "type", width: 120 },
-    { field: "name", width: 400 },
-    { field: "price", width: 80 },
-    { field: "date", width: 200 }
+    { 
+      field: "type",
+      headerName: "Type",
+      flex: 1,
+      minWidth: 120
+    },
+    { 
+      field: "name",
+      headerName: "Description",
+      flex: 2,
+      minWidth: 200
+    },
+    { 
+      field: "price",
+      headerName: "Amount",
+      flex: 1,
+      minWidth: 120,
+      type: 'numericColumn',
+      valueFormatter: (params) => params.value ? '₹' + params.value.toLocaleString() : ''
+    },
+    { 
+      field: "date",
+      headerName: "Date",
+      flex: 1,
+      minWidth: 150,
+      sort: 'desc' as const,
+      sortIndex: 0,
+      valueFormatter: (params) => params.value ? new Date(params.value).toLocaleDateString() : ''
+    }
   ];
   constructor(private billService: BillService, private expenseService: ExpenseService) {
     this.onSelectChange();

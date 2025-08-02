@@ -139,3 +139,34 @@
     box-shadow: 0 0 0 3px rgba(83, 109, 254, 0.1);
   }
 }
+@media only screen and (max-width: 1024px) {
+  .bill-container{
+    padding : 2px;
+    .bill-form {
+      padding: 2px;
+    }
+    .items-table {
+      td {
+        padding: 2px;
+        .ng-select {
+          min-width: 120px;
+        }
+      }
+    }
+
+    .bill-summary{
+      display: block;
+      position: relative;
+
+      .summary-details{
+        display: block;
+        margin-bottom: var(--spacing-md);
+      }
+      .actions {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+      }
+    }
+  }
+}

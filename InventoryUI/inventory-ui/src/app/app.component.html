@@ -5,24 +5,26 @@
         <img class="header-logo-image" src="logo.png" >
       </span>
       <div class="me-lg-auto app-name-header m-2"><h4><app-header></app-header></h4></div>
-      <ul class="nav col-12 col-lg-auto mb-2 justify-content-center mb-md-0" style="margin-right: 10px;">
-       
-        @for(inroute of routes; track inroute.path; let idx = $index){
-          <li class="c-nav-link"><a (click)="onclickRoute(idx)" class="nav-link px-2 {{idx==selected?'link-secondary':'link-dark'}}">
-            {{inroute.label}}
-          </a></li>
-      }
-       
-      </ul>
-
-      <div class="dropdown text-end">
-        <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
-        </a>
-        <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
-          <li><a class="dropdown-item" href="#" (click)="logout()">Sign out</a></li>
+      @if (isLoggedIn()) {
+        <ul class="nav col-12 col-lg-auto mb-2 justify-content-center mb-md-0" style="margin-right: 10px;">
+          @for(inroute of routes; track inroute.path; let idx = $index){
+            <li class="c-nav-link"><a (click)="onclickRoute(idx)" class="nav-link px-2 {{idx==selected?'link-secondary':'link-dark'}}">
+              {{inroute.label}}
+            </a></li>
+          }
         </ul>
-      </div>
+
+        <div class="dropdown text-end">
+          <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+          </a>
+          <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
+            <li><a class="dropdown-item" href="#" (click)="logout()">Sign out</a></li>
+          </ul>
+        </div>
+      } @else {
+        <button class="btn btn-primary" (click)="navigateToLogin()">Login</button>
+      }
     </div>
   </div>
 </header>

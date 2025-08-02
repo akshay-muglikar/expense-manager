@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using InventoryManagement.Api.Contracts;
+using InventoryManagement.Api.Provider;
 using InventoryManagement.Domain.Model;
 using InventoryManagement.Domain.Repository;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -14,8 +15,11 @@ namespace InventoryManagement.Api.UseCase;
 public class LoginService
 {
     private readonly ILoginReporsitory _loginReporsitory;
+    protected readonly UserServiceProvider userServiceProvider;
 
-    public LoginService(ILoginReporsitory loginReporsitory){
+    public LoginService(ILoginReporsitory loginReporsitory, UserServiceProvider userServiceProvider)
+    {
+        this.userServiceProvider = userServiceProvider;
         _loginReporsitory = loginReporsitory;
     }
 
@@ -30,7 +34,25 @@ public class LoginService
 
     public async Task<ClientModel> GetClient(string? value)
     {
+        
         return await _loginReporsitory.GetClient(Guid.Parse(value));
+    }
+    
+    public async Task<List<ClientModel>> GetAllClients()
+    {
+         if(userServiceProvider.GetUsername()== "admin")
+        {
+            throw new UnauthorizedAccessException("Admin user cannot be registered through this endpoint");
+        }
+        return await _loginReporsitory.GetAllClients();
+    }   
+    public async Task<List<User>> GetUsersAsync(Guid id)
+    {
+         if(userServiceProvider.GetUsername()== "admin")
+        {
+            throw new UnauthorizedAccessException("Admin user cannot be registered through this endpoint");
+        }
+        return await _loginReporsitory.GetUsersAsync(id);
     }
 
     private JwtSecurityToken GenerateAccessToken(string userName, Guid clientId)
@@ -54,5 +76,30 @@ public class LoginService
         );
 
         return token;
+    }
+
+    public async Task Register(UserModel user)
+    {
+        if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password))
+        {
+            throw new ArgumentException("Username and password must be provided");
+        }
+        if(userServiceProvider.GetUsername()== "admin")
+        {
+            throw new UnauthorizedAccessException("Admin user cannot be registered through this endpoint");
+        }
+        var userModel = new User
+        {
+            Username = user.Username,
+            Password = user.Password,
+            ClientId = Guid.NewGuid()
+        };
+
+        await _loginReporsitory.CreateUser(userModel);
+    }
+
+    internal async Task ContactUs(Contact contact)
+    {
+        await _loginReporsitory.ContactUs(contact);
     }
 }

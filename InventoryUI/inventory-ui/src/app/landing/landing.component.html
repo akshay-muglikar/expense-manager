@@ -1,0 +1,168 @@
+<header class="hero-section" @fadeIn>
+  <div class="container">
+    <h1>Smart Billing & Inventory Management</h1>
+    <p class="tagline">Streamline your business operations with our comprehensive management solution</p>
+    <div class="cta-buttons">
+      <button mat-raised-button color="primary" class="cta-primary" (click)="bookDemo()">
+        Start Billing Now
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+      <button mat-stroked-button color="primary" class="cta-secondary">
+        Watch Demo
+        <mat-icon>play_circle</mat-icon>
+      </button>
+    </div>
+    
+  </div>
+</header>
+
+<section class="features-section" @staggerFadeIn>
+  <div class="container">
+    <h2>Powerful Features for Your Business</h2>
+    <div class="features-grid">
+      <mat-card class="feature-card" *ngFor="let feature of features" [class.coming-soon-card]="feature.isComingSoon">
+        <div class="coming-soon-badge" *ngIf="feature.isComingSoon">Coming Soon!</div>
+        <mat-icon class="feature-icon" [color]="feature.isComingSoon ? 'accent' : 'primary'">{{feature.icon}}</mat-icon>
+        <h3>{{feature.title}}</h3>
+        <p>{{feature.description}}</p>
+      </mat-card>
+    </div>
+  </div>
+</section>
+
+<section class="offer-section" @fadeIn>
+  <div class="container">
+    <div class="offer-badge">Limited Time Offer!</div>
+    <h2>Start with 3 Months Free Trial</h2>
+    <div class="offer-features">
+      <div class="offer-feature">
+        <mat-icon>check_circle</mat-icon>
+        <span>Full Access to All Features</span>
+      </div>
+      <div class="offer-feature">
+        <mat-icon>check_circle</mat-icon>
+        <span>No Credit Card Required</span>
+      </div>
+      <div class="offer-feature">
+        <mat-icon>check_circle</mat-icon>
+        <span>Free Technical Support</span>
+      </div>
+    </div>
+    <button mat-raised-button color="accent" class="offer-button" (click)="bookDemo()">
+      Claim Your Free Trial
+      <mat-icon>redeem</mat-icon>
+    </button>
+    <p class="offer-terms">*No credit card required. Cancel anytime.</p>
+  </div>
+</section>
+<section class="testimonial-section" @fadeIn>
+  <div class="container">
+    <mat-card class="testimonial-card">
+      <mat-icon class="quote-icon">format_quote</mat-icon>
+      <blockquote>
+        <p>{{testimonial.quote}}</p>
+        <footer>
+          <cite>
+            <strong>{{testimonial.clientName}}</strong>
+            <span>{{testimonial.role}}</span>
+            <img class="header-logo-image" src="logo.png" >
+          </cite>
+        </footer>
+      </blockquote>
+    </mat-card>
+  </div>
+</section>
+
+
+<section class="contact-section" @fadeIn>
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h2>Need More Information?</h2>
+        <p class="subtitle">Our expert team is here to help you choose the right solution for your business</p>
+        
+        <div class="contact-details">
+          <div class="contact-item">
+            <mat-icon>support_agent</mat-icon>
+            <div>
+              <h3>Sales Support</h3>
+              <p>+91 8796148014</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <mat-icon>schedule</mat-icon>
+            <div>
+              <h3>Business Hours</h3>
+              <p>24/7</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <mat-icon>mail</mat-icon>
+            <div>
+              <h3>Email Us</h3>
+              <p>{{'akshay.muglikar@gmail.com'}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quick-contact">
+        <mat-card>
+          <h3>Request More Details</h3>
+          <p>Fill out the form and we'll get back to you shortly</p>
+          <button mat-raised-button color="primary" class="contact-button" (click)="bookDemo()">
+            Contact Sales Team
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<footer class="site-footer">
+  <div class="container">
+    <!-- <div class="footer-grid">
+      <div class="footer-section">
+        <h4>Contact</h4>
+        <p>
+          <mat-icon>email</mat-icon>
+          {{'akshay.muglikar@gmail.com'}}
+        </p>
+        <p>
+          <mat-icon>phone</mat-icon>
+          +91 8796148014
+        </p>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#">Features</a></li>
+          <li><a href="#">Pricing</a></li>
+          <li><a href="#">Support</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Follow Us</h4>
+        <div class="social-icons">
+          <a href="#" aria-label="Facebook">
+            <mat-icon>facebook</mat-icon>
+          </a>
+          <a href="#" aria-label="Twitter">
+            <mat-icon>twitter</mat-icon>
+          </a>
+          <a href="#" aria-label="LinkedIn">
+            <mat-icon>linkedin</mat-icon>
+          </a>
+        </div>
+      </div>
+    </div> -->
+    
+    <div class="footer-bottom">
+      <p>&copy; 2025 Billing & Inventory System. All rights reserved.</p>
+    </div>
+  </div>
+</footer>

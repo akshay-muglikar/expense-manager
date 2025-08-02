@@ -23,15 +23,23 @@ export class AppComponent {
     this.clientName =  this.authService.clientModel?.name
   }
   title = 'inventory-ui';
-  selected=1;
+  selected=0;
   routes :RoutDetails[] = [
-    new RoutDetails('','Dashboard', 'home'),
     new RoutDetails('bill','Billing', 'receipt'),
+    new RoutDetails('dashboard','Dashboard', 'dashboard'),
     new RoutDetails('expense','Expense', 'money_off'),
     new RoutDetails('inventory','Inventory', 'inventory'),
-
   ]
+
+  isLoggedIn(): boolean {
+    return !!this.authService.getaccessToken();
+  }
   constructor(private router: Router, private authService : AuthService){}
+  
+  navigateToLogin() {
+    this.router.navigate(['login']);
+  }
+
   onclickRoute(index:number){
     this.selected = index;
     this.router.navigate([this.routes[this.selected].path])

@@ -25,6 +25,31 @@ public class LoginController: ControllerBase
         }
         return Unauthorized("Invalid credentials");
     }
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(UserModel user)
+    {
+        await _loginService.Register(user);
+        return Ok();
+    }
+    [HttpGet("clients")]
+    public async Task<IActionResult> GetAllClient()
+    {
+        var clients = await _loginService.GetAllClients();
+        return Ok(clients);
+    }
+    [HttpGet("users")]
+    public async Task<IActionResult> GetUsers(Guid id)
+    {
+        var users = await _loginService.GetUsersAsync(id);
+        return Ok(users);
+    }
+
+    [HttpPost("contact")]
+    public async Task<IActionResult> ContactUs(Contact contact)
+    {
+        await _loginService.ContactUs(contact);
+        return Ok();
+    }
 
     [HttpGet("client")]
     public async Task<IActionResult> GetClient()

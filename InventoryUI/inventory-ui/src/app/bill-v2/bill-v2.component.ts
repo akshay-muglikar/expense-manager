@@ -1,10 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { BillModel } from '../models/bill.model';
 import { BillService } from '../services/bill.service';
-import { BillItemFormComponent } from "../bill-item-form/bill-item-form.component";
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BillItemModel } from '../models/bill-item.model';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { InventoryService } from '../common/InventoryService/InventoryService';
 import { Item } from '../contracts/item.model';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +15,7 @@ import { AddBillModel } from '../contracts/bill.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BillhistoryComponent } from '../billhistory/billhistory.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { AddinventoryComponent } from "../addinventory/addinventory.component";
 
 @Component({
   selector: 'app-bill-v2',
@@ -28,12 +28,15 @@ import { NgSelectModule } from '@ng-select/ng-select';
     MatProgressBarModule,
     NgSelectModule,
     ReactiveFormsModule,
-    BillhistoryComponent
-  ],
+    BillhistoryComponent,
+    AddinventoryComponent
+],
   templateUrl: './bill-v2.component.html',
   styleUrl: './bill-v2.component.scss'
 })
 export class BillV2Component {
+
+
   loading = false;
   bill: BillModel = {
     name: '',
@@ -72,6 +75,22 @@ export class BillV2Component {
       this.print(billId);
     });
   }
+  listenToAddInventory() {
+    window.addEventListener('add-inventory', (event: any) => {
+      this.getItems();
+      //close modal if open
+      const modal = document.querySelector('.modal');
+      if (modal) {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+        (modal as HTMLElement).style.display = 'none';
+      }
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.remove();
+      }
+    });
+  }
   listenToEdit() {
     window.addEventListener('edit-bill', (event: any) => {
       const billId = event.detail.billId;
@@ -87,9 +106,22 @@ export class BillV2Component {
       this.openSnackBar('Save the bill before sending to WhatsApp');
       return;
     }
-    const message = `Bill Details:\nName: ${this.bill.name}\nMobile: ${this.bill.mobile}\nPayment Mode: ${this.bill.paymentMode}\nBill Date: ${this.bill.billDate}\nItems: ${JSON.stringify(this.billItems)}`;
+    this.calculateTotal();
+    //send download link to whatsapp
+    const message = `Hi ${this.bill.name},
+Thank you for your purchase! Here are the details of your bill:
+    
+Invoice ID: ${this.bill.id}
+Bill Date: ${formatDate(this.bill.billDate ?? new Date(), 'dd/MM/yyyy', 'en-US')}
+
+Total Item(s): ${this.billItems.length}
+    
+Total Amount: ₹${this.total.toFixed(2)}
+Payment Mode: ${this.bill.paymentMode}
+
+If you have any questions, feel free to contact us.`;
     // Send the message to WhatsApp
-    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=91${this.bill.mobile}&text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   }
   constructor(private billService: BillService, private itemService: InventoryService) {
@@ -111,6 +143,7 @@ export class BillV2Component {
     this.addIteminBill();
      this.listenToPrint();
     this.listenToEdit();
+    this.listenToAddInventory();
   }
 
   addBill() {
@@ -179,8 +212,17 @@ export class BillV2Component {
       this.openSnackBar('Save the bill before updating');
       return;
     }
+    let addBill: AddBillModel = {
+      name: this.bill.name,
+      mobile: this.bill.mobile,
+      paymentMode: this.bill.paymentMode,
+      billDate: this.bill.billDate,
+      BillItems: this.billItems,
+      discount: this.bill.discount,
+      advance: this.bill.advance,
+    };
     this.loading = true;
-    this.billService.updateBill(this.bill.id, this.bill).pipe(
+    this.billService.updateBillWithItems(this.bill.id.toString(), addBill).pipe(
       finalize(() => this.loading = false)
     ).subscribe({
       next: () => {
@@ -193,7 +235,16 @@ export class BillV2Component {
   }
   saveBillWithItems() {
     this.loading = true;
-    this.billService.addBill(this.bill).pipe(
+    let addBill: AddBillModel = {
+      name: this.bill.name,
+      mobile: this.bill.mobile,
+      paymentMode: this.bill.paymentMode,
+      billDate: this.bill.billDate,
+      BillItems: this.billItems,
+      discount: this.bill.discount,
+      advance: this.bill.advance,
+    };
+    this.billService.addBillWithItems(addBill).pipe(
       finalize(() => this.loading = false)
     ).subscribe({
       next: (result) => {

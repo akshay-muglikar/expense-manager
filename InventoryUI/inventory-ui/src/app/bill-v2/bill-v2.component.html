@@ -74,6 +74,12 @@
         <mat-icon>add</mat-icon> Add Item
       </button>
     </div>
+    <div class="form-row mt-3">
+      <!-- open modal -->
+      <button mat-raised-button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addItemModal">
+        <mat-icon>add</mat-icon>Add in Inventory
+      </button>
+    </div>
 
     <div class="bill-summary">
       <div class="summary-details">
@@ -129,3 +135,20 @@
   <app-billhistory></app-billhistory>
 </div>
 
+
+
+<!-- Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="addItemModalLabel">Add Item to Inventory</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <app-addinventory></app-addinventory>
+      </div>
+
+    </div>
+  </div>
+</div>

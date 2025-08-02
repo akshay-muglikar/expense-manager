@@ -243,7 +243,7 @@ public class BillService
                         index = 0,
                         parameters = new object[]
                         {
-                            new { type = "text", text = await GenerateDownloadLink(id) }
+                           // new { type = "text", text = await GenerateDownloadLink(id) }
                         }
                     }
                  }
@@ -265,33 +265,7 @@ public class BillService
         File.Delete(tempFilePath);
     }
 
-    public async Task<String> GenerateDownloadLink(int id)
-    {
-        var bill = await _billRepository.GetByIdAsync(id);
-        if (bill == null)
-            throw new Exception("Bill not found");
-
-
-        // Generate jwt token
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim("client_id", _clientId.ToString()),
-                new Claim("bill_id", bill.Id.ToString())
-            }),
-            Expires = DateTime.UtcNow.AddDays(7),
-            SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_inventoryConfig.JwtSettings.UrlKey)),
-                SecurityAlgorithms.HmacSha256Signature)
-        };
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        var tokenString = tokenHandler.WriteToken(token);
-        var downloadLink = $"api/bill/download/{_clientId}/{id}?apiKey={tokenString}";
-        return downloadLink;
-
-    }
+   
 
     public async Task<Stream> GeneratePdf(int id, Guid clientId, string apiKey)
     {

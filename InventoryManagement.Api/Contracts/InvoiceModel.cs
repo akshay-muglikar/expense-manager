@@ -16,6 +16,8 @@ public class InvoiceModel
     public string Comments { get; set; }
     public int InvoiceAmount { get; set; }
     public int Discount { get; set; }
+    public string? PaymentMode { get; set; }
+    public int Advance { get; set; }
 
 }
 

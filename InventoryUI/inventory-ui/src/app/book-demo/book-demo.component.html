@@ -1,0 +1,105 @@
+<section class="hero-section">
+  <div class="container">
+    <h1>Book a Free Demo</h1>
+    <p class="subtitle">
+      Experience how our inventory management solution can transform your business operations.
+      Schedule a personalized demo with our experts today.
+    </p>
+  </div>
+</section>
+
+<section class="form-section">
+  <div class="container">
+    <div class="content-wrapper">
+      <div class="form-container">
+        <form [formGroup]="demoForm" (ngSubmit)="onSubmit()" class="demo-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Full Name</mat-label>
+            <input matInput formControlName="name" placeholder="Enter your full name">
+            <mat-icon matPrefix>person</mat-icon>
+            <mat-error>{{getErrorMessage('name')}}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Mobile Number</mat-label>
+            <input matInput formControlName="phone" placeholder="Enter 10-digit mobile number">
+            <mat-icon matPrefix>phone</mat-icon>
+            <mat-error>{{getErrorMessage('phone')}}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email Address</mat-label>
+            <input matInput formControlName="email" placeholder="Enter your email address">
+            <mat-icon matPrefix>email</mat-icon>
+            <mat-error>{{getErrorMessage('email')}}</mat-error>
+          </mat-form-field>
+
+
+
+          <mat-form-field appearance="outline">
+            <mat-label>City</mat-label>
+            <input matInput formControlName="city" placeholder="Enter your city">
+            <mat-icon matPrefix>location_city</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Message</mat-label>
+            <textarea matInput formControlName="message" rows="4" 
+                      placeholder="Tell us about your requirements"></textarea>
+            <mat-icon matPrefix>message</mat-icon>
+            <mat-error>{{getErrorMessage('message')}}</mat-error>
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" type="submit" 
+                  [disabled]="isSubmitting" class="submit-button">
+            <mat-spinner diameter="20" *ngIf="isSubmitting"></mat-spinner>
+            <span >Book Demo</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="contact-info">
+        <h2>Get in Touch</h2>
+        
+        <div class="info-item">
+          <mat-icon>phone</mat-icon>
+          <div>
+            <h3>Call Us</h3>
+            <p>+91 8796148014</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <mat-icon>email</mat-icon>
+          <div>
+            <h3>Email Us</h3>
+            <p>{{'akshay.muglikar@gmail.com'}}</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <mat-icon>location_on</mat-icon>
+          <div>
+            <h3>Visit Us</h3>
+            <p>123 Business Street<br>Mumbai, Maharashtra 400001</p>
+          </div>
+        </div>
+
+        <div class="social-links">
+          <h3>Follow Us</h3>
+          <div class="social-icons">
+            <a href="#" target="_blank" aria-label="Facebook">
+              <mat-icon>facebook</mat-icon>
+            </a>
+            <a href="#" target="_blank" aria-label="Twitter">
+              <mat-icon>twitter</mat-icon>
+            </a>
+            <a href="#" target="_blank" aria-label="LinkedIn">
+              <mat-icon>linkedin</mat-icon>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

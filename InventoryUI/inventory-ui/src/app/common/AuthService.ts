@@ -6,6 +6,9 @@ import { BehaviorSubject } from "rxjs/internal/BehaviorSubject";
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
+  bookDemo(value: any) {
+      return this.http.post('/api/login/contact', value);
+  }
   logout() {
     localStorage.removeItem(this.tokenKey)
     this.router.navigate(['login']);

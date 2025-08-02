@@ -40,7 +40,9 @@ public class InvoiceProvider
                 Items = items,
                 Comments = "test",
                 InvoiceAmount = BillUtility.Calculate(items, bill.Discount, bill.Advance),
-                Discount = bill.Discount
+                Discount = bill.Discount,
+                PaymentMode = bill.PaymentMode.ToString(),
+                Advance = bill.Advance
             };
         var document= new InvoiceDocument(model);
         var tempfile =Path.Combine(Path.GetTempPath(), Path.GetTempFileName());

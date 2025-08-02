@@ -80,9 +80,14 @@ public class InvoiceDocument : IDocument
             });
 
             column.Item().Element(ComposeTable);
+            column.Item().PaddingRight(5).AlignRight().Text($"Payment Mode: {Model.PaymentMode}").SemiBold();
 
             int discount = Model.Discount;
             column.Item().PaddingRight(5).AlignRight().Text($"Discount: {discount.ToString("C", InvoiceDocument.indiaCulture)}").SemiBold();
+            if (Model.Advance > 0)
+            {
+                column.Item().PaddingRight(5).AlignRight().Text($"Advance: {Model.Advance.ToString("C", InvoiceDocument.indiaCulture)}").SemiBold();
+            }
 
 
             int totalPrice = Model.InvoiceAmount;

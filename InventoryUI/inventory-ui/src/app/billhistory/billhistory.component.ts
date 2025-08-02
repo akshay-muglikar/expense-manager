@@ -7,26 +7,36 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, RowSelectionOptions, GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CommonModule, DecimalPipe, formatDate } from '@angular/common';
+import { MatOptionModule, provideNativeDateAdapter } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-billhistory',
   standalone: true,
   imports: [
-    FormsModule,
-    MatProgressBarModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    AgGridAngular
+    AgGridAngular,
+        CommonModule,
+        MatProgressBarModule,
+        MatSelectModule,
+        MatIconModule,
+        MatCardModule,
+        FormsModule,
+        MatDatepickerModule,
+        MatFormFieldModule,
+        MatInputModule
   ],
   templateUrl: './billhistory.component.html',
-  styleUrls: ['./billhistory.component.scss']
+  styleUrls: ['./billhistory.component.scss'],
+  providers: [provideNativeDateAdapter()]
 })
 export class BillhistoryComponent {
   loading = false;
   bills: any[] = [];
   billsList: any[] = [];
-  
+   filter: string = "0";
   defaultColDef = {
     flex: 1,
     minWidth: 100,
@@ -34,7 +44,33 @@ export class BillhistoryComponent {
     filter: true,
     resizable: true
   };
-  
+  start: Date = new Date();
+  end: Date = new Date();
+  hideCustomDate: boolean = true;
+  startDateText:string='';
+  endDateText:string ='';
+  subtractDays(days: number, date: Date = new Date()): Date {
+    if (days == 0) {
+      date.setHours(0, 0, 0, 0)
+      return date;
+    }
+    date.setDate(date.getDate() - days);
+    return date;
+  }
+  onSelectChange() {
+    if (this.filter != "-1") {
+      this.end = new Date();
+      this.start = this.subtractDays(Number(this.filter))
+      this.loadBills()
+      this.hideCustomDate = true;
+      
+    }
+    else {
+      this.start = this.subtractDays(0);
+      this.end = this.subtractDays(0);
+      this.hideCustomDate = false;
+    }
+  }
   colDefs: ColDef[] = [
     { 
       headerName: 'Bill No',
@@ -72,12 +108,20 @@ export class BillhistoryComponent {
   constructor(private billService: BillService) {}
 
   ngOnInit() {
+    this.onSelectChange();
+  }
+onCustomDateSet() {
+    this.start = new Date(this.startDateText)
+    this.end = this.subtractDays(-1, new Date(this.endDateText))
     this.loadBills();
   }
-
   loadBills() {
     this.loading = true;
-    this.billService.getAllBills().subscribe({
+    const formatedDate = formatDate(this.start, 'yyyy-MM-ddTHH:mm:ss', 'en-US');
+    const formatedStartDate = formatDate(this.end, 'yyyy-MM-ddTHH:mm:ss', 'en-US');
+    this.bills = [];
+    this.billsList = [];
+    this.billService.getBillsbyDate(formatedDate, formatedStartDate).subscribe({
       next: (bills) => {
         this.bills = bills;
         this.billsList = bills;
@@ -88,7 +132,7 @@ export class BillhistoryComponent {
       complete: () => {
         this.loading = false;
       }
-    });
+     });
   }
 
   onFilterTextBoxChanged() {
