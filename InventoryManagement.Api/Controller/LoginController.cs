@@ -8,11 +8,12 @@ namespace InventoryManagement.Api.Controller;
 
 [ApiController]
 [Route("api/[controller]")]
-public class LoginController: ControllerBase
+public class LoginController : ControllerBase
 {
     private readonly LoginService _loginService;
 
-    public LoginController(LoginService loginService){
+    public LoginController(LoginService loginService)
+    {
         _loginService = loginService;
     }
 
@@ -20,8 +21,9 @@ public class LoginController: ControllerBase
     public async Task<IActionResult> Login(UserModel user)
     {
         var at = await _loginService.Login(user);
-        if(at!=null){
-            return Ok(new { AccessToken = new JwtSecurityTokenHandler().WriteToken(at)});
+        if (at != null)
+        {
+            return Ok(new { AccessToken = new JwtSecurityTokenHandler().WriteToken(at) });
         }
         return Unauthorized("Invalid credentials");
     }
@@ -50,14 +52,32 @@ public class LoginController: ControllerBase
         await _loginService.ContactUs(contact);
         return Ok();
     }
+    [HttpPost("register/client")]
+    public async Task<IActionResult> RegisterClient(Register client)
+    {
+        await _loginService.RegisterClient(client);
+        return Ok();
+    }
 
     [HttpGet("client")]
     public async Task<IActionResult> GetClient()
     {
-        var claims = User?.Claims.SingleOrDefault(c => c.Type=="client_id").Value;
+        var claims = User?.Claims.SingleOrDefault(c => c.Type == "client_id").Value;
         Console.WriteLine($"-----------------{claims}");
         var at = await _loginService.GetClient(claims);
-        Console.WriteLine($"-------------------{at?.Name??"NoName"}");
+        Console.WriteLine($"-------------------{at?.Name ?? "NoName"}");
         return Ok(at);
+    }
+
+
+    [HttpGet("download/{clientId}")]
+    public async Task<IActionResult> DownloadDatabase([FromRoute] Guid clientId)
+    {
+        var stream = await _loginService.DownloadClientDatabase(clientId);
+        if (stream == null)
+        {
+            return NotFound("No database found");
+        }
+        return File(stream, "application/octet-stream", "database.db");
     }
 }

@@ -39,6 +39,7 @@ public class BillController : ControllerBase
         return Ok(bills);
     }
 
+    
     [HttpPost]
     public async Task<IActionResult> AddBill(BillModel bill)
     {

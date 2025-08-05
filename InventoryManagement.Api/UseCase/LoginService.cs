@@ -2,12 +2,14 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using InventoryManagement.Api.Config;
 using InventoryManagement.Api.Contracts;
 using InventoryManagement.Api.Provider;
 using InventoryManagement.Domain.Model;
 using InventoryManagement.Domain.Repository;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace InventoryManagement.Api.UseCase;
@@ -16,11 +18,13 @@ public class LoginService
 {
     private readonly ILoginReporsitory _loginReporsitory;
     protected readonly UserServiceProvider userServiceProvider;
-
-    public LoginService(ILoginReporsitory loginReporsitory, UserServiceProvider userServiceProvider)
+    private readonly string _connectionString;
+    public LoginService(ILoginReporsitory loginReporsitory,
+    UserServiceProvider userServiceProvider, IOptionsSnapshot<InventoryConfig> inventoryConfig)
     {
         this.userServiceProvider = userServiceProvider;
         _loginReporsitory = loginReporsitory;
+        _connectionString = inventoryConfig.Value.ConnectionStrings.Database.Replace("{AppBase}", AppContext.BaseDirectory);
     }
 
     public async Task<JwtSecurityToken> Login(UserModel user){
@@ -101,5 +105,54 @@ public class LoginService
     internal async Task ContactUs(Contact contact)
     {
         await _loginReporsitory.ContactUs(contact);
+    }
+
+    internal async Task RegisterClient(Register client)
+    {
+        if (string.IsNullOrEmpty(client.Username) || string.IsNullOrEmpty(client.Password) || string.IsNullOrEmpty(client.Name))
+        {
+            throw new ArgumentException("Username, password, and name must be provided");
+        }
+        if(userServiceProvider.GetUsername()== "admin")
+        {
+            throw new UnauthorizedAccessException("Admin user cannot be registered through this endpoint");
+        }
+        
+        var clientModel = new ClientModel
+        {
+            Name = client.Name,
+            LicenseExpiryDate = DateTime.Now.AddMonths(3)
+        };
+
+        var userModel = new User
+        {
+            Username = client.Username,
+            Password = client.Password,
+            ClientId = clientModel.Id
+        };
+        var ClientDetails = new ClientDetails
+        {
+            Address = client.Address,
+            RegistrationDate = DateTime.Now,
+        };
+
+        await _loginReporsitory.RegisterClient(clientModel, userModel, ClientDetails);
+    }
+
+    internal async Task<Stream> DownloadClientDatabase(Guid clientId)
+    {
+        if (userServiceProvider.GetUsername() == "admin")
+        {
+            throw new UnauthorizedAccessException("Admin user cannot download client database through this endpoint");
+        }
+
+        var downloadPath = _connectionString.Replace("{clientId}", clientId.ToString())
+                                .Replace("Data Source=", "");
+        if (!File.Exists(downloadPath))
+        {
+            throw new FileNotFoundException("Database file not found", downloadPath);
+        }
+
+        return new FileStream(downloadPath, FileMode.Open, FileAccess.Read);
     }
 }
