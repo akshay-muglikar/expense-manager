@@ -10,29 +10,63 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { FormsModule } from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, GridApi, GridReadyEvent, RowSelectedEvent, RowSelectionOptions } from 'ag-grid-community';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCardModule } from '@angular/material/card';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 
 @Component({
   selector: 'app-expense',
   standalone: true,
   imports: [
+    AgGridAngular,
     CommonModule,
-    DecimalPipe,
-    MatIconModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatProgressBarModule,
+    MatSelectModule,
+    MatIconModule,
+    MatCardModule,
     FormsModule,
-    AgGridAngular
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule
   ],
   templateUrl: './expense.component.html',
-  styleUrl: './expense.component.scss'
+  styleUrl: './expense.component.scss',
+  providers: [provideNativeDateAdapter()],
 })
 export class ExpenseComponent {
   rowSelection: RowSelectionOptions | "single" | "multiple" = {
     mode: "singleRow",
   };
+  start: Date = new Date();
+  end: Date = new Date();
+  hideCustomDate: boolean = true;
+  startDateText:string='';
+  endDateText:string ='';
+   filter: string = "0";
+  subtractDays(days: number, date: Date = new Date()): Date {
+    if (days == 0) {
+      date.setHours(0, 0, 0, 0)
+      return date;
+    }
+    date.setDate(date.getDate() - days);
+    return date;
+  }
+  onSelectChange() {
+    if (this.filter != "-1") {
+      this.end = new Date();
+      this.start = this.subtractDays(Number(this.filter))
+      this.getExpenses()
+      this.hideCustomDate = true;
+      
+    }
+    else {
+      this.start = this.subtractDays(0);
+      this.end = this.subtractDays(0);
+      this.hideCustomDate = false;
+    }
+  }
   onRowSelected($event: RowSelectedEvent<any,any>) {
     let selectedRows = this.gridApi.getSelectedRows();
     if(selectedRows.length==0){
@@ -43,6 +77,7 @@ export class ExpenseComponent {
   }
   clear() {
     this.selectedExpense = { id: "0", description: '', user: 'admin', amount: "0", date: formatDate((new Date()), "yyyy-MM-ddThh:mm:ss", "en-US") }
+    this.gridApi.deselectAll();
   }
   getDateString(arg0: string) {
     return formatDate(arg0, "dd MMM yyy hh:ss", "en-US");
@@ -101,9 +136,18 @@ export class ExpenseComponent {
   ngOnInit() {
     this.getExpenses();
   }
+  onCustomDateSet() {
+    this.start = new Date(this.startDateText)
+    this.end = this.subtractDays(-1, new Date(this.endDateText))
+    this.getExpenses();
+  }
   getExpenses() {
+    const formatedDate = formatDate(this.start, 'yyyy-MM-ddTHH:mm:ss', 'en-US');
+    const formatedStartDate = formatDate(this.end, 'yyyy-MM-ddTHH:mm:ss', 'en-US');
+    this.expenses = [];
+
     this.loading = true;
-    this.expenseService.getExpenses().subscribe({
+    this.expenseService.getExpensesbyDate(formatedDate, formatedStartDate).subscribe({
       next: (expenses) => {
         this.expenses = expenses;
         this.totalExpenses = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);

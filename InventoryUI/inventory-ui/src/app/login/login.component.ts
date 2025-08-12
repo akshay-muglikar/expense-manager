@@ -24,10 +24,15 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
+  navigateToRegistration() {
+    this.router.navigate(['/book-demo']);
+  }
   loginForm: FormGroup;
   isSubmitting = false;
   hidePassword = true;
-
+  ngOnInit() {
+    this.listenForLoginError();
+  }
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -61,7 +66,16 @@ export class LoginComponent {
       }
     });
   }
-
+  listenForLoginError() {
+    window.addEventListener('login-error', (event: any) => {
+      const error = event.detail;
+      this.snackBar.open('Login failed: ' + (error || 'Unknown error'), 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+      this.isSubmitting = false;
+    });
+  }
   getErrorMessage(controlName: string): string {
     const control = this.loginForm.get(controlName);
     if (!control) return '';

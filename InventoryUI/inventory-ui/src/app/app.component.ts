@@ -24,13 +24,14 @@ export class AppComponent {
   }
   title = 'inventory-ui';
   selected=0;
+  clentName :string = '';
   routes :RoutDetails[] = [
     new RoutDetails('bill','Billing', 'receipt'),
     new RoutDetails('dashboard','Dashboard', 'dashboard'),
     new RoutDetails('expense','Expense', 'money_off'),
     new RoutDetails('inventory','Inventory', 'inventory'),
   ]
-
+  
   isLoggedIn(): boolean {
     return !!this.authService.getaccessToken();
   }
@@ -43,6 +44,14 @@ export class AppComponent {
   onclickRoute(index:number){
     this.selected = index;
     this.router.navigate([this.routes[this.selected].path])
+  }
+  getClientDetails(){
+    this.authService.getClientDetails().subscribe((resp: any)=>{
+      this.clentName = resp.name;
+    });
+  }
+  ngOnInit(){
+    this.getClientDetails();
   }
 }
 

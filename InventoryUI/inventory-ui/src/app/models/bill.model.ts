@@ -9,3 +9,14 @@ export interface BillModel {
   paymentMode?: string;
   billDate?: Date;
 }
+
+export interface GetBillModel {
+  id?: number;
+  name: string;
+  mobile?: string;
+  discount?: number;
+  advance?: number;
+  paymentMode: number;
+  billDate?: Date;
+  paymentUser?: string;
+}

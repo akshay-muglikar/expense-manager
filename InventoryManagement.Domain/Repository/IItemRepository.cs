@@ -12,4 +12,6 @@ public interface IItemRepository
     Task AddAsync(Item item, string user);
     Task UpdateAsync(Item item, string user);
     Task DeleteAsync(int id, string user);
+    Task<(int, int)> AddOrUpdateAsync(List<Item> items, string user);
+    Task<Item> GetByBarcodeAsync(string barcode);
 }

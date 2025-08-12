@@ -61,5 +61,68 @@ public class ItemRepository : IItemRepository
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task<(int, int)> AddOrUpdateAsync(List<Item> items, string user)
+    {
+        var transaction = _context.Database.BeginTransaction();
+        int addedCount = 0, updatedCount = 0;
+        try
+        {
+            foreach (var item in items)
+            {
+                if (item.Id == 0)
+                {
+                    await _context.Items.AddAsync(item);
+                    await _historyRepository.AddAsync(item, "add", user);
+                    addedCount++;
+                }
+                else
+                {
+                    var existingItem = _context.Items.Find(item.Id);
+                    if (existingItem != null)
+                    {
+                        // check if any properties have changed
+                        if (existingItem.Name == item.Name &&
+                            existingItem.Car == item.Car &&
+                            existingItem.Quantity == item.Quantity &&
+                            existingItem.Description == item.Description &&
+                            existingItem.Price == item.Price && existingItem.Barcode == item.Barcode)
+                        {
+                            continue; // No changes, skip update
+                        }
+
+                        existingItem.Name = item.Name;
+                        existingItem.Car = item.Car;
+                        existingItem.Quantity = item.Quantity;
+                        existingItem.Description = item.Description;
+                        existingItem.Price = item.Price;
+                        existingItem.Barcode = item.Barcode;
+                        _context.Items.Update(existingItem);
+                        await _historyRepository.AddAsync(existingItem, "update", user);
+                        updatedCount++;
+                    }
+                    else
+                    {
+                        await _context.Items.AddAsync(item);
+                        await _historyRepository.AddAsync(item, "add", user);
+                        addedCount++;
+                    }
+                }
+            }
+            await _context.SaveChangesAsync();
+            transaction.Commit();
+            return (addedCount, updatedCount);
+        }
+        catch (Exception)
+        {
+            transaction.Rollback();
+            throw;
+        }   
+    }
+
+    public Task<Item> GetByBarcodeAsync(string barcode)
+    {
+        return _context.Items.FirstOrDefaultAsync(x => x.Barcode == barcode);
+    }
 }
 

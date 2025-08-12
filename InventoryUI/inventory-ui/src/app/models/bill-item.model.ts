@@ -3,4 +3,5 @@ export interface BillItemModel {
   quantity: number; // Quantity of the item
   amount?: number; // Total amount for the item (calculated as quantity * unitPrice)
   itemName?: string; // Name of the item
+  itemTotal?: number; // Price per unit of the item
 }

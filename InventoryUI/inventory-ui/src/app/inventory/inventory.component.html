@@ -16,6 +16,7 @@
 
       <div class="tab-content">
         <div class="search-container">
+          <div>
           <mat-form-field appearance="outline">
             <mat-icon matPrefix>search</mat-icon>
             <input matInput 
@@ -24,6 +25,13 @@
                    placeholder="Search items..." 
                    (input)="onFilterTextBoxChanged()" />
           </mat-form-field>
+          </div>
+          <button *ngIf="!scanMode" mat-raised-button color="secondary" (click)="scanToUpdateInventory()" data-toggle="modal" data-target="#scanModal">
+            <mat-icon>search</mat-icon>
+            Scan
+            </button>
+          <button mat-raised-button color="secondary" (click)="downloadInventory()"><mat-icon style="margin:0px">download</mat-icon></button>
+          <button mat-raised-button color="secondary" style="margin-left: 5px;" (click)="uploadInventory()"><mat-icon style="margin: 0px;">upload</mat-icon></button>
         </div>
 
           <ag-grid-angular 
@@ -75,6 +83,10 @@
               <label for="Price">Price</label>
               <input id="Price" type="number" formControlName="Price" placeholder="Enter price" required/>
             </div>
+            <div class="form-group">
+              <label for="Barcode">Barcode</label>
+              <input id="Barcode" type="text" formControlName="Barcode" placeholder="Enter barcode" required/>
+            </div>
 
             <div class="actions">
               <button type="button" mat-button class="btn btn-secondary" (click)="resetForm()">
@@ -95,7 +107,7 @@
     <mat-tab>
       <ng-template mat-tab-label>
         <mat-icon class="tab-icon">insights</mat-icon>
-        Statistics
+        Insights
       </ng-template>
 
       <div class="tab-content">
@@ -107,27 +119,74 @@
             <mat-progress-bar mode="determinate" [value]="100"></mat-progress-bar>
           </mat-card>
 
-          <mat-card class="stat-card">
-            <mat-icon class="stat-icon">directions_car</mat-icon>
-            <div class="stat-value">{{uniqueCarCount}}</div>
-            <div class="stat-label">Unique Car Models</div>
-            <mat-progress-bar mode="determinate" [value]="(uniqueCarCount / items.length) * 100"></mat-progress-bar>
-          </mat-card>
-
-          <mat-card class="stat-card">
-            <mat-icon class="stat-icon">category</mat-icon>
-            <div class="stat-value">{{commanCount}}</div>
-            <div class="stat-label">Miscellaneous Items</div>
-            <mat-progress-bar mode="determinate" [value]="(commanCount / items.length) * 100"></mat-progress-bar>
-          </mat-card>
+         
 
           <mat-card class="stat-card">
             <mat-icon class="stat-icon">price_check</mat-icon>
             <div class="stat-value">₹{{totalInventoryValue | number:'1.0-0'}}</div>
             <div class="stat-label">Total Inventory Value</div>
           </mat-card>
+          <mat-card class="stat-card">
+            <mat-icon class="stat-icon">warning</mat-icon>
+            <div class="stat-value">{{inventorybelowThreshold}}</div>
+            <div class="stat-label">Restock Needed Inventory</div>
+            <mat-progress-bar mode="determinate" [value]="(inventorybelowThreshold / items.length) * 100"></mat-progress-bar>
+          </mat-card>
         </div>
+      </div>
+      <div class="item-below-threshold">
+        <h2>Restock Needed Inventory</h2>
+        <p *ngIf="inventorybelowThreshold === 0">All items are above the restock threshold</p>
+        <div class="item-below-threshold-list">
+        <mat-card *ngFor="let item of itembelowThreshold" class="item-card">
+          <div class="item-details">
+            <h3>{{item.name}}</h3>
+            <p>Quantity: {{item.quantity}}</p>
+            <p>Price: ₹{{item.price | number:'1.0-0'}}</p>
+          </div>
+          </mat-card>
+          </div>
       </div>
     </mat-tab>
   </mat-tab-group>
+</div>
+
+<div class="modal fade" id="scanmodal" tabindex="-1"role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Scanner Mode</h2>
+      </div>
+      <div class="modal-body">
+          <p *ngIf="scannedItems.length === 0">No items scanned yet.</p>
+        <p>Scan items using the barcode scanner.
+          </p>
+        <table *ngIf="scannedItems.length > 0" class="table">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Category</th>
+              <th>Car Model</th>
+              <th>Quantity</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of scannedItems; let i = index; ">
+              <td>{{item.name}}</td>
+              <td>{{item.category}}</td>
+              <td>{{item.car}}</td>
+              <td><input type="number" [(ngModel)]="scannedItems[i].quantity" ></td>
+              <td>₹{{item.price | number:'1.0-0'}}</td>
+            </tr>
+          </tbody>
+        </table>
+      
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="exitScanner()">Save changes</button>
+        <button type="button" class="btn btn-secondary"(click)="exitScanner()" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>

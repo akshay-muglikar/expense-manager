@@ -50,7 +50,36 @@
         <div class="summary-value">₹{{totalExpenses | number:'1.0-0'}}</div>
       </div>
     </div>
+<mat-form-field appearance="outline">
+      <mat-label>Time Period</mat-label>
+      <mat-select [(ngModel)]="filter" (ngModelChange)="onSelectChange()">
+        <mat-option value="0">Today</mat-option>
+        <mat-option value="7">Last 7 days</mat-option>
+        <mat-option value="30">Last 30 days</mat-option>
+        <mat-option value="-1">Custom</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <span [hidden]="hideCustomDate">
+<mat-form-field appearance="outline">
+        <mat-label>Start Date</mat-label>
+        <input matInput [matDatepicker]="startPicker" [(ngModel)]="startDateText">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
 
+      <mat-form-field appearance="outline">
+        <mat-label>End Date</mat-label>
+        <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDateText">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+</span>
+      <button (click)="onCustomDateSet()" style="margin-left: 10px;" mat-mini-fab
+      aria-label="Example icon button with a menu icon">
+      <mat-icon>refresh</mat-icon>
+    </button>
     <div class="search-container">
       <mat-form-field appearance="outline">
         <mat-icon matPrefix>search</mat-icon>

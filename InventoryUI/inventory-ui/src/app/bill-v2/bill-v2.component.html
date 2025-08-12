@@ -13,7 +13,8 @@
     </button>
   </div>
 
-  <div *ngIf="activeTab === 'bill'" class="bill-form">
+  <div *ngIf="activeTab === 'bill'" class="bill-form-container">
+  <div class="bill-form">
     <div class="bill-header">
       <h2>New Bill</h2>
       <span class="text-secondary">{{bill.billDate?.toLocaleString()}}</span>
@@ -38,7 +39,8 @@
             <tr>
               <th>Action</th>
               <th>Item</th>
-              <th>Quantity</th>
+              <th>Rate</th>
+              <th>Qty</th>
               <th>Price</th>
             </tr>
           </thead>
@@ -54,15 +56,18 @@
                           [items]="items" 
                           bindLabel="name" 
                           bindValue="id"
-                          placeholder="Select item">
+                          placeholder="Select item"
+                          (change)="setItemProps(i)">
                 </ng-select>
               </td>
+              <td>                  <input type="text" [(ngModel)]="billItems[i].amount" placeholder="Price" (ngModelChange)="updateQty(i)">
+          </td>
               <td>
-                <input type="text" [(ngModel)]="billItems[i].quantity" placeholder="Quantity">
+                <input type="text" [(ngModel)]="billItems[i].quantity" placeholder="Quantity" (ngModelChange)="updateQty(i)">
               </td>
               <td>
-                <input [(ngModel)]="billItems[i].amount" placeholder="Unit Price" (ngModelChange)="calculateTotal()">
-              </td>
+                {{billItems[i].itemTotal | number:'1.0-0'}}
+                </td>
             </tr>
           </tbody>
         </table>
@@ -73,11 +78,15 @@
       <button mat-raised-button class="btn btn-secondary" (click)="addIteminBill()">
         <mat-icon>add</mat-icon> Add Item
       </button>
+    
+    </div>
+    <div class="form-row mt-3">
+      <input type="text" style="width: 300px;" placeholder="Scan/Enter product code" class="form-control mb-2" [(ngModel)]="scannedCode" id="barcodeinput" (keydown.enter)="ScanItem()">
     </div>
     <div class="form-row mt-3">
       <!-- open modal -->
-      <button mat-raised-button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addItemModal">
-        <mat-icon>add</mat-icon>Add in Inventory
+      <button mat-raised-button class="btn btn-secondary btn-inventory" data-bs-toggle="modal" data-bs-target="#addItemModal">
+        <mat-icon>add</mat-icon>Add new Inventory
       </button>
     </div>
 
@@ -92,7 +101,7 @@
             <option value="UPI">UPI</option>
           </select>
         </div>
-        
+
         <div class="summary-item">
           <div class="label">Discount</div>
           <input placeholder="Enter discount" (ngModelChange)="calculateTotal()" [(ngModel)]="bill.discount" class="form-control">
@@ -105,10 +114,10 @@
         
         <div class="summary-item">
           <div class="label">Grand Total</div>
-          <div class="value">{{total}}</div>
+          <div class="value">₹{{total - (bill.discount || 0) - (bill.advance || 0)}}</div>
         </div>
       </div>
-
+<div class="summary-actions">
       <div class="actions">
         <button *ngIf="!bill.id" mat-raised-button class="btn btn-primary" (click)="saveBillWithItems()">
           <mat-icon>save</mat-icon> Save Bill
@@ -116,7 +125,10 @@
         <button *ngIf="bill.id" mat-raised-button class="btn btn-primary" (click)="updateBillWithItems()">
           <mat-icon>update</mat-icon> Update Bill
         </button>
-        <button mat-raised-button class="btn btn-secondary" (click)="printBill()">
+        <button mat-raised-button class="btn btn-secondary btn-download"  (click)="download()">
+          <mat-icon>download</mat-icon> Download
+        </button>
+        <button mat-raised-button class="btn btn-secondary btn-print" (click)="printBill()">
           <mat-icon>print</mat-icon> Print
         </button>
           <button mat-raised-button class="btn btn-secondary" (click)="sendToWhatsapp()">
@@ -125,10 +137,37 @@
           <button mat-raised-button class="btn btn-secondary" (click)="Close()">
           <mat-icon>close</mat-icon> Close
         </button>
-
+</div>
       </div>
     </div>
   </div>
+  <div class="item-select-container">
+    <h3>Add to Bill</h3>
+   <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="filterItems()" placeholder="Search items" class="form-control mb-2">
+    <div class="item-list">
+      <div class ="item-card-grid" >
+       <!--show selectable item cards-->
+       <div *ngFor="let item of searchedItems; let i = index">
+
+          <mat-card class="item-card" (click)="selectItem(item)">
+           <div class="selected-banner" *ngIf="isItemSelected(item)">
+            <mat-icon>check_circle</mat-icon>
+           </div>
+          <div class="stat-value">{{item.name}}</div>
+          <div class="stat-label" *ngIf="item.car">Car -{{item.car}}</div>
+          <div class="stat-label">Price - ₹{{item.price}}</div>
+          </mat-card>
+        </div>
+    </div>
+    <div class="form-row mt-3">
+      <!-- open modal -->
+      <button mat-raised-button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addItemModal">
+        <mat-icon>add</mat-icon>Add new Inventory
+      </button>
+    </div>
+  </div>
+  </div>
+  
 </div>
 
 <div *ngIf="activeTab === 'history'">

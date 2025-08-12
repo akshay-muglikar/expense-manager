@@ -113,6 +113,7 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+builder.Services.AddMemoryCache(); // Add Memory Cache for caching
 var app = builder.Build();
 //configure startup task
 using (var scope = app.Services.CreateScope())

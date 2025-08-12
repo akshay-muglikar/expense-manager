@@ -14,5 +14,5 @@ export const routes: Routes = [
     {path:'expense', component: ExpenseComponent},
     {path:'bill', component:BillV2Component},
     {path:'login', component:LoginComponent},
-    {path:'book-demo', component: BookDemoComponent}
+    {path:'book-demo', component: BookDemoComponent},
 ];

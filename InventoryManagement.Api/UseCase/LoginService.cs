@@ -88,7 +88,11 @@ public class LoginService
         {
             throw new ArgumentException("Username and password must be provided");
         }
-        if(userServiceProvider.GetUsername()== "admin")
+        if(userServiceProvider.GetUsername()!= "admin")
+        {
+            throw new UnauthorizedAccessException("Only admin user can register new users");
+        }
+        if (user.Username == "admin")
         {
             throw new UnauthorizedAccessException("Admin user cannot be registered through this endpoint");
         }
@@ -113,7 +117,11 @@ public class LoginService
         {
             throw new ArgumentException("Username, password, and name must be provided");
         }
-        if(userServiceProvider.GetUsername()== "admin")
+        if(userServiceProvider.GetUsername()!= "admin")
+        {
+            throw new UnauthorizedAccessException("Only admin user can register new clients");
+        }
+        if (client.Username == "admin")
         {
             throw new UnauthorizedAccessException("Admin user cannot be registered through this endpoint");
         }
@@ -133,6 +141,7 @@ public class LoginService
         var ClientDetails = new ClientDetails
         {
             Address = client.Address,
+            GSTNumber = string.IsNullOrEmpty(client.GSTNumber)?"":client.GSTNumber,
             RegistrationDate = DateTime.Now,
         };
 

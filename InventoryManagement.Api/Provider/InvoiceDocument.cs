@@ -28,129 +28,157 @@ public class InvoiceDocument : IDocument
             .Page(page =>
             {
                 page.ContinuousSize(58, Unit.Millimetre);
-                page.Margin(5);
+                page.Margin(3);
+                page.DefaultTextStyle(x => x.FontFamily("DotMatrix").LineHeight(1.1f).FontSize(11).FontColor(Colors.Black));
 
                 page.Header().Element(ComposeHeader);
-                page.Content().Element(ComposeContent);
+                page.Content().DefaultTextStyle(x => x.FontFamily("DotMatrix").LineHeight(1f).FontSize(11))
+                .Element(ComposeContent);
 
-                page.Footer().AlignCenter().Text(text =>
+                page.Footer().AlignLeft().Text(text =>
                 {
-                
-                    //text.Span("Powered By : ");
+                    text.Span("!! THANK YOU ** VISIT AGAIN !!");
                 });
             });
     }
 
     void ComposeHeader(IContainer container)
     {
-        container.Row(row =>
+        container.Column(column =>
         {
-            row.RelativeItem().Column(column =>
-            {
-                column.Item().Row(row =>
-                {
-                    row.RelativeItem().Component(new AddressComponent("From", Model.SellerAddress));
-                });
-                column.Spacing(10);
-                column.Item().Row(row2=>{
-                     row2.RelativeItem().Text($"Invoice #{Model.InvoiceNumber}")
-                        .FontSize(14).SemiBold().FontColor(Colors.Blue.Medium);
-                });
-                column.Item().Row(row2=>{
-                    row2.RelativeItem().Text(text =>
-                    {
-                        text.Span("Date: ").SemiBold();
-                        text.Span($"{Model.IssueDate:d}");
-                    });
-                });
-            
+            // Company name and address (centered)
+            column.Item().AlignCenter().Text(Model.SellerAddress.CompanyName.ToUpper())
+                .SemiBold();
+                
+            column.Item().AlignCenter().Text($"{Model.SellerAddress.Street}")
+                ;
+                
+            column.Item().AlignCenter().Text($"{Model.SellerAddress.City} {Model.SellerAddress.State}")
+                ;
+                
+            column.Item().AlignCenter().Text($"Ph:{Model.SellerAddress.Phone}")
+                ;
+                
+            // Divider line with "Cash Memo" text
+            column.Item().Row(row => {
+                row.RelativeItem().AlignCenter().Text("------------ Tax Invoice ------------")
+                    ;
             });
+            
+            // Bill number and date
+            column.Item().Row(row => {
+                row.RelativeItem().Text(text => {
+                    text.Span("Date: ");
+                    text.Span($"{Model.IssueDate:dd/MM/yy}");
+                });
+                
+                row.RelativeItem().AlignRight().Text(text => {
+                    text.Span("Bill No. : ");
+                    text.Span($"{Model.InvoiceNumber}");
+                });
+            });
+            
+            // Cashier info
+            // column.Item().Text(text => {
+            //     text.Span("Cashier: ");
+            //     text.Span(Model.SellerAddress.State); // Using State field as cashier name as it's not in the model
+            // });
+            
+            // Divider line
+            column.Item().AlignCenter().Text("--------------------------------------");
         });
     }
 
     void ComposeContent(IContainer container)
     {
-        container.PaddingVertical(10).Column(column =>
+        container.Column(column =>
         {
-            column.Spacing(10);
+            column.Spacing(5);
+
+            // Column headers for the table
+            column.Item().Row(row => 
+            {
+                row.RelativeItem(2).Text("Particulars");
+                row.RelativeItem((float)0.8).AlignCenter().Text("Qty");
+                row.RelativeItem().AlignCenter().Text("Rate");
+                row.RelativeItem((float)1.3).AlignCenter().Text("Amount");
+            });
+            column.Item().AlignCenter().Text("--------------------------------------");
+
+            // Table with items
+            column.Item().Element(ComposeTable);
+
+                    
+            // Subtotal
+            decimal subTotal = Model.Items.Sum(x => x.Price * x.Quantity);
+            column.Item().AlignRight().Text("--------------");
 
             column.Item().Row(row =>
+                {
+                    row.RelativeItem(2).AlignRight().Text("Sub Total : ");
+                    row.RelativeItem().AlignRight().Text($"{subTotal:F2}");
+                });
+
+            if (Model.Discount > 0)
             {
-                row.RelativeItem().Component(new SmallAddressComponent("For", Model.CustomerAddress.CompanyName, Model.CustomerAddress.Phone));
-            });
-
-            column.Item().Element(ComposeTable);
-            column.Item().PaddingRight(5).AlignRight().Text($"Payment Mode: {Model.PaymentMode}").SemiBold();
-
-            int discount = Model.Discount;
-            column.Item().PaddingRight(5).AlignRight().Text($"Discount: {discount.ToString("C", InvoiceDocument.indiaCulture)}").SemiBold();
+                column.Item().Row(row =>
+                {
+                    row.RelativeItem(2).AlignRight().Text("Discount : ");
+                    row.RelativeItem().AlignRight().Text($"{Model.Discount:F2}");
+                });
+            }
             if (Model.Advance > 0)
             {
-                column.Item().PaddingRight(5).AlignRight().Text($"Advance: {Model.Advance.ToString("C", InvoiceDocument.indiaCulture)}").SemiBold();
+                column.Item().Row(row =>
+                {
+                    row.RelativeItem(2).AlignRight().Text("Advance : ");
+                    row.RelativeItem().AlignRight().Text($"{Model.Advance:F2}");
+                });
             }
+                column.Item().AlignCenter().Text("--------------------------------------");
 
+            int totalRounded = (int)Math.Round(subTotal - Model.Discount - Model.Advance);
+             column.Item().Row(row =>
+            {
+                row.RelativeItem(2).AlignRight().Text("Total : ");
+                row.RelativeItem().AlignRight().Text($"{totalRounded:F2}");
+            });
+                column.Item().AlignCenter().Text("--------------------------------------");
 
-            int totalPrice = Model.InvoiceAmount;
-            column.Item().PaddingRight(5).AlignRight().Text($"Bill Total: {totalPrice.ToString("C", InvoiceDocument.indiaCulture)}").SemiBold();
+                     
+            // Payment mode
+            column.Item().PaddingRight(5).AlignRight().Text($"Payment mode : {Model.PaymentMode}");
+                column.Item().AlignCenter().Text("                                ");
 
-           
-            if (!string.IsNullOrWhiteSpace(Model.Comments))
-                column.Item().PaddingTop(25).Element(ComposeComments);
+            // // Bottom row with GSTIN if available
+            // if (!string.IsNullOrEmpty(Model.Comments))
+            // {
+            //     column.Item().AlignCenter().Text($"GSTIN: {Model.Comments}");
+            // }
         });
     }
 
     void ComposeTable(IContainer container)
     {
-        var headerStyle = TextStyle.Default.SemiBold();
-
-        container.Table(table =>
+        container.Column(column => 
         {
-            table.ColumnsDefinition(columns =>
-            {
-                //columns.RelativeColumn();
-                //columns.RelativeColumn();
-                columns.RelativeColumn();
-                columns.RelativeColumn();
-                columns.RelativeColumn();
-            });
-
-            table.Header(header =>
-            {
-                //header.Cell().Text("#");
-                header.Cell().Text("Name").Style(headerStyle);
-                //header.Cell().AlignCenter().Text("Rate").Style(headerStyle);
-                header.Cell().AlignCenter().Text("Qty").Style(headerStyle);
-                header.Cell().AlignCenter().Text("Amount").Style(headerStyle);
-
-                header.Cell().ColumnSpan(3).PaddingTop(5).BorderBottom(1).BorderColor(Colors.Black);
-            });
-
             foreach (var item in Model.Items)
             {
-                var index = Model.Items.IndexOf(item) + 1;
-
-                //table.Cell().Element(CellStyle).Text($"{index}");
-                table.Cell().Element(CellStyle).Text(item.Name);
-                //table.Cell().Element(CellStyle).AlignCenter().Text($"{item.Price.ToString("C", InvoiceDocument.indiaCulture)}");
-                table.Cell().Element(CellStyle).AlignCenter().Text($"{item.Quantity}");
-                table.Cell().Element(CellStyle).AlignCenter().Text($"{(item.Price * item.Quantity).ToString()}");
-
-                static IContainer CellStyle(IContainer container) => container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
+                column.Item().Row(row => 
+                {
+                    row.RelativeItem(3).Text(item.Name);
+                    row.RelativeItem().AlignLeft().Text($"{item.Quantity}");
+                    row.RelativeItem().AlignLeft().Text($"{item.Price}");
+                    row.RelativeItem().AlignRight().Text($"{item.Price * item.Quantity}");
+                });
             }
         });
     }
 
-    void ComposeComments(IContainer container)
-    {
-        container.ShowEntire().Background(Colors.Grey.Lighten3).Padding(10).Column(column =>
-        {
-            column.Spacing(5);
-            column.Item().Text("Comments").FontSize(13).SemiBold();
-            column.Item().Text("                 ");
-        });
-    }
+    // No longer needed since comments are handled in ComposeContent
 }
 
+// Not used in the new format, but kept for backward compatibility
 public class AddressComponent : IComponent
 {
     private Address Address { get; }
@@ -166,23 +194,25 @@ public class AddressComponent : IComponent
         {
             column.Spacing(2);
 
-            column.Item().Text(Address.CompanyName).FontSize(17).SemiBold().AlignCenter();
+            column.Item().Text(Address.CompanyName).SemiBold().AlignCenter();
             column.Item().PaddingBottom(5).LineHorizontal(1);
-            column.Item().Text($"{Address.Street}, {Address.City}, {Address.State} {Address.Phone}").AlignCenter().FontSize(12);
+            column.Item().Text($"{Address.Street}, {Address.City}, {Address.State} {Address.Phone}").AlignCenter();
         });
     }
 }
+
+// Not used in the new format, but kept for backward compatibility
 public class SmallAddressComponent : IComponent
 {
     private string Title { get; }
-     private string Company { get; }
+    private string Company { get; }
     private string Mobile { get; }
 
     public SmallAddressComponent(string title, string company, string mobile)
     {
         Title = title;
         Company = company;
-        Mobile =mobile;
+        Mobile = mobile;
     }
 
     public void Compose(IContainer container)
@@ -191,9 +221,8 @@ public class SmallAddressComponent : IComponent
         {
             column.Spacing(2);
 
-            column.Item().Text($"Name   : {Company}").SemiBold();
+            column.Item().Text($"Name   : {Company}");
             column.Item().Text($"Mobile : {Mobile}");
-
         });
     }
 }

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { BillModel } from '../models/bill.model';
 import { BillService } from '../services/bill.service';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -16,6 +16,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { BillhistoryComponent } from '../billhistory/billhistory.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { AddinventoryComponent } from "../addinventory/addinventory.component";
+import { MatCard, MatCardModule } from "@angular/material/card";
 
 @Component({
   selector: 'app-bill-v2',
@@ -29,13 +30,50 @@ import { AddinventoryComponent } from "../addinventory/addinventory.component";
     NgSelectModule,
     ReactiveFormsModule,
     BillhistoryComponent,
-    AddinventoryComponent
+    AddinventoryComponent,
+    MatCardModule
 ],
   templateUrl: './bill-v2.component.html',
   styleUrl: './bill-v2.component.scss'
 })
 export class BillV2Component {
-
+  scannedCode = '';
+  ScanItem() {
+    if (!this.scannedCode) {
+      this._snackBar.open('Please enter a valid barcode', 'Close', { duration: 3000 });
+      return;
+    }
+    const item = this.items.find(item => item.barcode === this.scannedCode);
+    if (item) {
+      this.selectItem(item);
+      this.scannedCode = ''; // Clear input after scanning
+      // Refocus input for next scan
+      const input = document.getElementById('barcodeinput');
+      if (input) {
+        (input as HTMLInputElement).value = ''; // Clear the input field
+        input.focus(); // Refocus for next scan
+      }
+    } else {
+      this._snackBar.open('Item not found for the scanned barcode', 'Close', { duration: 3000 });
+    }
+  }
+updateQty(_t51: number) {
+    if (this.billItems[_t51]) {
+      this.billItems[_t51].itemTotal = this.billItems[_t51].quantity * (this.billItems[_t51].amount ?? 0);
+    }
+    this.calculateTotal();
+}
+selectItemFromScanner($event: KeyboardEvent) {
+if($event.key === 'Enter') {
+    let barcode = ($event.target as HTMLInputElement).value.trim();
+    console.log('Barcode scanned:', barcode);
+      const item = this.items.find(item => item.barcode === barcode);
+      if (item) {
+        console.log('Item found:', item);
+        this.selectItem(item);
+      }
+    }
+}
 
   loading = false;
   bill: BillModel = {
@@ -46,13 +84,25 @@ export class BillV2Component {
   };
   billItems: BillItemModel[] = [];
   items: Item[] = [];
+  searchTerm = '';
+  searchedItems: Item[] = [];
+  
+  filterItems(){
+    this.searchedItems = this.items.filter(item => 
+      item.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      item.car?.toLowerCase().includes(this.searchTerm.toLowerCase())
+    ).splice(0, 10); // Limit to 10 results
+  }
+
+  isItemSelected(item: Item): boolean {
+    return this.billItems.some(billItem => billItem.itemId === item.id);
+  }
   total: number = 0;
   filteredOptions: Observable<Item[]>;
   myControl = new FormControl('');
   activeTab = 'bill';
   selectedItem: BillItemModel = {
     quantity: 1,
-
   };
   private _snackBar = inject(MatSnackBar);
   displayFn(shop: number): string {
@@ -140,7 +190,7 @@ If you have any questions, feel free to contact us.`;
 
   ngOnInit() {
     this.getItems();
-    this.addIteminBill();
+    //this.addIteminBill();
      this.listenToPrint();
     this.listenToEdit();
     this.listenToAddInventory();
@@ -162,14 +212,12 @@ If you have any questions, feel free to contact us.`;
     this.loading = true;
     this.itemService.getInventory().pipe(
       finalize(() => this.loading = false)
-    ).subscribe({
-      next: (items) => {
-        this.items = items;
-      },
-      error: (error) => {
+    ).subscribe((items: Item[]) => {
+      this.items = items;
+      this.searchedItems = items.slice(0, 10); // Limit to 10 results
+    }, (error) => {
         this._snackBar.open('Error loading items', 'Close', { duration: 3000 });
-      }
-    });
+      });
   }
   addItem(item: BillItemModel) {
     if (!this.bill.id) return;
@@ -180,13 +228,9 @@ If you have any questions, feel free to contact us.`;
     });
   }
   calculateTotal() {
+    this.total =0;
     this.total = this.billItems.reduce((sum, item) => sum + (item.quantity * item.amount!), 0);
-    if (this.bill.discount) {
-      this.total -= this.bill.discount;
-    }
-    if (this.bill.advance) {
-      this.total -= this.bill.advance;
-    }
+
     return this.total;
   }
   removeItem(index: number) {
@@ -217,9 +261,9 @@ If you have any questions, feel free to contact us.`;
       mobile: this.bill.mobile,
       paymentMode: this.bill.paymentMode,
       billDate: this.bill.billDate,
-      BillItems: this.billItems,
-      discount: this.bill.discount,
-      advance: this.bill.advance,
+      BillItems: this.billItems.filter(item => item.itemId && item.quantity),
+      discount: this.bill.discount || 0,
+      advance: this.bill.advance || 0,
     };
     this.loading = true;
     this.billService.updateBillWithItems(this.bill.id.toString(), addBill).pipe(
@@ -240,9 +284,9 @@ If you have any questions, feel free to contact us.`;
       mobile: this.bill.mobile,
       paymentMode: this.bill.paymentMode,
       billDate: this.bill.billDate,
-      BillItems: this.billItems,
-      discount: this.bill.discount,
-      advance: this.bill.advance,
+      BillItems: this.billItems.filter(item => item.itemId && item.quantity),
+      discount: this.bill.discount|| 0,
+      advance: this.bill.advance|| 0,
     };
     this.billService.addBillWithItems(addBill).pipe(
       finalize(() => this.loading = false)
@@ -258,6 +302,21 @@ If you have any questions, feel free to contact us.`;
   }
   openSnackBar(message: string) {
     this._snackBar.open(message, 'Close', { duration: 4000 });
+  }
+  download() {
+    if (!this.bill.id) {
+      this.openSnackBar('Save the bill before downloading');
+      return;
+    }
+    this.billService.download(this.bill.id.toString()).subscribe((resp: any) => {
+      const fileURL = URL.createObjectURL(resp);
+      const a = document.createElement('a');
+      a.href = fileURL;
+      a.download = 'bill.pdf'; // Specify the file name
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    });
   }
   print(id:any){
     this.billService.download(id.toString()).subscribe((resp: any) => {
@@ -297,4 +356,33 @@ If you have any questions, feel free to contact us.`;
     this.addIteminBill();
     this.openSnackBar('Bill closed and reset');
   }
+  setItemProps(id: number) {
+    let billItem = this.items.find(item => item.id === this.billItems[id].itemId);
+    this.billItems[id].amount = billItem?.price || 0; // Set amount based on item price
+    this.billItems[id].itemName = billItem?.name + ' - ' + (billItem?.car || ''); // Set item name with car info
+    this.billItems[id].itemTotal = this.billItems[id].quantity * (billItem?.price ?? 0); // Set item total based on item price and quantity
+    this.billItems[id].quantity = 1;
+  } 
+  selectItem(item: Item) {
+    if (this.isItemSelected(item)) {
+      // If item is already in the bill, increase its quantity
+      const existingItem = this.billItems.find(billItem => billItem.itemId === item.id);
+      if (existingItem) {
+        existingItem.quantity += 1; // Increase quantity by 1
+        existingItem.amount = item.price||0 * existingItem.quantity || 0; // Update amount if needed
+      }
+     
+    } else {
+      // Add new item to the bill
+      this.billItems.push({
+        itemId: item.id,
+        itemName: item.name,
+        quantity: 1,
+        itemTotal: 1 * item.price || 0,
+        amount: item.price || 0,
+      });
+    }
+    this.calculateTotal();
+  }
 }
+

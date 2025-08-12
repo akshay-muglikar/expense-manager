@@ -1,19 +1,23 @@
 using System;
+using System.Text;
 using InventoryManagement.Api.Provider;
 using InventoryManagement.Domain.Model;
 using InventoryManagement.Domain.Repository;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace InventoryManagement.Api.UseCase;
 
-public class ItemService: IUseCase
+public class ItemService : IUseCase
 {
     private readonly IItemRepository _itemRepository;
     private string _user;
+    private IMemoryCache _cache;
 
-    public ItemService(IItemRepository itemRepository, UserServiceProvider userServiceProvider)
+    public ItemService(IItemRepository itemRepository, UserServiceProvider userServiceProvider, IMemoryCache cache)
     {
         _itemRepository = itemRepository;
         _user = userServiceProvider.GetUsername();
+        _cache = cache;
     }
 
     public async Task<Item> GetByIdAsync(int id)
@@ -39,5 +43,64 @@ public class ItemService: IUseCase
     public async Task DeleteAsync(int id)
     {
         await _itemRepository.DeleteAsync(id, _user);
+    }
+
+    internal async Task<byte[]> GenerateCsvAsync()
+    {
+        var items = await _itemRepository.GetAllAsync();
+        var csv = new StringBuilder();
+        csv.AppendLine("Id,Name,Car,Quantity,Description,Barcode,Price");
+        foreach (var item in items)
+        {
+            csv.AppendLine($"{item.Id},{item.Name},{item.Car},{item.Quantity},{item.Description},{item.Barcode},{item.Price}");
+        }
+        return Encoding.UTF8.GetBytes(csv.ToString());
+    }
+    internal async Task<(int, int)> UploadCsv(Stream fileStream)
+    {
+        using var reader = new StreamReader(fileStream);
+        string line;
+        List<Item> items = new List<Item>();
+        await reader.ReadLineAsync(); // Skip header line
+        while ((line = await reader.ReadLineAsync()) != null)
+        {
+            var values = line.Split(',');
+            if (values.Length < 7) continue; // Skip invalid lines
+            int.TryParse(values[0], out int id);
+            var item = new Item
+            {
+                Id = id,
+                Name = values[1],
+                Car = values[2],
+                Quantity = int.Parse(values[3]),
+                Description = values[4],
+                Barcode = values[5],
+                Price = int.Parse(values[6])
+            };
+            items.Add(item);
+        }
+        return await _itemRepository.AddOrUpdateAsync(items, _user);
+    }
+
+    internal async Task ScanItemAsync(string barcode, string clientId)
+    {
+        var item = await _itemRepository.GetByBarcodeAsync(barcode);
+        if (item == null)
+        {
+            string key = $"{clientId}_inventory";
+            _cache.Set(key, barcode, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            });
+        }
+        else
+        {
+            string key = $"{clientId}_bill";
+            _cache.Set(key, item.Id, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            });
+        }
+        // Here you can add any additional logic for scanning, like logging or updating inventory
     }
 }

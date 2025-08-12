@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace InventoryManagement.Domain.Migrations.AppDb
+namespace InventoryManagement.Domain.AppMigration
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -29,9 +29,6 @@ namespace InventoryManagement.Domain.Migrations.AppDb
                     b.Property<DateTimeOffset>("BillDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("CalculatedBillAmount")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("Discount")
                         .HasColumnType("INTEGER");
 
@@ -43,11 +40,18 @@ namespace InventoryManagement.Domain.Migrations.AppDb
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("User")
+                    b.Property<int>("PaymentMode")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PaymentUser")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("status")
+                    b.Property<int>("Status")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("User")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -69,12 +73,6 @@ namespace InventoryManagement.Domain.Migrations.AppDb
                     b.Property<int>("ItemId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("ItemId1")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("OtherItem")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
 
@@ -83,8 +81,6 @@ namespace InventoryManagement.Domain.Migrations.AppDb
                     b.HasIndex("BillId");
 
                     b.HasIndex("ItemId");
-
-                    b.HasIndex("ItemId1");
 
                     b.ToTable("BillItems");
                 });
@@ -146,10 +142,10 @@ namespace InventoryManagement.Domain.Migrations.AppDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Car")
+                    b.Property<string>("Barcode")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Category")
+                    b.Property<string>("Car")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
@@ -164,9 +160,6 @@ namespace InventoryManagement.Domain.Migrations.AppDb
 
                     b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -209,18 +202,9 @@ namespace InventoryManagement.Domain.Migrations.AppDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("InventoryManagement.Domain.Model.Item", null)
-                        .WithMany("BillItems")
-                        .HasForeignKey("ItemId1");
-
                     b.Navigation("Bill");
 
                     b.Navigation("Item");
-                });
-
-            modelBuilder.Entity("InventoryManagement.Domain.Model.Item", b =>
-                {
-                    b.Navigation("BillItems");
                 });
 #pragma warning restore 612, 618
         }

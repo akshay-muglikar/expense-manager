@@ -16,7 +16,7 @@ import {
 import { AgGridAngular } from 'ag-grid-angular';
 import { Expense } from '../expense/expense.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { BillModel } from '../models/bill.model';
+import { BillModel, GetBillModel } from '../models/bill.model';
 import { BillService } from '../services/bill.service';
 @Component({
   selector: 'app-dashboard',
@@ -56,7 +56,7 @@ export class DashboardComponent {
 
   startDateText:string='';
   endDateText:string ='';
-  bills: BillModel[] = []
+  bills: GetBillModel[] = []
   expenses: Expense[] = [];
   allItems: DashboardItems[] = [];
   dashboardStats:DashboardStats = {billCount:0,revenue:0,expenses:0}
@@ -90,6 +90,20 @@ export class DashboardComponent {
       sort: 'desc' as const,
       sortIndex: 0,
       valueFormatter: (params) => params.value ? new Date(params.value).toLocaleDateString() : ''
+    },
+    {
+      field: "paymentMode",
+      headerName: "Payment Mode",
+      flex: 1,
+      minWidth: 120,
+      filter: 'agSetColumnFilter',
+    },
+    {
+      field: "paymentUser",
+      headerName: "Manager",
+      flex: 1,
+      minWidth: 120,
+      filter:'agSetColumnFilter',
     }
   ];
   constructor(private billService: BillService, private expenseService: ExpenseService) {
@@ -155,7 +169,9 @@ export class DashboardComponent {
             type: 'Bill',
             name: x.name + ' - ' + x.mobile,
             price: '0',//x.calculatedBillAmount?.toString() ?? "0",
-            date: formatDate(x.billDate ?? new Date(), 'dd MMM yyyy HH:mm', 'en-US')
+            date: formatDate(x.billDate ?? new Date(), 'dd MMM yyyy HH:mm', 'en-US'),
+            paymentMode: paymentMode[x.paymentMode].toString(),
+            paymentUser: x.paymentUser?? ''
           }) 
         });
         this.gridApi.setGridOption("rowData", this.allItems);
@@ -178,10 +194,15 @@ export interface DashboardItems {
   name: string,
   price: string,
   date: string
+  paymentMode?: string,
+  paymentUser?: string
 }
 
 export interface DashboardStats {
   billCount: number,
   revenue: number,
   expenses: number
+}
+enum paymentMode {
+CARD, UPI,CASH
 }

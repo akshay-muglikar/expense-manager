@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventoryManagement.Domain.AppMigration
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250727143838_InitMigration")]
-    partial class InitMigration
+    [Migration("20250806132427_NewInit")]
+    partial class NewInit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -144,6 +144,9 @@ namespace InventoryManagement.Domain.AppMigration
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Barcode")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Car")
                         .HasColumnType("TEXT");

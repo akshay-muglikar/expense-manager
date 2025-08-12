@@ -18,12 +18,21 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.authService.getaccessToken();
-    request = request.clone({
+    if(request.body && request.body instanceof FormData) {
+      request = request.clone({
       setHeaders: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       }
     });
+    }else{
+    request = request.clone({
+          setHeaders: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        });
+    }
+    
 
     return next.handle(request).pipe( tap(() => {},
       (err: any) => {

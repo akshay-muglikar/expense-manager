@@ -22,4 +22,12 @@ export class InventoryService {
   updateInventory(item: Item) {
     return this.http.put('/api/item/'+item.id, item);
   }
+  downloadInventory() {
+    return this.http.get('/api/item/download', { responseType: 'blob' });
+  }
+  uploadInventory(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post('/api/item/upload', formData);
+  }
 }

@@ -11,6 +11,7 @@ public interface ILoginReporsitory{
     Task<ClientModel> GetClient(Guid guid);
     public Task<Model.User> GetUser(string username, string password);
     Task<List<User>> GetUsersAsync(Guid id);
+    Task RegisterClient(ClientModel clientModel, User userModel, ClientDetails clientDetails);
 }
 public class LoginRepository : ILoginReporsitory
 {
@@ -52,5 +53,25 @@ public class LoginRepository : ILoginReporsitory
     public Task<List<User>> GetUsersAsync(Guid id)
     {
         return _context.Users.AsNoTracking().Where(x => x.ClientId == id).ToListAsync();
+    }
+
+    public Task RegisterClient(ClientModel clientModel, User userModel, ClientDetails clientDetails)
+    {
+        var transaction = _context.Database.BeginTransaction();
+        try
+        {
+            _context.Clients.Add(clientModel);
+            userModel.ClientId = clientModel.Id;
+            _context.Users.Add(userModel);
+            clientDetails.ClientId = clientModel.Id;
+            _context.ClientDetails.Add(clientDetails);
+            transaction.Commit();
+            return _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            transaction.Rollback();
+            throw;
+        }
     }
 }

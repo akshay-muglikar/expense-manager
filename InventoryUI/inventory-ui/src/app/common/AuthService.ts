@@ -38,6 +38,13 @@ export class AuthService {
         localStorage.setItem(this.tokenKey, resp.accessToken)
         this.router.navigate(['bill']);
         this.getClient()
+    }, (error) => {
+      //check for 401 Unauthorized error
+      let message = "Login failed.";
+      if (error.status === 401) {
+        message = "Invalid username or password";
+      }
+      window.dispatchEvent(new CustomEvent('login-error', { detail: message }));
     });
   }
 
@@ -49,6 +56,10 @@ export class AuthService {
         this.clientNameSubject.next(this.clientModel.name);
 
     });
+  }
+
+  getClientDetails(){
+    return this.http.get<ClientModel>("/api/login/client");
   }
 
 

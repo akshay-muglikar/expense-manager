@@ -6,6 +6,7 @@ export class Item {
     quantity: number;
     description: string;
     price: number;
+    barcode?: string; // Optional field for barcode
   
     constructor(
       name: string,

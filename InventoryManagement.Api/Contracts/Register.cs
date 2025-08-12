@@ -7,4 +7,5 @@ public class Register
     public string ConfirmPassword { get; set; }
     public string Name { get; set; }
     public string Address { get; set; }
+    public string GSTNumber{ get; set; }
 }

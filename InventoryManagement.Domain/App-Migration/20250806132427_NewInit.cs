@@ -3,14 +3,24 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace InventoryManagement.Domain.Migrations.AppDb
+namespace InventoryManagement.Domain.AppMigration
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class NewInit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql(@"
+                DROP TABLE IF EXISTS BillItems; 
+                DROP TABLE IF EXISTS Expenses;
+                DROP TABLE IF EXISTS Histories;
+                DROP TABLE IF EXISTS Users;
+                DROP TABLE IF EXISTS Bills;
+                DROP TABLE IF EXISTS Items; 
+            ");
+           
+
             migrationBuilder.CreateTable(
                 name: "Bills",
                 columns: table => new
@@ -20,10 +30,11 @@ namespace InventoryManagement.Domain.Migrations.AppDb
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Mobile = table.Column<string>(type: "TEXT", nullable: false),
                     Discount = table.Column<int>(type: "INTEGER", nullable: false),
-                    CalculatedBillAmount = table.Column<int>(type: "INTEGER", nullable: false),
                     Advance = table.Column<int>(type: "INTEGER", nullable: false),
+                    PaymentMode = table.Column<int>(type: "INTEGER", nullable: false),
+                    PaymentUser = table.Column<string>(type: "TEXT", nullable: false),
                     BillDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    status = table.Column<int>(type: "INTEGER", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
                     User = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
@@ -70,12 +81,11 @@ namespace InventoryManagement.Domain.Migrations.AppDb
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Category = table.Column<string>(type: "TEXT", nullable: true),
                     Car = table.Column<string>(type: "TEXT", nullable: true),
                     Quantity = table.Column<int>(type: "INTEGER", nullable: false),
-                    Type = table.Column<string>(type: "TEXT", nullable: true),
                     Description = table.Column<string>(type: "TEXT", nullable: true),
-                    Price = table.Column<int>(type: "INTEGER", nullable: false)
+                    Price = table.Column<int>(type: "INTEGER", nullable: false),
+                    Barcode = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -106,9 +116,7 @@ namespace InventoryManagement.Domain.Migrations.AppDb
                     BillId = table.Column<int>(type: "INTEGER", nullable: false),
                     ItemId = table.Column<int>(type: "INTEGER", nullable: false),
                     Quantity = table.Column<int>(type: "INTEGER", nullable: false),
-                    OtherItem = table.Column<string>(type: "TEXT", nullable: true),
-                    Amount = table.Column<int>(type: "INTEGER", nullable: false),
-                    ItemId1 = table.Column<int>(type: "INTEGER", nullable: true)
+                    Amount = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -125,11 +133,6 @@ namespace InventoryManagement.Domain.Migrations.AppDb
                         principalTable: "Items",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_BillItems_Items_ItemId1",
-                        column: x => x.ItemId1,
-                        principalTable: "Items",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -141,11 +144,6 @@ namespace InventoryManagement.Domain.Migrations.AppDb
                 name: "IX_BillItems_ItemId",
                 table: "BillItems",
                 column: "ItemId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BillItems_ItemId1",
-                table: "BillItems",
-                column: "ItemId1");
         }
 
         /// <inheritdoc />

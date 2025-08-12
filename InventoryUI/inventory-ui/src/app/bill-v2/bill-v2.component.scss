@@ -11,13 +11,19 @@
       margin-bottom: var(--spacing-sm);
     }
   }
-  
+  .bill-form-container {
+  display: grid;
+  grid-template-columns: 1fr 450px;
+  gap: var(--spacing-lg);
+  height: 100%;
+  }
   .bill-form {
     background: var(--background-white);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
     padding: var(--spacing-lg);
     margin-bottom: var(--spacing-lg);
+    
     
     .form-row {
       display: flex;
@@ -79,16 +85,20 @@
   }
   
   .bill-summary {
-    position: sticky;
+    position: relative;
     bottom: 0;
     background: var(--background-white);
     padding: var(--spacing-md);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     box-shadow: var(--shadow-lg);
-    display: flex;
+   
     justify-content: space-between;
     align-items: center;
-    
+    .summary-actions{
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 15px;
+    }
     .summary-details {
       display: flex;
       gap: var(--spacing-lg);
@@ -140,8 +150,23 @@
   }
 }
 @media only screen and (max-width: 1024px) {
+  .bill-form-container {
+    display: block !important;
+  }
   .bill-container{
     padding : 2px;
+    .item-select-container{
+      display: none;
+    }
+    .btn-inventory{
+      display: flex;
+    }
+    .btn-print{
+      display: none;
+    }
+    .btn-download{
+      display: inline;
+    }
     .bill-form {
       padding: 2px;
     }
@@ -169,4 +194,35 @@
       }
     }
   }
+}
+.item-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+.item-card{
+    padding: clamp(16px, 3vw, 24px);
+    text-align: center;
+    border-radius: 12px;
+    background: white;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.2s ease;
+    cursor: pointer;
+  }
+.btn-download{
+  display: none;
+}
+.btn-print{
+  display: inline;
+}
+.btn-inventory{
+  display: none;;
+}
+
+.selected-banner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #4caf50;
+  z-index: 1;
 }

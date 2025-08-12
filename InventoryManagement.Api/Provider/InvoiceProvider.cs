@@ -51,6 +51,6 @@ public class InvoiceProvider
         return File.Open(tempfile, FileMode.Open);
 
     }
-
+    
     
 }

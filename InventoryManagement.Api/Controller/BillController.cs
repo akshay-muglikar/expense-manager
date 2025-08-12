@@ -39,7 +39,7 @@ public class BillController : ControllerBase
         return Ok(bills);
     }
 
-    
+
     [HttpPost]
     public async Task<IActionResult> AddBill(BillModel bill)
     {
@@ -113,8 +113,9 @@ public class BillController : ControllerBase
     {
         if (request == null || request.BillItems == null || request.BillItems.Count == 0)
             return BadRequest("Bill and BillItems are required");
-        var result = await _billService.UpdateBillWithItemsAsync(id,request);
+        var result = await _billService.UpdateBillWithItemsAsync(id, request);
         return Ok(result);
     }
+
 }
 

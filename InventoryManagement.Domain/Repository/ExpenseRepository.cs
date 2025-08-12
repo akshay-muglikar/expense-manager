@@ -62,7 +62,9 @@ public class ExpenseRepository : IExpenseRepository
     }
     public async Task<List<Expense>> GetFilteredAsync(DateTime? start, DateTime? end){
         var expenses = await GetAllAsync();
-        return expenses.Where(x=>x.Date.DateTime>=start.Value && x.Date.DateTime<=end.Value).ToList();
+        Console.WriteLine($"Filtering expenses from {start} to {end}");
+        Console.WriteLine($"Total expenses before filtering: {expenses.Count()}");
+        return expenses.Where(x => x.Date.DateTime >= start.Value && x.Date.DateTime <= end.Value).ToList();
     }
 }
 
