@@ -3,6 +3,7 @@ using System;
 using InventoryManagement.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventoryManagement.Domain.AppMigration
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250815042359_AddSupplierTable")]
+    partial class AddSupplierTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
@@ -100,12 +103,6 @@ namespace InventoryManagement.Domain.AppMigration
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("ExpenseType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("PaymentMode")
-                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("SupplierId")
                         .HasColumnType("INTEGER");

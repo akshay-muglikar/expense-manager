@@ -22,31 +22,50 @@ public class BillRepository : IBillRepository
             .FirstOrDefaultAsync(b => b.Id == id) ?? throw new Exception("Bill not found");
     }
 
-    public async Task<IEnumerable<Bill>> GetAllAsync()
+    public async Task<IEnumerable<(Bill, int TotalAmount)>> GetAllAsync()
     {
-        return await _context.Bills
-            .ToListAsync();
+        List<(Bill, int TotalAmount)> billItems = new();
+        //get all bills calculate total amount
+        var bills = await _context.Bills.ToListAsync();
+        foreach (var bill in bills)
+        {
+            var items = await _context.BillItems
+                .Where(bi => bi.BillId == bill.Id)
+                .ToListAsync();
+            var totalAmount = items.Sum(item => item.Quantity * item.Amount);
+            billItems.Add((bill, totalAmount));
+        }
+        return billItems;
     }
-    public async Task<List<Bill>> GetAllAsync(DateTime? start, DateTime? end)
+    public async Task<List<(Bill, int TotalAmount)>> GetAllAsync(DateTime? start, DateTime? end)
     {
         if (start == null || end == null)
             throw new ArgumentNullException("Start and end dates must be provided");
-        return (await _context.Bills.ToListAsync()).Where(
-            x => x.BillDate.DateTime > start.Value && x.BillDate.DateTime < end.Value
-        ).ToList();
+        var bills = (await _context.Bills.ToListAsync())
+            .Where(x => x.BillDate.DateTime > start.Value && x.BillDate.DateTime < end.Value);
+        List<(Bill, int TotalAmount)> billItems = new();
+        foreach (var bill in bills)
+        {
+            var items = await _context.BillItems
+                .Where(bi => bi.BillId == bill.Id)
+                .ToListAsync();
+            var totalAmount = items.Sum(item => item.Quantity * item.Amount);
+            billItems.Add((bill, totalAmount));
+        }
+        return billItems;
     }
 
     public async Task AddAsync(Bill bill, string user)
     {
         await _context.Bills.AddAsync(bill);
-        await _historyRepository.AddAsync(bill, "add",user);
+        await _historyRepository.AddAsync(bill, "add", user);
         await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Bill bill, string user)
     {
         _context.Bills.Update(bill);
-        await _historyRepository.AddAsync(bill,"update" ,user);
+        await _historyRepository.AddAsync(bill, "update", user);
 
         await _context.SaveChangesAsync();
     }
@@ -108,7 +127,7 @@ public class BillRepository : IBillRepository
 
     public async Task<List<BillItem>> getBillItems(int id)
     {
-        return await _context.BillItems.Include(x=>x.Item).Where(x=>x.BillId ==id).ToListAsync();
+        return await _context.BillItems.Include(x => x.Item).Where(x => x.BillId == id).ToListAsync();
     }
     public async Task AddBillWithItemsAsync(Bill bill, List<BillItem> billItems, string user)
     {
@@ -132,6 +151,30 @@ public class BillRepository : IBillRepository
             await transaction.RollbackAsync();
             throw;
         }
+    }
+
+    public async Task<IEnumerable<(string, string)>> GetAllCustomersAsync()
+    {
+        var customers = await _context.Bills
+            .Select(c => new { c.Name, c.Mobile })
+            .Distinct()
+            .ToListAsync();
+        return customers.Select(c => (c.Name, c.Mobile));
+    }
+    public async Task<List<(Bill, int)>> GetCustomerBillsByNameAndMobileAsync(string name, string mobile)
+    {
+        var billItems = new List<(Bill, int)>();
+        var bills = await _context.Bills
+            .Where(b => b.Name == name && b.Mobile == mobile).ToListAsync();
+        foreach (var bill in bills)
+        {
+            var items = await _context.BillItems
+                .Where(bi => bi.BillId == bill.Id)
+                .ToListAsync();
+            var totalAmount = items.Sum(item => item.Quantity * item.Amount);
+            billItems.Add((bill, totalAmount));
+        }
+        return billItems;
     }
 }
 

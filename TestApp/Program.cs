@@ -19,7 +19,7 @@ var billItems = new List<BillItem>
     new BillItem { Item = new Item { Name = "Item1" }, Amount = 100, Quantity = 2 },
     new BillItem { Item = new Item { Name = "Item2" }, Amount = 200, Quantity = 1 }
 };
-using var stream = InvoiceProvider.GetInvoice(bill, billItems);
+using var stream = InvoiceProvider.GetInvoiceA5(bill, billItems);
 // Save or use the stream as needed
 // For example, save to a file
 var filePath = "/Users/akshay/InventoryApi/TestApp/invoice.pdf";
