@@ -1,4 +1,6 @@
 using System;
+using AutoMapper;
+using InventoryManagement.Api.Contracts;
 using InventoryManagement.Api.Provider;
 using InventoryManagement.Domain.Model;
 using InventoryManagement.Domain.Repository;
@@ -9,37 +11,47 @@ public class ExpenseService
 {
     private readonly IExpenseRepository _expenseRepository;
     private string _user;
+    private readonly IMapper _mapper;
 
-    public ExpenseService(IExpenseRepository expenseRepository, UserServiceProvider userServiceProvider)
+    public ExpenseService(IExpenseRepository expenseRepository, UserServiceProvider userServiceProvider, IMapper mapper)
     {
         _expenseRepository = expenseRepository;
-        _user = userServiceProvider?.GetUsername();
+        _mapper = mapper;
+        _user = userServiceProvider?.GetUsername() ?? "Unknown";
     }
 
-    public async Task<Expense> GetByIdAsync(int id)
+    public async Task<ExpenseModel> GetByIdAsync(int id)
     {
-        return await _expenseRepository.GetByIdAsync(id);
+        var expense = await _expenseRepository.GetByIdAsync(id);
+        return _mapper.Map<ExpenseModel>(expense);
     }
 
-    public async Task<IEnumerable<Expense>> GetAllAsync(DateTime? start, DateTime? end)
+    public async Task<IEnumerable<ExpenseModel>> GetAllAsync(DateTime? start, DateTime? end)
     {
         if(start==null && end==null){
-            return await _expenseRepository.GetAllAsync();
+            var expenses = await _expenseRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<ExpenseModel>>(expenses);
         }else{
-            return await _expenseRepository.GetFilteredAsync(start, end);
+            var filteredExpenses = await _expenseRepository.GetFilteredAsync(start, end);
+            return _mapper.Map<IEnumerable<ExpenseModel>>(filteredExpenses);
         }
     }
 
-    public async Task AddAsync(Expense expense)
+    public async Task AddAsync(ExpenseModel expense)
     {
         // Add any additional validation or processing logic if needed
-        await _expenseRepository.AddAsync(expense, _user);
+        var expenseEntity = _mapper.Map<Expense>(expense);
+        expenseEntity.User = _user; // Set the user from the service provider
+        await _expenseRepository.AddAsync(expenseEntity, _user);
     }
 
-    public async Task UpdateAsync(Expense expense)
+    public async Task UpdateAsync(ExpenseModel expense)
     {
         // Update business logic if required
-        await _expenseRepository.UpdateAsync(expense, _user);
+        var expenseEntity = _mapper.Map<Expense>(expense);
+        expenseEntity.User = _user; // Set the user from the service provider
+
+        await _expenseRepository.UpdateAsync(expenseEntity, _user);
     }
 
     public async Task DeleteAsync(int id)

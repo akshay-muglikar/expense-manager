@@ -52,15 +52,26 @@ public class BillService
         return billModel;
     }
 
-    public async Task<IEnumerable<Bill>> GetAllAsync(DateTime? start, DateTime? end)
+    public async Task<IEnumerable<GetAllBillModel>> GetAllAsync(DateTime? start, DateTime? end)
     {
         if (start == null && end == null)
         {
-            return await _billRepository.GetAllAsync();
+            var billItems = await _billRepository.GetAllAsync();
+            return billItems.Select(x =>
+            {
+                var map = _mapper.Map<GetAllBillModel>(x.Item1);
+                map.TotalAmount = x.Item2;
+                return map;
+            }).ToList();
         }
         else
         {
-            return await _billRepository.GetAllAsync(start, end);
+            var billItems = await _billRepository.GetAllAsync(start, end);
+             return billItems.Select(x => {
+                var map = _mapper.Map<GetAllBillModel>(x.Item1);
+                map.TotalAmount = x.Item2;
+                return map;
+            }).ToList();
         }
     }
 

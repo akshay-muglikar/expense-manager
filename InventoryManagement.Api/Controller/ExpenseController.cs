@@ -1,4 +1,5 @@
 using System;
+using InventoryManagement.Api.Contracts;
 using InventoryManagement.Api.UseCase;
 using InventoryManagement.Domain.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -36,14 +37,14 @@ public class ExpenseController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add(Expense expense)
+    public async Task<IActionResult> Add(ExpenseModel expense)
     {
         await _expenseService.AddAsync(expense);
         return Created();
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Expense expense)
+    public async Task<IActionResult> Update(int id, ExpenseModel expense)
     {
         if (id != expense.Id)
             return BadRequest("ID mismatch");

@@ -14,6 +14,8 @@ public static class DependencyConfiguration
         services.AddScoped<LoginService>();
         services.AddScoped<ItemService>();
         services.AddScoped<ExpenseService>();
+        services.AddScoped<SupplierService>();
+        services.AddScoped<CustomerService>();
         return services;
     }
 }
