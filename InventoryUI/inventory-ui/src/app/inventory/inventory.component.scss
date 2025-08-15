@@ -20,24 +20,16 @@ ag-grid, ag-grid-angular{
 }
 
 .inventory-container {
-  padding: var(--spacing-lg);
   max-width: 1400px;
   margin: 0 auto;
   height: 100%;
-
+.page-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
   .header {
     margin-bottom: var(--spacing-lg);
-    text-align: center;
-
-    h1 {
-      color: var(--text-primary);
-      font-size: var(--font-size-xxl);
-      margin-bottom: var(--spacing-xs);
-    }
-
-    p {
-      color: var(--text-secondary);
-    }
   }
 
   .loading-bar {

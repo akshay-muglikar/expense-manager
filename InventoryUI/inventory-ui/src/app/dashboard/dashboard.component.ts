@@ -16,7 +16,7 @@ import {
 import { AgGridAngular } from 'ag-grid-angular';
 import { Expense } from '../expense/expense.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { BillModel, GetBillModel } from '../models/bill.model';
+import { BillModel, GetAllBillModel, GetBillModel } from '../models/bill.model';
 import { BillService } from '../services/bill.service';
 @Component({
   selector: 'app-dashboard',
@@ -40,12 +40,20 @@ import { BillService } from '../services/bill.service';
 })
 export class DashboardComponent {
   calculateExpense(): number {
-    return this.expenses.reduce((n, { amount }) => n + Number(amount), 0);
-  }
+    let sum = 0;
+    this.expenses.forEach(x => {
+      if(x.expenseType === 'CREDIT') {
+        sum -= Number(x.amount);
+      } else {
+        sum += Number(x.amount);
+      }
+    });
+
+    return sum;}
   calculate() {
-    //let sum = this.bills.reduce((n, { calculatedBillAmount }) => n + calculatedBillAmount, 0);
+    let sum = this.bills.reduce((n, { totalAmount }) => n + (totalAmount || 0), 0);
     let expense = this.calculateExpense()
-    return  expense;
+    return sum- expense;
   }
   private gridApi!: GridApi;
   isHighlighted: any;
@@ -56,7 +64,7 @@ export class DashboardComponent {
 
   startDateText:string='';
   endDateText:string ='';
-  bills: GetBillModel[] = []
+  bills: GetAllBillModel[] = []
   expenses: Expense[] = [];
   allItems: DashboardItems[] = [];
   dashboardStats:DashboardStats = {billCount:0,revenue:0,expenses:0}
@@ -154,21 +162,34 @@ export class DashboardComponent {
     this.billService.getBillsbyDate(formatedDate, formatedStartDate).subscribe((response) => {
       console.log(response);
       this.bills = response;
-      this.expenseService.getExpensesbyDate(formatedDate, formatedStartDate).subscribe((resonse) => {
+      this.expenseService.getExpensesbyDate(formatedDate, formatedStartDate).subscribe((resonse : any[]) => {
         this.expenses = resonse;
-        this.expenses.forEach(x => {
-          this.allItems.push({
-            type: 'Expense',
-            name: x.description,
-            price: x.amount?.toString() ?? "0",
-            date: formatDate(x.date ?? new Date(), 'dd MMM yyyy HH:mm', 'en-US')
-          })
+        resonse.forEach(x => {
+          if (x.supplierId) {
+            this.allItems.push({
+              type:  'Payment' + (x.expenseType === 'CREDIT' ? ' from vendor' : ' to vendor'),
+              name: x.description,
+              price: x.amount?.toString() ?? "0",
+              date: formatDate(x.date ?? new Date(), 'dd MMM yyyy HH:mm', 'en-US'),
+              paymentMode: x.paymentMode ,
+              paymentUser: x.user ?? ''
+            });
+          }else{
+            this.allItems.push({
+              type: 'Expense',
+              name: x.description,
+              price: x.amount?.toString() ?? "0",
+              date: formatDate(x.date ?? new Date(), 'dd MMM yyyy HH:mm', 'en-US'),
+              paymentMode: x.paymentMode ,
+              paymentUser: x.user ?? ''
+            });
+          }
         });
         this.bills.forEach(x => {
           this.allItems.push({
             type: 'Bill',
             name: x.name + ' - ' + x.mobile,
-            price: '0',//x.calculatedBillAmount?.toString() ?? "0",
+            price: (x.totalAmount||0 ).toString(),//x.calculatedBillAmount?.toString() ?? "0",
             date: formatDate(x.billDate ?? new Date(), 'dd MMM yyyy HH:mm', 'en-US'),
             paymentMode: paymentMode[x.paymentMode].toString(),
             paymentUser: x.paymentUser?? ''

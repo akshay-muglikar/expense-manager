@@ -20,3 +20,15 @@ export interface GetBillModel {
   billDate?: Date;
   paymentUser?: string;
 }
+
+export interface GetAllBillModel {
+  id?: number;
+  name: string;
+  mobile?: string;
+  discount?: number;
+  advance?: number;
+  paymentMode: number;
+  billDate?: Date;
+  paymentUser?: string;
+  totalAmount?: number;
+}

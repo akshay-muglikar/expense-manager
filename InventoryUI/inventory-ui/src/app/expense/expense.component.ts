@@ -76,7 +76,7 @@ export class ExpenseComponent {
     }
   }
   clear() {
-    this.selectedExpense = { id: "0", description: '', user: 'admin', amount: "0", date: formatDate((new Date()), "yyyy-MM-ddThh:mm:ss", "en-US") }
+    this.selectedExpense = { id: "0", description: '', amount: "0", date: formatDate((new Date()), "yyyy-MM-ddThh:mm:ss", "en-US") }
     this.gridApi.deselectAll();
   }
   getDateString(arg0: string) {
@@ -85,7 +85,7 @@ export class ExpenseComponent {
   expenses: Expense[] = [];
   private _snackBar = inject(MatSnackBar);
 
-  selectedExpense: Expense = { id: "0", description: '', user: 'admin', amount: "0", date: formatDate((new Date()), "yyyy-MM-ddThh:mm:ss", "en-US") }
+  selectedExpense: Expense = { id: "0", description: '',  amount: "0", date: formatDate((new Date()), "yyyy-MM-ddThh:mm:ss", "en-US") }
   constructor(private expenseService: ExpenseService) { }
 
   loading = false;
@@ -134,7 +134,8 @@ export class ExpenseComponent {
   }
 
   ngOnInit() {
-    this.getExpenses();
+    //this.getExpenses();
+    this.onSelectChange();
   }
   onCustomDateSet() {
     this.start = new Date(this.startDateText)
@@ -148,8 +149,8 @@ export class ExpenseComponent {
 
     this.loading = true;
     this.expenseService.getExpensesbyDate(formatedDate, formatedStartDate).subscribe({
-      next: (expenses) => {
-        this.expenses = expenses;
+      next: (expenses: any[]) => {
+        this.expenses = expenses.filter(exp=> !exp.supplierId);
         this.totalExpenses = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
       },
       error: (error) => {
@@ -204,7 +205,9 @@ export class ExpenseComponent {
 export interface Expense {
   id: string,
   description: string
-  user: string,
   amount: string
   date: string
+  paymentMode?: 'CASH' | 'CARD' | 'UPI';
+  supplierId?: number;
+  expenseType?: 'CREDIT' | 'DEBIT';
 }

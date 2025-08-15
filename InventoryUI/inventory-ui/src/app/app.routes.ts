@@ -6,6 +6,8 @@ import { LoginComponent } from './login/login.component';
 import { BillV2Component } from './bill-v2/bill-v2.component';
 import { LandingComponent } from './landing/landing.component';
 import { BookDemoComponent } from './book-demo/book-demo.component';
+import { VendorComponent } from './vendor/vendor.component';
+import { CustomerComponent } from './customer/customer.component';
 
 export const routes: Routes = [
     {path : '' , component : LandingComponent},
@@ -13,6 +15,8 @@ export const routes: Routes = [
     {path : 'inventory', component: InventoryComponent},
     {path:'expense', component: ExpenseComponent},
     {path:'bill', component:BillV2Component},
+    {path:'vendor', component: VendorComponent},
+    {path:'customer', component: CustomerComponent},
     {path:'login', component:LoginComponent},
     {path:'book-demo', component: BookDemoComponent},
 ];

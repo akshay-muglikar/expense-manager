@@ -1,22 +1,14 @@
 .dashboard-container {
-  padding: clamp(16px, 3vw, 24px);
+  padding: clamp(0px, 0vw, 0px);
   max-width: 1400px;
   margin: 0 auto;
-
+.page-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
   .header {
     margin-bottom: clamp(24px, 4vw, 32px);
-    text-align: center;
-
-    h1 {
-      font-size: clamp(1.5rem, 5vw, 2rem);
-      margin-bottom: 8px;
-      color: var(--text-primary);
-    }
-
-    p {
-      color: var(--text-secondary);
-      font-size: clamp(0.875rem, 2vw, 1rem);
-    }
   }
 
   .loading-bar {

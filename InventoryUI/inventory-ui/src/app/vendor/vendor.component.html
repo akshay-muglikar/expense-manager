@@ -1,0 +1,255 @@
+<div class="vendor-container">
+  <mat-progress-bar *ngIf="loading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
+  
+  <mat-tab-group #tabGroup>
+    <!-- Vendor Management Tab -->
+    <mat-tab label="Vendor Management">
+      <div class="vendor-management-content">
+        <!-- Form Column -->
+        <div class="form-column">
+          <div class="header">
+            <h2>Vendor Details</h2>
+            <p class="text-secondary">Add or edit vendor information</p>
+          </div>
+
+          <div class="form-card">
+            <div class="form-group">
+              <label>Vendor Name *</label>
+              <input [(ngModel)]="selectedVendor.name" 
+                     placeholder="Enter vendor name" 
+                     maxlength="100" />
+            </div>
+
+            <div class="form-group">
+              <label>Mobile Number *</label>
+              <input [(ngModel)]="selectedVendor.mobile" 
+                     type="tel"
+                     placeholder="Enter mobile number" 
+                     maxlength="15" />
+            </div>
+
+            <div class="actions">
+              <button mat-raised-button 
+                      class="btn btn-primary" 
+                      (click)="addVendor()"
+                      [disabled]="loading"
+                       *ngIf="!selectedVendor.id">
+                <mat-icon>add</mat-icon>
+                Add Vendor
+              </button>
+              <button mat-raised-button 
+                      class="btn btn-secondary" 
+                      (click)="updateVendor()"
+                      *ngIf="selectedVendor.id">
+                <mat-icon>edit</mat-icon>
+                Update
+              </button>
+             
+              <button mat-raised-button 
+                      class="btn btn-secondary" 
+                      (click)="clearVendorForm()">
+                <mat-icon>clear</mat-icon>
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cards Column -->
+        <div class="cards-column">
+          <div class="header">
+            <h2>All Vendors</h2>
+            <p class="text-secondary">Manage your vendor list</p>
+          </div>
+
+          <div class="search-container">
+            <mat-form-field appearance="outline">
+              <mat-icon matPrefix>search</mat-icon>
+              <input matInput 
+                     type="text" 
+                     [(ngModel)]="searchTerm"
+                     placeholder="Search vendors..." 
+                     (input)="filterVendors()" />
+            </mat-form-field>
+          </div>
+
+          <div class="vendors-cards-container">
+            <div class="vendor-card" 
+                 *ngFor="let vendor of filteredVendors" 
+                 (click)="selectVendor(vendor)"
+                 [class.selected]="selectedVendor.id === vendor.id">
+              <div class="vendor-card-header">
+                <div class="vendor-avatar">
+                  <mat-icon>person</mat-icon>
+                </div>
+                <div class="vendor-info">
+                  <h3>{{ vendor.name }}</h3>
+                  <p class="mobile">{{ vendor.mobile }}</p>
+                </div>
+                <div class="vendor-actions">
+                  <button mat-icon-button 
+                          (click)="viewVendorAccount(vendor.id!); $event.stopPropagation()"
+                          matTooltip="View Account">
+                    <mat-icon>account_balance</mat-icon>
+                  </button>
+                  <button mat-icon-button 
+                          (click)="editVendor(vendor); $event.stopPropagation()"
+                          matTooltip="Edit Vendor">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div class="vendor-card-footer">
+                <span class="created-date" *ngIf="vendor.createdDate">
+                  <mat-icon>schedule</mat-icon>
+                  Created: {{ formatDate(vendor.createdDate) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="no-vendors" *ngIf="filteredVendors.length === 0 && !loading">
+            <mat-icon>info</mat-icon>
+            <p>No vendors found</p>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Vendor Account Tab -->
+    <mat-tab label="Vendor Account" [disabled]="!selectedVendorForAccount">
+      <div class="vendor-account-content" *ngIf="selectedVendorForAccount">
+         <div class="expense-form-card">
+          <div class="expense-form-header">
+            <h3>Add Transaction</h3>
+            <p class="text-secondary">Record a new expense or payment for this vendor</p>
+          </div>
+          
+          <div class="expense-form-content">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Description *</label>
+                <input [(ngModel)]="newExpense.description" 
+                       placeholder="Enter transaction description" 
+                       maxlength="200"
+                       [class.error]="!newExpense.description.trim() && newExpense.description !== ''" />
+                <small class="error-text" *ngIf="!newExpense.description.trim() && newExpense.description !== ''">
+                  Description is required
+                </small>
+              </div>
+            </div>
+              <div class="form-row">
+              <div class="form-group">
+                <label>Amount *</label>
+                <input [(ngModel)]="newExpense.amount" 
+                       type="number"
+                       step="0.01"
+                       min="0.01"
+                       placeholder="Enter amount"
+                       [class.error]="newExpense.amount <= 0" />
+                <small class="error-text" *ngIf="newExpense.amount <= 0">
+                  Amount must be greater than 0
+                </small>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Transaction Type *</label>
+                <mat-form-field appearance="outline">
+                  <mat-select [(ngModel)]="newExpense.expenseType" placeholder="Select type">
+                    <mat-option value="DEBIT">Payment to Vendor (Debit)</mat-option>
+                    <mat-option value="CREDIT">Payment from Vendor (Credit)</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="form-group">
+                <label>Payment Mode *</label>
+                <mat-form-field appearance="outline">
+                  <mat-select [(ngModel)]="newExpense.paymentMode" placeholder="Select payment mode">
+                    <mat-option value="CASH">Cash</mat-option>
+                    <mat-option value="CARD">Card</mat-option>
+                    <mat-option value="UPI">UPI</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              
+              
+            </div>
+            
+            <div class="expense-actions">
+              <button mat-raised-button 
+                      class="btn btn-primary" 
+                      (click)="addVendorExpense()"
+                      [disabled]="loading || !isExpenseFormValid()">
+                <mat-icon>add</mat-icon>
+                Add Transaction
+              </button>
+              <button mat-raised-button 
+                      class="btn btn-secondary" 
+                      (click)="clearExpenseForm()">
+                <mat-icon>clear</mat-icon>
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="account-header">
+          <h2>{{ selectedVendorForAccount.name }} - Account Statement</h2>
+          <p class="text-secondary">Mobile: {{ selectedVendorForAccount.mobile }}</p>
+          
+          <div class="account-summary">
+            <div class="summary-card">
+              <div class="summary-item">
+                <span class="summary-label">Total Transactions</span>
+                <span class="summary-value">{{ vendorAccounts.length }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Total Credits</span>
+                <span class="summary-value credit">₹{{ getTotalCredits().toFixed(2) }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Total Debits</span>
+                <span class="summary-value debit">₹{{ getTotalDebits().toFixed(2) }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Current Balance</span>
+                <span class="summary-value" 
+                      [ngClass]="{'positive-balance': getTotalBalance() >= 0, 'negative-balance': getTotalBalance() < 0}">
+                  ₹{{ getTotalBalance().toFixed(2) }}
+                </span>
+              </div>
+            </div>
+          </div>
+            <div class="account-search-container">
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix>search</mat-icon>
+            <input matInput 
+                   type="text" 
+                   id="account-filter-text-box" 
+                   placeholder="Search transactions..." 
+                   (input)="onAccountFilterTextBoxChanged()" />
+          </mat-form-field>
+        </div>
+
+        <div class="account-grid-card">
+          <ag-grid-angular 
+            class="ag-theme-material"
+            [rowData]="vendorAccounts" 
+            [columnDefs]="accountColDefs"
+            [defaultColDef]="defaultColDef"
+            [pagination]="true"
+            [paginationPageSize]="20"
+            (gridReady)="onAccountGridReady($event)">
+          </ag-grid-angular>
+        </div>
+        </div>
+
+        <!-- Add Expense Form -->
+       
+
+      
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

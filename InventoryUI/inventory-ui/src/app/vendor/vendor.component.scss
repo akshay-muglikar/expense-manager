@@ -1,0 +1,25 @@
+@import 'vendor-forms';
+@import 'vendor-cards';
+@import 'vendor-account';
+@import 'vendor-responsive';
+
+.vendor-container {
+  .loading-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+  
+  .vendor-management-content {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: var(--spacing-lg);
+    padding-top: 10px;
+    
+    @media (max-width: 1200px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}

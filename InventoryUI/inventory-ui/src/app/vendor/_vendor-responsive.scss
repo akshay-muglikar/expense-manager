@@ -1,0 +1,38 @@
+@media (max-width: 1024px) {
+  .vendor-account-content {
+    display: block !important;
+  }
+  
+  .search-container, .account-search-container, .form-column {
+    max-width: fit-content;
+  }
+  
+  .vendor-management-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-column .form-card .actions {
+    flex-direction: column;
+    
+    button {
+      flex: none;
+      width: 100%;
+    }
+  }
+
+  .vendors-cards-container {
+    grid-template-columns: 1fr;
+    
+    .vendor-card .vendor-card-header .vendor-actions {
+      flex-direction: column;
+    }
+  }
+
+  .expense-actions {
+    flex-direction: column;
+
+    button {
+      max-width: none;
+    }
+  }
+}

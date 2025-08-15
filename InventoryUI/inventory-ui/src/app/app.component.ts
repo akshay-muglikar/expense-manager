@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet, NavigationEnd } from '@angular/router';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
 import {MatToolbarModule} from '@angular/material/toolbar';
 import { AuthService } from './common/AuthService';
 import { HeaderComponent } from './header/header.component';
+import { filter } from 'rxjs/operators';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -25,17 +26,22 @@ export class AppComponent {
   title = 'inventory-ui';
   selected=0;
   clentName :string = '';
+  sidebarExpanded = false; // Start collapsed
   routes :RoutDetails[] = [
     new RoutDetails('bill','Billing', 'receipt'),
     new RoutDetails('dashboard','Dashboard', 'dashboard'),
     new RoutDetails('expense','Expense', 'money_off'),
     new RoutDetails('inventory','Inventory', 'inventory'),
+    new RoutDetails('vendor','Vendors', 'people'),
+    new RoutDetails('customer','Customers', 'person'),
   ]
   
   isLoggedIn(): boolean {
     return !!this.authService.getaccessToken();
   }
-  constructor(private router: Router, private authService : AuthService){}
+  constructor(private router: Router, 
+    private authService : AuthService,
+    private active: ActivatedRoute){}
   
   navigateToLogin() {
     this.router.navigate(['login']);
@@ -43,7 +49,25 @@ export class AppComponent {
 
   onclickRoute(index:number){
     this.selected = index;
+    this.sidebarExpanded = false; // Collapse sidebar on route change
     this.router.navigate([this.routes[this.selected].path])
+  }
+
+  toggleSidebar() {
+    this.sidebarExpanded = !this.sidebarExpanded;
+  }
+
+  onSidebarMouseEnter() {
+    if (!this.sidebarExpanded) {
+      this.sidebarExpanded = true;
+    }
+  }
+
+  onSidebarMouseLeave() {
+    // Small delay to prevent flickering when moving between sidebar elements
+    setTimeout(() => {
+      this.sidebarExpanded = false;
+    }, 200);
   }
   getClientDetails(){
     this.authService.getClientDetails().subscribe((resp: any)=>{
@@ -52,6 +76,27 @@ export class AppComponent {
   }
   ngOnInit(){
     this.getClientDetails();
+    this.setSelectedIndexFromRoute();
+    
+    // Subscribe to router events to update selected index on route changes
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.setSelectedIndexFromRoute();
+      });
+  }
+
+  setSelectedIndexFromRoute() {
+    const currentPath = this.router.url.split('?')[0].split('/')[1]; // Get the first path segment
+    
+    // Handle empty path (root route)
+    if (!currentPath || currentPath === '') {
+      this.selected = 1; // Default to dashboard or whichever is your default
+      return;
+    }
+    
+    const routeIndex = this.routes.findIndex(route => route.path === currentPath);
+    this.selected = routeIndex >= 0 ? routeIndex : 1; // Default to dashboard if not found
   }
 }
 

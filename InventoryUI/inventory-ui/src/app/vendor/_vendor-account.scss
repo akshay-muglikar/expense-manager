@@ -1,0 +1,128 @@
+.vendor-account-content {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: var(--spacing-lg);
+
+  .account-header {
+    h2 {
+      color: var(--text-primary);
+      font-size: var(--font-size-xl);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .account-summary .summary-card {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-lg);
+
+      .summary-item {
+        background: var(--background-light);
+        padding: var(--spacing-md);
+        border-radius: var(--radius-md);
+        text-align: center;
+
+        .summary-label {
+          display: block;
+          color: var(--text-secondary);
+          font-size: var(--font-size-sm);
+          margin-bottom: var(--spacing-xs);
+        }
+
+        .summary-value {
+          display: block;
+          font-size: var(--font-size-lg);
+          font-weight: 600;
+          color: var(--text-primary);
+          
+          &.credit, &.positive-balance {
+            color: #28a745;
+          }
+          
+          &.debit, &.negative-balance {
+            color: #dc3545;
+          }
+        }
+      }
+    }
+
+    .balance-info {
+      margin-top: var(--spacing-md);
+      
+      .balance-label {
+        color: var(--text-secondary);
+        font-size: var(--font-size-md);
+      }
+      
+      .balance-amount {
+        font-size: var(--font-size-lg);
+        font-weight: 600;
+        
+        &.positive-balance {
+          color: #28a745;
+        }
+        
+        &.negative-balance {
+          color: #dc3545;
+        }
+      }
+    }
+  }
+
+  .expense-form-card {
+    .expense-form-header {
+      h3 {
+        color: var(--text-primary);
+        font-size: var(--font-size-lg);
+        margin-bottom: var(--spacing-xs);
+      }
+    }
+
+    .expense-form-content .form-row {
+      margin-bottom: var(--spacing-md);
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xs);
+
+        label {
+          color: var(--text-secondary);
+          font-size: var(--font-size-sm);
+          font-weight: 500;
+        }
+
+        input {
+          width: 100%;
+          padding: var(--spacing-sm) var(--spacing-md);
+          border: 1px solid #ddd;
+          border-radius: var(--radius-md);
+          font-size: var(--font-size-md);
+        }
+
+        .error-text {
+          color: var(--error-color);
+          font-size: 0.75rem;
+          margin-top: 4px;
+        }
+
+        mat-form-field {
+          width: 100%;
+        }
+      }
+    }
+  }
+  .account-search-container { 
+    mat-form-field { width: 100%; }
+  }
+
+  .account-grid-card {
+    overflow: hidden;
+    height: 500px;
+
+    ag-grid-angular {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}

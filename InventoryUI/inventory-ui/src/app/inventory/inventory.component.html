@@ -2,8 +2,7 @@
   <mat-progress-bar *ngIf="loading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
 
   <div class="header">
-    <h1>Inventory Management</h1>
-    <p class="text-secondary">Manage and track your inventory items</p>
+    <span class="page-header">Inventory Management</span>
   </div>
 
   <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)" animationDuration="200ms">

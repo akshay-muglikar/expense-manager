@@ -1,0 +1,120 @@
+<div class="customer-container">
+  <mat-progress-bar mode="indeterminate" class="loading-bar" *ngIf="isLoading"></mat-progress-bar>
+
+  <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="customer-management-tabs">
+    <!-- Customers List Tab -->
+    <mat-tab label="Customers">
+      <div class="customer-management-content">
+        <div class="cards-column">
+          <div class="header">
+            <h2>Customer Management</h2>
+          </div>
+
+          <div class="search-container">
+            <mat-form-field appearance="outline" class="search-field">
+              <mat-label>Search customers...</mat-label>
+              <input 
+                matInput 
+                [(ngModel)]="searchTerm" 
+                (input)="onSearchChange()"
+                placeholder="Search by name, mobile, or email">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="customers-cards-container" *ngIf="filteredCustomers.length > 0">
+            <div 
+              class="customer-card" 
+              *ngFor="let customer of filteredCustomers"
+              (click)="selectCustomer(customer)">
+              
+              <div class="customer-card-header">
+                <div class="customer-avatar">
+                  <span>{{ getCustomerInitials(customer.name) }}</span>
+                </div>
+                
+                <div class="customer-info">
+                  <h3>{{ customer.name }}</h3>
+                  <p class="mobile">{{ customer.mobile }}</p>
+                </div>
+                
+                <div class="customer-actions">
+                  <button mat-icon-button>
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                </div>
+              </div>
+
+             
+            </div>
+          </div>
+
+          <div class="no-customers" *ngIf="filteredCustomers.length === 0 && !isLoading">
+            <mat-icon>people_outline</mat-icon>
+            <p>No customers found</p>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Customer Account Tab -->
+    <mat-tab label="Customer Account" *ngIf="selectedCustomer">
+      <div class="customer-account-content">
+        <div class="account-column">
+          <div class="account-header">
+            <div class="account-navigation">
+              <button mat-icon-button (click)="goBackToCustomers()">
+                <mat-icon>arrow_back</mat-icon>
+              </button>
+              <h2>{{ selectedCustomer.name }}</h2>
+            </div>
+
+            <div class="customer-details" *ngIf="selectedCustomer">
+              <div class="detail-item">
+                <span class="label">Mobile:</span>
+                <span class="value">{{ selectedCustomer.mobile }}</span>
+              </div>
+            </div>
+
+            <div class="account-summary" *ngIf="customerAccount">
+              <div class="summary-card">
+                <div class="summary-item">
+                  <span class="summary-label">Total Bills</span>
+                  <span class="summary-value">{{ totalBills }}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Total Amount</span>
+                  <span class="summary-value amount">₹{{ totalAmount.toFixed(2) }}</span>
+                </div>
+                <div class="summary-item" *ngIf="lastBillDate">
+                  <span class="summary-label">Last Bill</span>
+                  <span class="summary-value">{{ formatDate(lastBillDate) }}</span>
+                </div>
+              </div>
+            </div>
+            <div>
+                <button mat-raised-button color="primary" (click)="createNewBill()">
+                    <mat-icon>add</mat-icon> New Bill
+                </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="bills-column">
+          <div class="bills-grid-card">
+            <h3>Customer Bills</h3>
+            <ag-grid-angular
+              class="ag-theme-alpine"
+              [rowData]="customerAccount?.bills || []"
+              [columnDefs]="billsColumnDefs"
+              [pagination]="true"
+              [paginationPageSize]="20"
+              [domLayout]="'autoHeight'"
+              [suppressHorizontalScroll]="false">
+            </ag-grid-angular>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

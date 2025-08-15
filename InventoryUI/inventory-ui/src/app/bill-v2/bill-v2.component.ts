@@ -17,6 +17,7 @@ import { BillhistoryComponent } from '../billhistory/billhistory.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { AddinventoryComponent } from "../addinventory/addinventory.component";
 import { MatCard, MatCardModule } from "@angular/material/card";
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-bill-v2',
@@ -143,13 +144,17 @@ if($event.key === 'Enter') {
   }
   listenToEdit() {
     window.addEventListener('edit-bill', (event: any) => {
-      const billId = event.detail.billId;
+      this.gotoEditBill(event.detail.billId);
+    });
+  }
+  gotoEditBill(id:number) {
+     const billId = id;
        this.billService.getBillById(billId).subscribe((bill: any) => {
         this.bill = bill;
         this.billItems = bill.billItems || [];
         this.activeTab = 'bill';
+        this.calculateTotal();
      });
-    });
   }
   sendToWhatsapp() {
     if (!this.bill.id) {
@@ -174,7 +179,9 @@ If you have any questions, feel free to contact us.`;
     const whatsappUrl = `https://api.whatsapp.com/send?phone=91${this.bill.mobile}&text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   }
-  constructor(private billService: BillService, private itemService: InventoryService) {
+  constructor(private billService: BillService, private itemService: InventoryService,
+    private route: ActivatedRoute, private router: Router
+  ) {
     this.filteredOptions = this.myControl.valueChanges.pipe(
       map(value => this._filter(value || '')),
     );
@@ -191,9 +198,36 @@ If you have any questions, feel free to contact us.`;
   ngOnInit() {
     this.getItems();
     //this.addIteminBill();
+    this.readParams();
      this.listenToPrint();
     this.listenToEdit();
     this.listenToAddInventory();
+  }
+  readParams() {
+//read router params
+this.route.queryParams.subscribe(params => {
+    const billId = params['billid'];
+    if(billId) {
+      this.gotoEditBill(Number(billId));
+      //clear the bill id from params
+      this.router.navigate([], {
+        queryParams: { billid: null },
+        queryParamsHandling: 'merge', // remove billid from the URL
+      });
+
+      return;
+    }
+    const customerId = params['customerId'];
+    const customerMobile = params['customerMobile'];
+    if (customerId && customerMobile) {
+      this.bill.name = customerId;
+      this.bill.mobile = customerMobile;
+       this.router.navigate([], {
+        queryParams: { customerId: null, customerMobile: null },
+        queryParamsHandling: 'merge', // remove billid from the URL
+      });
+    }
+  });
   }
 
   addBill() {

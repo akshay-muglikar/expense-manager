@@ -19,6 +19,16 @@
                type="number"
                placeholder="Enter amount" />
       </div>
+       <div class="form-group">
+          <label>Payment Mode *</label>
+          <mat-form-field appearance="outline">
+            <mat-select [(ngModel)]="selectedExpense.paymentMode" placeholder="Select payment mode">
+              <mat-option value="CASH">Cash</mat-option>
+              <mat-option value="CARD">Card</mat-option>
+              <mat-option value="UPI">UPI</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
 
       <div class="actions">
         <button mat-raised-button 
@@ -43,13 +53,6 @@
       <p class="text-secondary">Manage your expenses</p>
     </div>
 
-    <div class="summary-card">
-      <mat-icon class="summary-icon">account_balance_wallet</mat-icon>
-      <div class="summary-content">
-        <div class="summary-title">Total Expenses</div>
-        <div class="summary-value">₹{{totalExpenses | number:'1.0-0'}}</div>
-      </div>
-    </div>
 <mat-form-field appearance="outline">
       <mat-label>Time Period</mat-label>
       <mat-select [(ngModel)]="filter" (ngModelChange)="onSelectChange()">
