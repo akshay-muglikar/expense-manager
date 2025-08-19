@@ -1,7 +1,6 @@
 using System;
 using InventoryManagement.Api.Provider;
 using InventoryManagement.Api.UseCase;
-
 namespace InventoryManagement.Api;
 
 public static class DependencyConfiguration
@@ -16,6 +15,7 @@ public static class DependencyConfiguration
         services.AddScoped<ExpenseService>();
         services.AddScoped<SupplierService>();
         services.AddScoped<CustomerService>();
+
         return services;
     }
 }

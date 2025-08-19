@@ -376,5 +376,10 @@ public class BillService
         await _billRepository.AddBillItems(billItems);
         return _mapper.Map<BillModel>(existingBill);
     }
+
+    internal List<Dictionary<string, object>> ExecuteSqlQuery(string sqlQuery)
+    {
+        return _billRepository.ExecuteSqlQuery(sqlQuery);
+    }
 }
 

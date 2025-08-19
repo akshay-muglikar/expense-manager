@@ -1,6 +1,7 @@
 using System.Text;
 using InventoryManagement.Api;
 using InventoryManagement.Api.Config;
+using InventoryManagement.Api.AI.DependencyConfig;
 using InventoryManagement.Domain;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -71,9 +72,11 @@ builder.Services.AddAutoMapper(typeof(Program)); // Register AutoMapper
 builder.Services.AddControllers();
 // Add Swagger for API documentation
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpClient();
 
 builder.Services.AddDomainDependencies();
 builder.Services.AddApiDependencies();
+builder.Services.AddAIDependencies();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
