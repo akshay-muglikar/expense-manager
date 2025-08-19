@@ -1,0 +1,145 @@
+<!-- Chat Toggle Button -->
+<button class="chat-toggle-btn" 
+        [class.chat-open]="!isMinimized"
+        (click)="toggleChat()"
+        [attr.aria-label]="isMinimized ? 'Open Shrivo AI Chat' : 'Close Shrivo AI Chat'">
+  <mat-icon>{{isMinimized ? 'smart_toy' : 'close'}}</mat-icon>
+</button>
+
+<!-- Chat Panel -->
+<div class="chat-widget" [class.open]="!isMinimized">
+  <!-- Chat Header -->
+  <div class="chat-header">
+    <div class="header-info">
+      <div class="ai-avatar">
+        <mat-icon>smart_toy</mat-icon>
+      </div>
+      <div class="ai-details">
+        <h5>Shrivo AI Assistant</h5>
+        <span class="status">Online • Ready to help</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="clear-btn" (click)="clearChat()" aria-label="Clear chat" *ngIf="messages.length > 0">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button class="close-btn" (click)="toggleChat()" aria-label="Close chat">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Chat Body -->
+  <div class="chat-body">
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage">
+      <div class="error-content">
+        <mat-icon>error</mat-icon>
+        <span>{{errorMessage}}</span>
+        <button class="retry-btn" (click)="checkAIHealth()">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Welcome Message for healthy service -->
+    <div class="welcome-message" *ngIf="isHealthy && messages.length === 0">
+      <div class="ai-avatar">
+        <mat-icon>smart_toy</mat-icon>
+      </div>
+      <div class="welcome-content">
+        <h6>Hi! I'm Shrivo, your AI assistant</h6>
+        <p>I can help you with inventory management, billing, customer support, and more. Try asking me about any feature of the app!</p>
+        
+        <!-- Suggested Questions -->
+        <div class="suggested-questions" *ngIf="quickActions.length > 0">
+          <h6>Here are some things you can ask:</h6>
+          <div class="question-buttons">
+            <button 
+              class="question-btn" 
+              *ngFor="let suggestion of quickActions.slice(0, 4); trackBy: trackByAction"
+              (click)="sendQuickMessage(suggestion)">
+              <mat-icon>{{getQuickActionIcon(suggestion)}}</mat-icon>
+              <span>{{formatQuickActionText(suggestion)}}</span>
+            </button>
+          </div>
+          <p class="more-help">Or just type your question below! 👇</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="messages-container" #messagesContainer>
+      <div *ngFor="let message of messages; trackBy: trackByMessage" 
+           class="message" 
+           [class.user-message]="message.isUser"
+           [class.ai-message]="!message.isUser">
+        
+        <div class="message-avatar" *ngIf="!message.isUser">
+          <mat-icon>smart_toy</mat-icon>
+        </div>
+        
+        <div class="message-content">
+          <div class="message-bubble">
+            <div class="message-text" [innerHTML]="formatMessage(message.content)"></div>
+            <div class="message-time">{{formatTime(message.timestamp)}}</div>
+             <div class="question-buttons">
+                <button 
+                class="question-btn" 
+                *ngFor="let suggestion of message.suggestions.slice(0, 4); trackBy: trackByAction"
+                (click)="sendQuickMessage(suggestion)">
+                <mat-icon>{{getQuickActionIcon(suggestion)}}</mat-icon>
+                <span>{{formatQuickActionText(suggestion)}}</span>
+                </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="message-avatar user-avatar" *ngIf="message.isUser">
+          <mat-icon>person</mat-icon>
+        </div>
+      </div>
+
+      <!-- Typing Indicator -->
+      <div class="message ai-message typing-message" *ngIf="isTyping">
+        <div class="message-avatar">
+          <mat-icon>smart_toy</mat-icon>
+        </div>
+        <div class="message-content">
+          <div class="message-bubble typing-bubble">
+            <div class="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input">
+      <div class="input-container">
+          <input matInput 
+                 [(ngModel)]="currentMessage" 
+                 (keypress)="onKeyPress($event)"
+                 placeholder="Ask me anything about the app..."
+                 [disabled]="isTyping || !isHealthy">
+        <button mat-fab 
+                class="send-btn" 
+                (click)="sendMessage()" 
+                [disabled]="!currentMessage.trim() || isTyping || !isHealthy"
+                color="primary">
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
+      <div class="service-status" *ngIf="!isHealthy">
+        <mat-icon>warning</mat-icon>
+        <span>AI service is unavailable</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Bar -->
+  <mat-progress-bar mode="indeterminate" *ngIf="isTyping" class="loading-bar"></mat-progress-bar>
+</div>

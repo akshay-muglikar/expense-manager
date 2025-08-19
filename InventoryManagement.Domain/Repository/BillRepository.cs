@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using System.Threading.Tasks;
 using InventoryManagement.Domain.Model;
 using Microsoft.EntityFrameworkCore;
@@ -175,6 +176,31 @@ public class BillRepository : IBillRepository
             billItems.Add((bill, totalAmount));
         }
         return billItems;
+    }
+
+    public List<Dictionary<string, object>> ExecuteSqlQuery(string sqlQuery)
+    {
+        var dataTable = new DataTable();
+        using (var command = _context.Database.GetDbConnection().CreateCommand())
+        {
+            command.CommandText = sqlQuery;
+            _context.Database.OpenConnection();
+            using (var reader = command.ExecuteReader())
+            {
+                dataTable.Load(reader);
+                var rows = new List<Dictionary<string, object>>();
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    var rowDict = new Dictionary<string, object>();
+                    foreach (DataColumn column in dataTable.Columns)
+                    {
+                        rowDict[column.ColumnName] = row[column];
+                    }
+                    rows.Add(rowDict);
+                }
+                return rows;
+            }
+        }
     }
 }
 

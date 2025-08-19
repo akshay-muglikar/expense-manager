@@ -18,4 +18,5 @@ public interface IBillRepository
     Task AddBillWithItemsAsync(Bill bill, List<BillItem> billItems, string user);
     Task<IEnumerable<(string, string)>> GetAllCustomersAsync();
     Task<List<(Bill, int)>> GetCustomerBillsByNameAndMobileAsync(string name, string mobile);
+    List<Dictionary<string, object>> ExecuteSqlQuery(string sqlQuery);
 }

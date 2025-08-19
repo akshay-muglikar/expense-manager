@@ -5,13 +5,14 @@ import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import { AuthService } from './common/AuthService';
 import { HeaderComponent } from './header/header.component';
+import { ShrivoChatComponent } from './shrivo-chat/shrivo-chat.component';
 import { filter } from 'rxjs/operators';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MatIconModule, MatToolbarModule, HeaderComponent],
+  imports: [RouterOutlet, MatIconModule, MatToolbarModule, HeaderComponent, ShrivoChatComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
