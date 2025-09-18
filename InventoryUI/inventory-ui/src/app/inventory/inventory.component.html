@@ -2,7 +2,7 @@
   <mat-progress-bar *ngIf="loading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
 
   <div class="header">
-    <span class="page-header">Inventory Management</span>
+    <span class="page-header" translate>Inventory Management</span>
   </div>
 
   <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)" animationDuration="200ms">
@@ -10,30 +10,21 @@
     <mat-tab>
       <ng-template mat-tab-label>
         <mat-icon class="tab-icon">list</mat-icon>
-        Item List
+        <span translate>Item List</span>
       </ng-template>
 
       <div class="tab-content">
         <div class="search-container">
-          <div>
-          <mat-form-field appearance="outline">
-            <mat-icon matPrefix>search</mat-icon>
-            <input matInput 
-                   type="text" 
-                   id="filter-text-box" 
-                   placeholder="Search items..." 
-                   (input)="onFilterTextBoxChanged()" />
-          </mat-form-field>
-          </div>
+          <div></div>
           <button *ngIf="!scanMode" mat-raised-button color="secondary" (click)="scanToUpdateInventory()" data-toggle="modal" data-target="#scanModal">
             <mat-icon>search</mat-icon>
-            Scan
+            <span translate>Scan</span>
             </button>
-          <button mat-raised-button color="secondary" (click)="downloadInventory()"><mat-icon style="margin:0px">download</mat-icon></button>
-          <button mat-raised-button color="secondary" style="margin-left: 5px;" (click)="uploadInventory()"><mat-icon style="margin: 0px;">upload</mat-icon></button>
+          <button mat-raised-button color="secondary" (click)="downloadInventory()"><mat-icon style="margin:0px">download</mat-icon> <span translate>Download</span></button>
+          <button mat-raised-button color="secondary" style="margin-left: 5px;" (click)="uploadInventory()"><mat-icon style="margin: 0px;">upload</mat-icon><span translate>Upload</span></button>
         </div>
 
-          <ag-grid-angular 
+          <!-- <ag-grid-angular 
             class="ag-theme-material"
             [rowData]="items" 
             [columnDefs]="colDefs"
@@ -42,7 +33,13 @@
             (rowSelected)="onRowSelected($event)"
             [pagination]="true"
             (gridReady)="onGridReady($event)">
-          </ag-grid-angular>
+          </ag-grid-angular> -->
+          <app-paginated-table
+          [data]="items"
+          [colDefs]="colDefs" 
+          [rowSelection]="true"
+          (rowSelectionChange)="onRowSelected($event)"
+          ></app-paginated-table>
       </div>
     </mat-tab>
 
@@ -50,7 +47,7 @@
     <mat-tab>
       <ng-template mat-tab-label>
         <mat-icon class="tab-icon">{{selectedRowId ? 'edit' : 'add'}}</mat-icon>
-        {{selectedRowId ? 'Edit Item' : 'New Item'}}
+        {{(selectedRowId ? 'Edit Item' : 'New Item' )| translate}}
       </ng-template>
 
       <div class="tab-content">
@@ -59,31 +56,31 @@
         <div class="form-card">
           <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
             <div class="form-group">
-              <label for="Name">Name</label>
+              <label for="Name" translate>Name</label>
               <input id="Name" formControlName="Name" placeholder="Enter item name" required />
             </div>
 
             <div class="form-group">
-              <label for="Quantity">Quantity</label>
+              <label for="Quantity" translate>Quantity</label>
               <input id="Quantity" type="number" formControlName="Quantity" placeholder="Enter quantity" required/>
             </div>
 
             <div class="form-group">
-              <label for="Car">Car Model</label>
+              <label for="Car" translate>Car Model</label>
               <input id="Car" formControlName="Car" placeholder="Enter car model"/>
             </div>
 
             <div class="form-group">
-              <label for="Description">Description</label>
+              <label for="Description" translate>Description</label>
               <input id="Description" formControlName="Description" placeholder="Enter description"/>
             </div>
 
             <div class="form-group">
-              <label for="Price">Price</label>
+              <label for="Price" translate>Price</label>
               <input id="Price" type="number" formControlName="Price" placeholder="Enter price" required/>
             </div>
             <div class="form-group">
-              <label for="Barcode">Barcode</label>
+              <label for="Barcode" translate>Barcode</label>
               <input id="Barcode" type="text" formControlName="Barcode" placeholder="Enter barcode" required/>
             </div>
 
@@ -94,7 +91,7 @@
               </button>
               <button type="submit" mat-raised-button class="btn btn-primary" [disabled]="!itemForm.valid">
                 <mat-icon>save</mat-icon>
-                {{selectedRowId ? 'Update' : 'Save'}}
+                {{(selectedRowId ? 'Update' : 'Save') | translate}}
               </button>
             </div>
           </form>
@@ -106,7 +103,7 @@
     <mat-tab>
       <ng-template mat-tab-label>
         <mat-icon class="tab-icon">insights</mat-icon>
-        Insights
+        <span translate>Insights</span>
       </ng-template>
 
       <div class="tab-content">
@@ -114,7 +111,7 @@
           <mat-card class="stat-card">
             <mat-icon class="stat-icon">inventory_2</mat-icon>
             <div class="stat-value">{{items.length}}</div>
-            <div class="stat-label">Total Items</div>
+            <div class="stat-label" translate>Total Items</div>
             <mat-progress-bar mode="determinate" [value]="100"></mat-progress-bar>
           </mat-card>
 
@@ -123,18 +120,18 @@
           <mat-card class="stat-card">
             <mat-icon class="stat-icon">price_check</mat-icon>
             <div class="stat-value">₹{{totalInventoryValue | number:'1.0-0'}}</div>
-            <div class="stat-label">Total Inventory Value</div>
+            <div class="stat-label" translate>Total Inventory Value</div>
           </mat-card>
           <mat-card class="stat-card">
             <mat-icon class="stat-icon">warning</mat-icon>
             <div class="stat-value">{{inventorybelowThreshold}}</div>
-            <div class="stat-label">Restock Needed Inventory</div>
+            <div class="stat-label" translate>Restock Needed Inventory</div>
             <mat-progress-bar mode="determinate" [value]="(inventorybelowThreshold / items.length) * 100"></mat-progress-bar>
           </mat-card>
         </div>
       </div>
       <div class="item-below-threshold">
-        <h2>Restock Needed Inventory</h2>
+        <h2 translate>Restock Needed Inventory</h2>
         <p *ngIf="inventorybelowThreshold === 0">All items are above the restock threshold</p>
         <div class="item-below-threshold-list">
         <mat-card *ngFor="let item of itembelowThreshold" class="item-card">

@@ -2,22 +2,22 @@
   <mat-progress-bar *ngIf="loading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
 
   <div class="history-header">
-    <h2>Bill History</h2>
-    <p class="text-secondary">Manage and review all bills</p>
+    <h2 translate>Bill History</h2>
+    <p class="text-secondary" translate>Manage and review all bills</p>
   </div>
 
   <mat-form-field appearance="outline">
-      <mat-label>Time Period</mat-label>
+      <mat-label translate>Time Period</mat-label>
       <mat-select [(ngModel)]="filter" (ngModelChange)="onSelectChange()">
-        <mat-option value="0">Today</mat-option>
-        <mat-option value="7">Last 7 days</mat-option>
-        <mat-option value="30">Last 30 days</mat-option>
-        <mat-option value="-1">Custom</mat-option>
+        <mat-option value="0">{{'Today' | translate }}</mat-option>
+        <mat-option value="7">{{'Last 7 days' | translate }}</mat-option>
+        <mat-option value="30">{{'Last 30 days' | translate }}</mat-option>
+        <mat-option value="-1">{{'Custom' | translate }}</mat-option>
       </mat-select>
     </mat-form-field>
     <span [hidden]="hideCustomDate">
 <mat-form-field appearance="outline">
-        <mat-label>Start Date</mat-label>
+        <mat-label translate>Start Date</mat-label>
         <input matInput [matDatepicker]="startPicker" [(ngModel)]="startDateText">
             <mat-hint>MM/DD/YYYY</mat-hint>
             <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
@@ -25,7 +25,7 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>End Date</mat-label>
+        <mat-label transalate>End Date</mat-label>
         <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDateText">
             <mat-hint>MM/DD/YYYY</mat-hint>
             <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
@@ -37,33 +37,14 @@
       <mat-icon>refresh</mat-icon>
     </button>
   </span>
-  <div class="search-card mb-3">
-    <div class="search-form">
-      <mat-form-field class="search-input">
-        <mat-icon matPrefix>search</mat-icon>
-        <input matInput type="text" id="filter-text-box" 
-               placeholder="Search bills..." 
-               (input)="onFilterTextBoxChanged()" />
-      </mat-form-field>
-
-      <div class="stat-badge">
-        <mat-icon class="text-primary">receipt</mat-icon>
-        <div class="stat-content">
-          <div class="stat-value">{{bills.length}}</div>
-          <div class="stat-label">Total Bills</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  
 
   <div class="grid-card">
-    <ag-grid-angular class="ag-theme-material"
-      [rowData]="bills"
-      [columnDefs]="colDefs"
-      (rowSelected)="onRowSelected($event)"
-      [pagination]="true"
-      (gridReady)="onGridReady($event)"
-      [defaultColDef]="defaultColDef"
-    ></ag-grid-angular>
+    <app-paginated-table
+    [colDefs]="colDefs"
+    [data]="bills"
+    [rowActions]="rowActions"
+    (action)="rowAction($event)"
+    ></app-paginated-table>
   </div>
 </div>

@@ -10,18 +10,21 @@ import { CommonModule, DecimalPipe, formatDate } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import type { ColDef, RowSelectionOptions } from 'ag-grid-community'; // Column Definition Type Interface
-import {
-  GridApi, GridReadyEvent
-} from "ag-grid-community";
+
 import { AgGridAngular } from 'ag-grid-angular';
 import { Expense } from '../expense/expense.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BillModel, GetAllBillModel, GetBillModel } from '../models/bill.model';
 import { BillService } from '../services/bill.service';
+import { TranslateDirective, TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { InventoryService } from '../common/InventoryService/InventoryService';
+import { ItemSummary } from '../models/item-summary.model';
+import { SalesSummary } from '../models/sales-summary';
+import { AuthService, ClientModel } from '../common/AuthService';
+import { PaginatedTableComponent ,TableCol} from "../common/paginated-table/paginated-table.component";
 @Component({
   selector: 'app-dashboard',
   imports: [
-    AgGridAngular,
     CommonModule,
     DecimalPipe,
     MatProgressBarModule,
@@ -31,14 +34,55 @@ import { BillService } from '../services/bill.service';
     FormsModule,
     MatDatepickerModule,
     MatFormFieldModule,
-    MatInputModule
-  ],
+    MatInputModule, TranslateDirective, TranslatePipe,
+    PaginatedTableComponent
+],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   providers: [provideNativeDateAdapter()],
 
 })
 export class DashboardComponent {
+
+
+  tableColDefs: TableCol[]=[]
+  
+  setColDefs(){
+  this.tableColDefs  = [{
+      name : this.translate.instant('Type'),
+      width: 150, 
+      key: 'type'
+    },
+    {
+      name : this.translate.instant("Description"),
+      width: 250, 
+      key: 'name'
+    },
+    
+    {
+      name : this.translate.instant("Amount"),
+      width: 80, 
+      key: 'price',
+      currency:"₹"
+    },
+    {
+      name : this.translate.instant("Date"),
+      width: 150, 
+      key:'date'
+    },
+    {
+      name : this.translate.instant("Payment Mode"),
+      width: 150, 
+      key:'paymentMode'
+    },
+    {
+      name : this.translate.instant("Manager"),
+      width: 80, 
+      key:'paymentUser'
+    },
+  ]
+}
+  tableData = [];
   calculateExpense(): number {
     let sum = 0;
     this.expenses.forEach(x => {
@@ -52,10 +96,9 @@ export class DashboardComponent {
     return sum;}
   calculate() {
     let sum = this.bills.reduce((n, { totalAmount }) => n + (totalAmount || 0), 0);
-    let expense = this.calculateExpense()
-    return sum- expense;
+    //let expense = this.calculateExpense()
+    return sum;
   }
-  private gridApi!: GridApi;
   isHighlighted: any;
   hideCustomDate: boolean = true;
   filter: string = "0";
@@ -69,60 +112,49 @@ export class DashboardComponent {
   allItems: DashboardItems[] = [];
   dashboardStats:DashboardStats = {billCount:0,revenue:0,expenses:0}
   hideFormLoading = true;
-  colDefs: ColDef[] = [
-    { 
-      field: "type",
-      headerName: "Type",
-      flex: 1,
-      minWidth: 120
-    },
-    { 
-      field: "name",
-      headerName: "Description",
-      flex: 2,
-      minWidth: 200
-    },
-    { 
-      field: "price",
-      headerName: "Amount",
-      flex: 1,
-      minWidth: 120,
-      type: 'numericColumn',
-      valueFormatter: (params) => params.value ? '₹' + params.value.toLocaleString() : ''
-    },
-    { 
-      field: "date",
-      headerName: "Date",
-      flex: 1,
-      minWidth: 150,
-      sort: 'desc' as const,
-      sortIndex: 0,
-      valueFormatter: (params) => params.value ? new Date(params.value).toLocaleDateString() : ''
-    },
-    {
-      field: "paymentMode",
-      headerName: "Payment Mode",
-      flex: 1,
-      minWidth: 120,
-      filter: 'agSetColumnFilter',
-    },
-    {
-      field: "paymentUser",
-      headerName: "Manager",
-      flex: 1,
-      minWidth: 120,
-      filter:'agSetColumnFilter',
-    }
-  ];
-  constructor(private billService: BillService, private expenseService: ExpenseService) {
+  colDefs: ColDef[] =[]
+  
+  clientModel : ClientModel | undefined =undefined;
+  
+
+  constructor(private billService: BillService, private expenseService: ExpenseService
+    ,private translate : TranslateService, private inventoryService : InventoryService
+    ,private authService : AuthService
+  ) {
+    const savedLang = localStorage.getItem('lang');
+    translate.use(savedLang || 'en');
+    this.setColDefs();
+
     this.onSelectChange();
+    this.getSummary();
+    this.getSalesSummary();
+    
+    
   }
   ngOnInit() {
+    this.authService.getClientDetails().subscribe((res)=>{
+      this.clientModel =res;
+    })
+  }
+  inventorySummary: ItemSummary | null = null;
+  salesSummary : SalesSummary | null = null;
+  options : any= {};
+  getSummary(){
+    this.inventoryService.summary().subscribe((resp)=>{
+      this.inventorySummary = resp
+      this.inventorySummary.lowStockItems = this.inventorySummary.lowStockItems.slice(0, 3); 
+    });
+  }
+   getSalesSummary(){
+    const formatedDate = formatDate(this.start, 'yyyy-MM-ddTHH:mm:ss', 'en-US');
+    const formatedStartDate = formatDate(this.end, 'yyyy-MM-ddTHH:mm:ss', 'en-US');
+    this.billService.summary(formatedStartDate, formatedDate).subscribe((resp)=>{
+      this.salesSummary = resp
+      this.salesSummary.topProducts = this.salesSummary.topProducts.slice(0, 3); 
+    });
   }
 
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
+ 
 
   onSelectChange() {
     if (this.filter != "-1") {
@@ -158,7 +190,8 @@ export class DashboardComponent {
     const formatedDate = formatDate(this.start, 'yyyy-MM-ddTHH:mm:ss', 'en-US');
     const formatedStartDate = formatDate(this.end, 'yyyy-MM-ddTHH:mm:ss', 'en-US');
     this.allItems = [];
-
+    let allItems :DashboardItems[] =[]
+    this.getSalesSummary()
     this.billService.getBillsbyDate(formatedDate, formatedStartDate).subscribe((response) => {
       console.log(response);
       this.bills = response;
@@ -166,7 +199,7 @@ export class DashboardComponent {
         this.expenses = resonse;
         resonse.forEach(x => {
           if (x.supplierId) {
-            this.allItems.push({
+            allItems.push({
               type:  'Payment' + (x.expenseType === 'CREDIT' ? ' from vendor' : ' to vendor'),
               name: x.description,
               price: x.amount?.toString() ?? "0",
@@ -175,7 +208,7 @@ export class DashboardComponent {
               paymentUser: x.user ?? ''
             });
           }else{
-            this.allItems.push({
+            allItems.push({
               type: 'Expense',
               name: x.description,
               price: x.amount?.toString() ?? "0",
@@ -186,7 +219,7 @@ export class DashboardComponent {
           }
         });
         this.bills.forEach(x => {
-          this.allItems.push({
+          allItems.push({
             type: 'Bill',
             name: x.name + ' - ' + x.mobile,
             price: (x.totalAmount||0 ).toString(),//x.calculatedBillAmount?.toString() ?? "0",
@@ -195,7 +228,7 @@ export class DashboardComponent {
             paymentUser: x.paymentUser?? ''
           }) 
         });
-        this.gridApi.setGridOption("rowData", this.allItems);
+        this.allItems = [...allItems]
         this.hideFormLoading = true;
         this.calculateStats();
       });

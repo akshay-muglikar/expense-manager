@@ -49,6 +49,11 @@ export class LandingComponent {
       description: 'Track stock levels, manage multiple warehouses, and automate reordering with real-time updates and alerts.'
     },
     {
+      icon: 'smart_toy',
+      title: 'AI Business Assistant',
+      description: 'Your intelligent business companion. Get smart inventory suggestions, automated reordering recommendations, and predictive analytics powered by advanced AI.',
+    },
+    {
       icon: 'receipt_long',
       title: 'Smart Billing',
       description: 'Create professional invoices, manage payments, and track receivables with our intelligent billing system.'
@@ -72,12 +77,6 @@ export class LandingComponent {
       icon: 'store',
       title: 'Multi-Client Support',
       description: 'Perfect for businesses with multiple branches or clients'
-    },
-    {
-      icon: 'smart_toy',
-      title: 'AI Business Assistant',
-      description: 'Coming Soon! Your intelligent business companion. Get smart inventory suggestions, automated reordering recommendations, and predictive analytics powered by advanced AI.',
-      isComingSoon: true
     },
     {
         icon: 'support_agent',

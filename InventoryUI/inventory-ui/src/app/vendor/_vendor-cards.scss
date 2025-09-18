@@ -13,6 +13,12 @@
     padding: var(--spacing-lg);
     cursor: pointer;
     border: 2px solid transparent;
+    margin-top: 10px;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
 
     &.selected {
       border-color: var(--primary-color);

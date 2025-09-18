@@ -8,14 +8,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef } from 'ag-grid-community';
 import { CustomerService } from '../services/customer.service';
 import { CustomerModel, CustomerAccountModel } from '../contracts/customer.model';
 import { BillService } from '../services/bill.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { query } from '@angular/animations';
+import { TranslateDirective, TranslatePipe } from "@ngx-translate/core";
+import { PaginatedTableComponent, TableAction, TableCol } from "../common/paginated-table/paginated-table.component";
 
 @Component({
   selector: 'app-customer',
@@ -25,13 +24,14 @@ import { query } from '@angular/animations';
     FormsModule,
     MatTabsModule,
     MatCardModule,
-    MatIconModule,
+    MatIconModule, TranslatePipe,
     MatButtonModule,
     MatInputModule,
     MatFormFieldModule,
     MatProgressBarModule,
-    AgGridAngular
-  ],
+    TranslateDirective,
+    PaginatedTableComponent
+],
   templateUrl: './customer.component.html',
   styleUrl: './customer.component.scss'
 })
@@ -43,36 +43,31 @@ export class CustomerComponent implements OnInit {
   isLoading = false;
   searchTerm = '';
   selectedTabIndex = 0;
-
+  rowActions:TableAction[]=[]
   // Grid column definitions for bills
-  billsColumnDefs: ColDef[] = [
-    { field: 'id', headerName: 'Bill Number', sortable: true, filter: true, width: 150 },
+  rowAction(data:any){
+    if(data.action=='edit'){
+      this.editBill(data.index);
+    }else if(data.action=='print'){
+      this.download(data.index)
+    }
+
+  }
+  actions : TableAction[]= [
+    {name:'Edit', action:'edit'},{name:'Print', action:'print'}
+  ]
+  billsColumnDefs: TableCol[] = [
+    { key: 'id', name: 'Bill Number',width: 150 },
     { 
-      field: 'billDate', 
-      headerName: 'Date', 
-      sortable: true, 
-      filter: true, 
+      key: 'billDate', 
+      name: 'Bill Date', 
       width: 120,
-      valueFormatter: (params) => new Date(params.value).toLocaleDateString()
     },
     { 
-      field: 'totalAmount', 
-      headerName: 'Amount', 
-      sortable: true, 
-      filter: true, 
+      key: 'totalAmount', 
+      name: 'Amount', 
+      currency: "₹", 
       width: 120,
-      valueFormatter: (params) => `₹${params.value.toFixed(2)}`
-    },
-    { 
-      field: 'items', 
-      headerName: 'Items', 
-      width: 100,
-      valueFormatter: (params) => params.value ? params.value.length : 0
-    },
-    {
-        field: 'Actions',
-        headerName: 'Actions',
-      cellRenderer: this.actionCellRenderer.bind(this),
     }
   ];
 totalBills: any;
@@ -95,6 +90,7 @@ lastBillDate: any;
         this.customers = customers;
         this.filteredCustomers = [...customers];
         this.isLoading = false;
+        this.rowActions=[...this.actions]
       },
       error: (error) => {
         console.error('Error loading customers:', error);
@@ -179,14 +175,14 @@ lastBillDate: any;
   editBill(id: number) {
     // Implement the logic to edit the bill
 
-    this.router.navigateByUrl('bill?billid=' + id);
+    this.router.navigateByUrl('bill?billid=' + this.customerAccount?.bills[id].id);
   }
   createNewBill(){
     this.router.navigateByUrl('bill?customerId=' + this.selectedCustomer?.name + '&customerMobile=' + this.selectedCustomer?.mobile);
   }
   download(id : number) {
-   
-    this.billService.download(id.toString()).subscribe((resp: any) => {
+   let billId=this.customerAccount?.bills[id].id
+    this.billService.download(billId!.toString()).subscribe((resp: any) => {
       const fileURL = URL.createObjectURL(resp);
       const a = document.createElement('a');
       a.href = fileURL;

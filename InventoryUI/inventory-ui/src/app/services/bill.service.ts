@@ -4,6 +4,7 @@ import { BillModel } from '../models/bill.model';
 import { BillItemModel } from '../models/bill-item.model';
 import { Observable } from 'rxjs';
 import { AddBillModel } from '../contracts/bill.model';
+import { SalesSummary } from '../models/sales-summary';
 @Injectable({
   providedIn: 'root'
 })
@@ -58,5 +59,8 @@ export class BillService {
   }
   getBillById(billId: number) {
     return this.http.get<any>(`/api/bill/${billId}`);
+  }
+  summary(formatedDate: string, formatedStartDate: string){
+    return this.http.get<SalesSummary>(`/api/analytics/sales-summary?start=${formatedDate}&end=${formatedStartDate}`)
   }
 }

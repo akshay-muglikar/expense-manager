@@ -139,24 +139,24 @@ public class BillService
     }
     public async Task Add(int id, BillItemModel billItemModel)
     {
-        await _billRepository.AddBillItems(new List<BillItem>()
-        {
-            new BillItem()
-            {
-                ItemId = billItemModel.ItemId,
-                Quantity = billItemModel.Quantity,
-                Amount = billItemModel.Amount,
-                BillId = id
-            }
-        });
-        var item = await _itemRepository.GetByIdAsync(billItemModel.ItemId);
+        // // await _billRepository.AddBillItems(new List<BillItem>()
+        // // {
+        // //     new BillItem()
+        // //     {
+        // //         ItemId = billItemModel.ItemId,
+        // //         Quantity = billItemModel.Quantity,
+        // //         Amount = billItemModel.Amount,
+        // //         BillId = id
+        // //     }
+        // // });
+        // var item = await _itemRepository.GetByIdAsync(billItemModel.ItemId);
 
 
-        if (item == null)
-            throw new Exception("Item not found");
-        item.Quantity -= billItemModel.Quantity;
+        // if (item == null)
+        //     throw new Exception("Item not found");
+        // item.Quantity -= billItemModel.Quantity;
 
-        await _itemRepository.Update(item);
+        // await _itemRepository.Update(item);
     }
 
     public async Task DeleteAsync(int id)
@@ -373,7 +373,7 @@ public class BillService
             Quantity = bi.Quantity,
             Amount = bi.Amount
         }) ?? new List<BillItem>();
-        await _billRepository.AddBillItems(billItems);
+        await _billRepository.AddBillItems(id, billItems, _user);
         return _mapper.Map<BillModel>(existingBill);
     }
 

@@ -170,6 +170,11 @@
       padding: 2px;
     }
     .items-table {
+      thead{
+        th:first-child{
+          padding: 0px;
+        }
+      }
       td {
         padding: 2px;
         .ng-select {
@@ -207,6 +212,11 @@
     box-shadow: var(--shadow-md);
     transition: transform 0.2s ease;
     cursor: pointer;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+      }
   }
 .btn-download{
   display: none;
@@ -224,4 +234,8 @@
   right: 0;
   color: #4caf50;
   z-index: 1;
+}
+.mat-mdc-progress-spinner{
+  width: 30px !important;
+  height: 30px !important;
 }

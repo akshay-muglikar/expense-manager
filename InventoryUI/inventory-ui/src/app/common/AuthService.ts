@@ -12,6 +12,10 @@ export class AuthService {
   logout() {
     localStorage.removeItem(this.tokenKey)
     this.router.navigate(['login']);
+    this.accesstoken=''
+    this.clientNameSubject.next('');
+    window.dispatchEvent(new CustomEvent('logout'));
+
   }
   constructor(private router: Router,private http: HttpClient) {
   }
@@ -22,7 +26,13 @@ export class AuthService {
   private clientNameSubject = new BehaviorSubject<string | null>(null);
   clientName$ = this.clientNameSubject.asObservable();
 
-  
+  isLoggedIn(){
+    var token = this.getaccessToken()
+    return token !=  null && token!= undefined && token!=''
+  }
+  getUser(){
+    return this.http.get<UserModel>("/api/login/user");
+  }
   getaccessToken(){
     let value =  this.accesstoken;
     if (value === null || value === undefined || value === '') {
@@ -38,6 +48,8 @@ export class AuthService {
         localStorage.setItem(this.tokenKey, resp.accessToken)
         this.router.navigate(['bill']);
         this.getClient()
+        window.dispatchEvent(new CustomEvent('login-success'));
+
     }, (error) => {
       //check for 401 Unauthorized error
       let message = "Login failed.";
@@ -74,4 +86,8 @@ export interface ClientModel{
     id:string,
     name:string
 
+}
+export interface UserModel {
+  username : string,
+  client : ClientModel
 }

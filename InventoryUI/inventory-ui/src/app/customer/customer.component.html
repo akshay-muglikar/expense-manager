@@ -3,16 +3,16 @@
 
   <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="customer-management-tabs">
     <!-- Customers List Tab -->
-    <mat-tab label="Customers">
+    <mat-tab label="{{'Customers' | translate}}">
       <div class="customer-management-content">
         <div class="cards-column">
           <div class="header">
-            <h2>Customer Management</h2>
+            <h2 translate>Customer Management</h2>
           </div>
 
           <div class="search-container">
             <mat-form-field appearance="outline" class="search-field">
-              <mat-label>Search customers...</mat-label>
+              <mat-label translate>Search customers...</mat-label>
               <input 
                 matInput 
                 [(ngModel)]="searchTerm" 
@@ -58,7 +58,7 @@
     </mat-tab>
 
     <!-- Customer Account Tab -->
-    <mat-tab label="Customer Account" *ngIf="selectedCustomer">
+    <mat-tab label="{{'Customer Account' | translate}}" *ngIf="selectedCustomer">
       <div class="customer-account-content">
         <div class="account-column">
           <div class="account-header">
@@ -71,7 +71,7 @@
 
             <div class="customer-details" *ngIf="selectedCustomer">
               <div class="detail-item">
-                <span class="label">Mobile:</span>
+                <span class="label" translate>Mobile</span>
                 <span class="value">{{ selectedCustomer.mobile }}</span>
               </div>
             </div>
@@ -79,22 +79,22 @@
             <div class="account-summary" *ngIf="customerAccount">
               <div class="summary-card">
                 <div class="summary-item">
-                  <span class="summary-label">Total Bills</span>
+                  <span class="summary-label" translate>Total Bills</span>
                   <span class="summary-value">{{ totalBills }}</span>
                 </div>
                 <div class="summary-item">
-                  <span class="summary-label">Total Amount</span>
+                  <span class="summary-label" translate>Total Amount</span>
                   <span class="summary-value amount">₹{{ totalAmount.toFixed(2) }}</span>
                 </div>
                 <div class="summary-item" *ngIf="lastBillDate">
-                  <span class="summary-label">Last Bill</span>
+                  <span class="summary-label" translate>Last Bill</span>
                   <span class="summary-value">{{ formatDate(lastBillDate) }}</span>
                 </div>
               </div>
             </div>
             <div>
                 <button mat-raised-button color="primary" (click)="createNewBill()">
-                    <mat-icon>add</mat-icon> New Bill
+                    <mat-icon>add</mat-icon> <span translate>New Bill</span>
                 </button>
             </div>
           </div>
@@ -102,16 +102,14 @@
 
         <div class="bills-column">
           <div class="bills-grid-card">
-            <h3>Customer Bills</h3>
-            <ag-grid-angular
-              class="ag-theme-alpine"
-              [rowData]="customerAccount?.bills || []"
-              [columnDefs]="billsColumnDefs"
-              [pagination]="true"
-              [paginationPageSize]="20"
-              [domLayout]="'autoHeight'"
-              [suppressHorizontalScroll]="false">
-            </ag-grid-angular>
+            <h3 translate>Customer Bills</h3>
+           
+            <app-paginated-table
+            [data]="customerAccount?.bills || []"
+            [colDefs]="billsColumnDefs"
+            [rowActions]="rowActions"
+            (action)="rowAction($event)"
+            ></app-paginated-table>
           </div>
         </div>
       </div>

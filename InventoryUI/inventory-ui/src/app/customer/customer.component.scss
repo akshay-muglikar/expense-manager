@@ -41,7 +41,10 @@
       padding: var(--spacing-lg);
       cursor: pointer;
       border: 2px solid transparent;
-
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+      }
       .customer-card-header {
         display: flex;
         align-items: center;

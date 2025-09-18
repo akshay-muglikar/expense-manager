@@ -8,8 +8,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { FormsModule } from '@angular/forms';
-import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef, GridApi, GridReadyEvent, RowSelectedEvent, RowSelectionOptions } from 'ag-grid-community';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule, MatTabGroup } from '@angular/material/tabs';
@@ -18,25 +16,28 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { VendorModel, VendorAccountModel } from '../contracts/vendor.model';
 import { finalize } from 'rxjs';
+import { TranslateDirective, TranslatePipe } from "@ngx-translate/core";
+import { PaginatedTableComponent, TableCol } from "../common/paginated-table/paginated-table.component";
 
 @Component({
   selector: 'app-vendor',
   standalone: true,
   imports: [
-    AgGridAngular,
     CommonModule,
     MatProgressBarModule,
     MatSelectModule,
     MatIconModule,
     MatCardModule,
     MatButtonModule,
-    FormsModule,
+    FormsModule, TranslatePipe,
     MatFormFieldModule,
     MatInputModule,
     MatTabsModule,
     MatTooltipModule,
-    MatDatepickerModule
-  ],
+    MatDatepickerModule,
+    TranslateDirective,
+    PaginatedTableComponent
+],
   templateUrl: './vendor.component.html',
   styleUrl: './vendor.component.scss',
   providers: [provideNativeDateAdapter()]
@@ -59,73 +60,33 @@ export class VendorComponent {
     expenseType: 'DEBIT'
   };
   
-  rowSelection: RowSelectionOptions | "single" | "multiple" = {
-    mode: "singleRow",
-  };
 
-  private accountGridApi!: GridApi;
+
 
   // Column definitions for vendor account grid
-  accountColDefs: ColDef[] = [
+  accountColDefs: TableCol[] = [
     { 
-      field: 'description', 
-      headerName: 'Description',
-      flex: 1,
-      sortable: true,
-      filter: true
+      key: 'description', 
+      name: 'Description',
+      width: 200
     },
     { 
-      field: 'amount', 
-      headerName: 'Amount',
+      key: 'amount', 
+      name: 'Amount',
       width: 120,
-      sortable: true,
-      valueFormatter: (params) => '₹' + params.value?.toFixed(2),
-      cellStyle: (params) => {
-        const row = params.data;
-        if (row?.expenseType === 'CREDIT') {
-          return { color: 'green', fontWeight: 'bold' };
-        } else if (row?.expenseType === 'DEBIT') {
-          return { color: 'red', fontWeight: 'bold' };
-        }
-        return null;
-      }
     },
     { 
-      field: 'type', 
-      headerName: 'Type',
+      key: 'expenseType', 
+      name: 'Type',
       width: 120,
-      sortable: true,
-      valueFormatter: (params) => {
-        return params.data.expenseType === 'CREDIT' ? 'Payment From Vendor' : 'Payment To Vendor';
-      },
-      cellStyle: (params) => {
-        if (params.data.expenseType === 'CREDIT') {
-          return { color: 'green', fontWeight: 'bold' };
-        } else if (params.data.expenseType === 'DEBIT') {
-          return { color: 'red', fontWeight: 'bold' };
-        }
-        return null;
-      }
     },
     { 
-      field: 'date', 
-      headerName: 'Date',
+      key: 'date', 
+      name: 'Date',
       width: 120,
-      sortable: true,
-      valueFormatter: (params) => {
-        if (params.value) {
-          return formatDate(params.value, 'dd/MM/yyyy', 'en-US');
-        }
-        return '';
-      }
     }
   ];
 
-  defaultColDef: ColDef = {
-    resizable: true,
-    sortable: true,
-    filter: false,
-  };
 
   constructor(private vendorService: VendorService) {}
 
@@ -161,14 +122,7 @@ export class VendorComponent {
     return formatDate(date, 'dd/MM/yyyy', 'en-US');
   }
 
-  onAccountGridReady(params: GridReadyEvent) {
-    this.accountGridApi = params.api;
-  }
-
-  onAccountFilterTextBoxChanged() {
-    const filterTextBox = document.getElementById('account-filter-text-box') as HTMLInputElement;
-    this.accountGridApi.setGridOption('quickFilterText', filterTextBox.value);
-  }
+  
 
   getVendors() {
     this.loading = true;

@@ -1,4 +1,4 @@
-// VS Code Copilot Style Chat - Chat Toggle Button (Bottom Right)
+// Optimized Chat Styles
 .chat-toggle-btn {
   position: fixed;
   bottom: 24px;
@@ -26,14 +26,13 @@
   }
   
   &.chat-open {
-    right: 444px; // Move left when panel is open (400px width + 44px spacing)
+    right: 444px;
     background: #0366d6;
     border-color: #0366d6;
     color: white;
     
     &:hover {
       background: #0256d1;
-      border-color: #0256d1;
       transform: translateY(-2px);
     }
   }
@@ -45,11 +44,10 @@
   }
 }
 
-// VS Code Copilot Style Chat Panel
 .chat-widget {
   position: fixed;
   top: 0;
-  right: -400px; // Hide offscreen initially
+  right: -400px;
   width: 400px;
   height: 100vh;
   background: #ffffff;
@@ -61,12 +59,11 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
   &.open {
-    right: 0; // Slide into view
+    right: 0;
     box-shadow: -4px 0 16px rgba(0, 0, 0, 0.15);
   }
 }
 
-// VS Code Style Chat Header
 .chat-header {
   display: flex;
   align-items: center;
@@ -82,43 +79,22 @@
     flex: 1;
   }
   
-  .ai-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    background: #0366d6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 12px;
-    
-    mat-icon {
-      color: white;
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-  }
-  
   .ai-details {
     h5 {
       margin: 0;
       font-size: 13px;
       font-weight: 600;
       color: #24292e;
-      line-height: 1.2;
     }
     
     .status {
       font-size: 11px;
       color: #586069;
-      margin-top: 1px;
     }
   }
   
   .header-actions {
     display: flex;
-    align-items: center;
     gap: 4px;
   }
   
@@ -131,9 +107,6 @@
     padding: 4px;
     border-radius: 3px;
     transition: all 0.15s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     
     &:hover {
       background: #e1e4e8;
@@ -147,7 +120,25 @@
     }
   }
 }
-// VS Code Style Chat Body
+
+.ai-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #0366d6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  
+  mat-icon {
+    color: white;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
 .chat-body {
   flex: 1;
   display: flex;
@@ -156,7 +147,6 @@
   overflow: hidden;
 }
 
-// Error Message Styles
 .error-message {
   padding: 16px;
   background: #ffeaea;
@@ -167,17 +157,7 @@
     align-items: center;
     gap: 8px;
     color: #721c24;
-    
-    mat-icon {
-      font-size: 18px;
-      color: #f5c6cb;
-    }
-    
-    span {
-      flex: 1;
-      font-size: 13px;
-      line-height: 1.4;
-    }
+    font-size: 13px;
     
     .retry-btn {
       background: none;
@@ -186,46 +166,21 @@
       padding: 4px;
       cursor: pointer;
       color: #721c24;
-      transition: all 0.15s ease;
       
       &:hover {
         background: #f5c6cb;
         color: white;
       }
-      
-      mat-icon {
-        font-size: 16px;
-        color: inherit;
-      }
     }
   }
 }
 
-// Welcome Message Styles
 .welcome-message {
   padding: 20px 16px;
   border-bottom: 1px solid #e1e4e8;
   background: #f8fafc;
-  
   display: flex;
   gap: 12px;
-  align-items: flex-start;
-  
-  .ai-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    background: #0366d6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    
-    mat-icon {
-      color: white;
-      font-size: 18px;
-    }
-  }
   
   .welcome-content {
     flex: 1;
@@ -246,99 +201,53 @@
       &.more-help {
         margin: 12px 0 0 0;
         font-size: 12px;
-        font-style: italic;
         text-align: center;
         color: #6a737d;
       }
     }
   }
-  
-  .suggested-questions {
-    margin-top: 16px;
-    
-    h6 {
-      margin: 0 0 12px 0;
-      font-size: 12px;
-      font-weight: 600;
-      color: #586069;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    
-    
-  }
 }
 
 .question-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    
-    .question-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
-      background: white;
-      border: 1px solid #d0d7de;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      font-size: 12px;
-      color: #24292e;
-      text-align: left;
-      
-      &:hover {
-        background: #f6f8fa;
-        border-color: #0366d6;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(3, 102, 214, 0.15);
-      }
-      
-      &:active {
-        transform: translateY(0);
-        box-shadow: 0 1px 4px rgba(3, 102, 214, 0.15);
-      }
-      
-      mat-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-        color: #0366d6;
-        flex-shrink: 0;
-      }
-      
-      span {
-        line-height: 1.3;
-        font-weight: 500;
-      }
-    }
-// Service Status Styles
-.service-status {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.question-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  padding: 8px;
-  background: #fff3cd;
+  gap: 8px;
+  padding: 10px 12px;
+  background: white;
+  border: 1px solid #d0d7de;
   border-radius: 6px;
-  border: 1px solid #ffeaa7;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 12px;
+  color: #24292e;
+  text-align: left;
+  
+  &:hover {
+    background: #f6f8fa;
+    border-color: #0366d6;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(3, 102, 214, 0.15);
+  }
   
   mat-icon {
     font-size: 16px;
-    color: #856404;
+    width: 16px;
+    height: 16px;
+    color: #0366d6;
+    flex-shrink: 0;
   }
   
   span {
-    font-size: 12px;
-    color: #856404;
+    font-weight: 500;
   }
 }
 
-// VS Code Style Messages Container
 .messages-container {
   flex: 1;
   overflow-y: auto;
@@ -364,7 +273,6 @@
   }
 }
 
-// VS Code Style Message Layout
 .message {
   display: flex;
   margin-bottom: 16px;
@@ -377,7 +285,6 @@
     .message-bubble {
       background: #f1f3f4;
       border: 1px solid #d0d7de;
-      color: #24292e;
       margin-left: 8px;
     }
   }
@@ -388,7 +295,6 @@
     .message-bubble {
       background: #ffffff;
       border: 1px solid #d0d7de;
-      color: #24292e;
       margin-right: 8px;
     }
   }
@@ -421,52 +327,13 @@
   }
 }
 
-.message-content {
-  flex: 1;
-  max-width: calc(100% );
-}
-
 .message-bubble {
   border-radius: 6px;
   padding: 8px 12px;
   word-wrap: break-word;
-  max-width: 100%;
   font-size: 13px;
   line-height: 1.5;
-  
-  .message-text {
-    ::ng-deep {
-      h4, h5, h6 {
-        margin: 8px 0 4px 0;
-        font-size: 13px;
-        font-weight: 600;
-        color: #24292e;
-      }
-      
-      ul, ol {
-        margin: 8px 0;
-        padding-left: 20px;
-      }
-      
-      li {
-        margin: 2px 0;
-      }
-      
-      strong, b {
-        font-weight: 600;
-        color: #24292e;
-      }
-      
-      code {
-        background: #f6f8fa;
-        padding: 2px 4px;
-        border-radius: 3px;
-        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-        font-size: 12px;
-        border: 1px solid #e1e4e8;
-      }
-    }
-  }
+  color: #24292e;
   
   .message-time {
     font-size: 10px;
@@ -475,14 +342,12 @@
   }
 }
 
-// VS Code Style Typing Indicator
 .typing-bubble {
   background: #f6f8fa !important;
   border: 1px solid #e1e4e8 !important;
   
   .typing-indicator {
     display: flex;
-    align-items: center;
     gap: 3px;
     padding: 4px 0;
     
@@ -500,99 +365,44 @@
   }
 }
 
-@keyframes typing {
-  0%, 60%, 100% {
-    transform: translateY(0);
-    opacity: 0.4;
-  }
-  30% {
-    transform: translateY(-4px);
-    opacity: 1;
-  }
-}
-
-// VS Code Style Chat Input
 .chat-input {
   padding: 16px;
   border-top: 1px solid #e1e4e8;
   background: #ffffff;
   
   .input-container {
-   display: grid;
+    display: grid;
     grid-template-columns: 1fr auto;
     gap: 12px;
-
-    position: relative;
   }
   
-  .message-input {
-    flex: 1;
+  input {
+    padding: 12px 16px;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    background: #f6f8fa;
+    font-size: 14px;
+    color: #24292e;
     
-    ::ng-deep {
-      .mat-mdc-form-field-wrapper {
-        padding-bottom: 0;
-      }
-      
-      .mat-mdc-text-field-wrapper {
-        border-radius: 8px;
-        background: #f6f8fa;
-        min-height: 44px;
-      }
-      
-      .mdc-notched-outline {
-        .mdc-notched-outline__leading,
-        .mdc-notched-outline__notch,
-        .mdc-notched-outline__trailing {
-          border-color: #d0d7de;
-          border-width: 1px;
-        }
-      }
-      
-      .mat-mdc-form-field-focus-overlay {
-        background: transparent;
-      }
-      
-      .mat-mdc-form-field.mat-focused .mdc-notched-outline {
-        .mdc-notched-outline__leading,
-        .mdc-notched-outline__notch,
-        .mdc-notched-outline__trailing {
-          border-color: #0366d6;
-          border-width: 2px;
-        }
-      }
-      
-      .mat-mdc-form-field-input-control input {
-        padding: 12px 16px;
-        font-size: 14px;
-        color: #24292e;
-        background: transparent;
-        line-height: 1.5;
-      }
-      
-      .mat-mdc-form-field-input-control input::placeholder {
-        color: #656d76;
-        font-style: italic;
-      }
-      
-      .mat-mdc-form-field-label {
-        color: #656d76;
-        font-size: 14px;
-      }
-      
-      .mat-mdc-form-field-infix {
-        min-height: 44px;
-        padding: 0;
-      }
+    &:focus {
+      outline: none;
+      border-color: #0366d6;
+      box-shadow: 0 0 0 2px rgba(3, 102, 214, 0.15);
+    }
+    
+    &::placeholder {
+      color: #656d76;
     }
   }
   
   .send-btn {
     width: 44px;
     height: 44px;
-    min-height: 44px;
-    min-width: 44px;
     background: #0366d6;
+    border: none;
     border-radius: 8px;
+    cursor: pointer;
+    color: white;
     transition: all 0.2s ease;
     
     &:hover:not(:disabled) {
@@ -601,64 +411,59 @@
       box-shadow: 0 4px 12px rgba(3, 102, 214, 0.3);
     }
     
-    &:active:not(:disabled) {
-      transform: translateY(0);
-      box-shadow: 0 2px 6px rgba(3, 102, 214, 0.3);
-    }
-    
     &:disabled {
       background: #8b949e;
-      color: #f0f6fc;
       cursor: not-allowed;
     }
     
     mat-icon {
       font-size: 18px;
-      width: 18px;
-      height: 18px;
     }
   }
 }
 
-// Loading Bar
+.service-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px;
+  background: #fff3cd;
+  border-radius: 6px;
+  
+  span {
+    font-size: 12px;
+    color: #856404;
+  }
+}
+
 .loading-bar {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 2px;
-  
-  ::ng-deep {
-    .mat-mdc-progress-bar-buffer {
-      background: #f1f3f4;
-    }
-    
-    .mat-mdc-progress-bar-primary {
-      background: #0366d6;
-    }
-  }
 }
 
-// VS Code Style Responsive Design
-@media (max-width: 768px) {
+@keyframes typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
+  30% { transform: translateY(-10px); opacity: 1; }
+}
+
+@media (max-width: 1024px) {
   .chat-widget {
     width: 100vw;
     right: -100vw;
     
-    &.open {
-      right: 0;
-    }
+    &.open { right: 0; }
   }
   
   .chat-toggle-btn {
-    bottom: 20px;
-    right: 20px;
     width: 48px;
     height: 48px;
     
-    &.chat-open {
-      right: 20px; // Don't move on mobile, stay in corner
-    }
+    &.chat-open { right: 20px;
+    display: none !important; }
     
     mat-icon {
       font-size: 24px;
@@ -668,41 +473,12 @@
   }
   
   .message {
-    &.user-message {
-      margin-left: 20px;
-    }
-    
-    &.ai-message {
-      margin-right: 20px;
-    }
+    &.user-message { margin-left: 20px; }
+    &.ai-message { margin-right: 20px; }
   }
   
-  .welcome-message {
-    padding: 16px 12px;
-    flex-direction: column;
-    gap: 8px;
-    
-    .ai-avatar {
-      align-self: flex-start;
-    }
-    
-    .suggested-questions {
-      .question-buttons {
-        grid-template-columns: 1fr;
-        gap: 6px;
-      }
-      
-      .question-btn {
-        padding: 8px 10px;
-        font-size: 11px;
-        
-        mat-icon {
-          font-size: 14px;
-          width: 14px;
-          height: 14px;
-        }
-      }
-    }
+  .question-buttons {
+    grid-template-columns: 1fr;
   }
 }
 

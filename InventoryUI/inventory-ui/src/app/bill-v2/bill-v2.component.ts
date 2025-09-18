@@ -18,6 +18,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { AddinventoryComponent } from "../addinventory/addinventory.component";
 import { MatCard, MatCardModule } from "@angular/material/card";
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateDirective, TranslatePipe } from "@ngx-translate/core";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-bill-v2',
@@ -32,7 +34,9 @@ import { ActivatedRoute, Router } from '@angular/router';
     ReactiveFormsModule,
     BillhistoryComponent,
     AddinventoryComponent,
-    MatCardModule
+    MatCardModule,
+    TranslateDirective, TranslatePipe,
+    MatProgressSpinner
 ],
   templateUrl: './bill-v2.component.html',
   styleUrl: './bill-v2.component.scss'
@@ -148,6 +152,7 @@ if($event.key === 'Enter') {
     });
   }
   gotoEditBill(id:number) {
+    this._snackBar.open(`Bill# ${id} selected for editing`, 'Close', { duration: 3000 })
      const billId = id;
        this.billService.getBillById(billId).subscribe((bill: any) => {
         this.bill = bill;
@@ -161,6 +166,7 @@ if($event.key === 'Enter') {
       this.openSnackBar('Save the bill before sending to WhatsApp');
       return;
     }
+    this.loading = true;
     this.calculateTotal();
     //send download link to whatsapp
     const message = `Hi ${this.bill.name},
@@ -178,6 +184,7 @@ If you have any questions, feel free to contact us.`;
     // Send the message to WhatsApp
     const whatsappUrl = `https://api.whatsapp.com/send?phone=91${this.bill.mobile}&text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
+    this.loading = false;
   }
   constructor(private billService: BillService, private itemService: InventoryService,
     private route: ActivatedRoute, private router: Router
@@ -222,6 +229,7 @@ this.route.queryParams.subscribe(params => {
     if (customerId && customerMobile) {
       this.bill.name = customerId;
       this.bill.mobile = customerMobile;
+      this._snackBar.open(`New bill for ${customerId} - ${customerMobile}`,'Close', { duration: 3000 })
        this.router.navigate([], {
         queryParams: { customerId: null, customerMobile: null },
         queryParamsHandling: 'merge', // remove billid from the URL
@@ -342,7 +350,13 @@ this.route.queryParams.subscribe(params => {
       this.openSnackBar('Save the bill before downloading');
       return;
     }
-    this.billService.download(this.bill.id.toString()).subscribe((resp: any) => {
+    this.downloadBill(this.bill.id);
+  }
+  downloadBill(id:number){
+
+    this.loading =true;
+
+    this.billService.download(id.toString()).subscribe((resp: any) => {
       const fileURL = URL.createObjectURL(resp);
       const a = document.createElement('a');
       a.href = fileURL;
@@ -350,9 +364,11 @@ this.route.queryParams.subscribe(params => {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      this.loading= false
     });
   }
   print(id:any){
+    this.loading = true;
     this.billService.download(id.toString()).subscribe((resp: any) => {
 
       const fileURL = URL.createObjectURL(resp);
@@ -366,6 +382,7 @@ this.route.queryParams.subscribe(params => {
           printWindow.print();
         };
       }
+      this.loading = false;
     });
   }
   printBill() {

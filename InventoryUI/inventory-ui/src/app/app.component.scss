@@ -57,20 +57,7 @@ a {
         }
     }
 
-    .user-avatar {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        background-color: #f8f9fa;
-        border-radius: 50%;
-        color: #666;
-        
-        &:hover {
-            background-color: #e9ecef;
-        }
-    }
+    
 }
 
 // Sidebar styles
@@ -168,10 +155,10 @@ a {
 
         &.active {
             background-color: #f5f5f5;
-            color: #002BFF;
+            color: #1467ad;
             
             .nav-icon {
-                color: #002BFF;
+                color: #1467ad;
             }
             
             // Don't show tooltip for active items
@@ -244,6 +231,9 @@ a {
             border: none;
         }
     }
+    .client-name-header{
+        display: none !important;
+    }
 
     .main-content {
         &.sidebar-expanded,
@@ -267,13 +257,6 @@ a {
     }
 }
 
-@media only screen and (max-width: 576px) {
-    .app-header {
-        .app-name-header {
-            display: none !important;
-        }
-    }
-}
 
 // Legacy responsive classes (keeping for compatibility)
 @media only screen and (max-width: 765px) {
@@ -301,3 +284,24 @@ a {
     }
 }
 
+.lang-select{
+    bottom: 0;
+    padding: 0px;
+    position: absolute;
+    display: none;
+    a {
+        margin-left: 15px;
+    }
+    a:hover{
+       border-bottom: 1px solid black;
+    }
+}
+.sidebar.expanded {
+    .lang-select{
+        display: block !important;
+    }
+}
+.app-header-data{
+    display: grid;
+    grid-template-columns: 2fr 0.7fr 0.1fr;
+}

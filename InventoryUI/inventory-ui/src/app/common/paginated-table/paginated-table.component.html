@@ -1,0 +1,77 @@
+<div class="table-container">
+  <!-- Search input -->
+  <div class="table-search-container" *ngIf="data.length > 5">
+    <input 
+      class="table-search" 
+      placeholder="Search..." 
+      [(ngModel)]="searchText" 
+      (ngModelChange)="search()">
+  </div>
+
+  <!-- Table -->
+  <table class="paginated-table">
+    <thead>
+      <tr>
+        <th *ngIf="rowSelection" width="20px">
+          
+        </th>
+        <th *ngFor="let col of colDefs" [style.width.px]="col.width ?? 100">
+          {{col.name}}
+        </th>
+        <th *ngIf="rowActions" width="100px">
+            Actions</th>
+      </tr>
+    </thead>
+    <tbody *ngIf="dataToDisplay.length > 0; else noDataTemplate">
+      <tr *ngFor="let row of dataToDisplay; let i = index">
+        <td *ngIf="rowSelection">
+          <input 
+            class="checkbox" 
+            (click)="onRowSelection(i, $event)" 
+            type="checkbox">
+        </td>
+        <td *ngFor="let col of colDefs">
+        @if(col.key.toLowerCase().includes("date")){
+            
+            {{row[col.key ?? col.name] ?? "" | date:'dd MMM yyyy HH:mm' }}
+          }@else{
+            {{col.currency}}{{row[col.key ?? col.name] ?? ""}}
+          }
+        </td>
+        <td class="actions-cell" *ngIf="rowActions">
+          <div class="action-buttons">
+            <button 
+              *ngFor="let action of rowActions" 
+              class="action-btn"
+              style="margin-left: 5px;padding: 3px;"
+              (click)="rowAction(i,action)"
+              [title]="action.name">
+              <mat-icon>{{action.icon??action.action}}</mat-icon>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- No data template -->
+  <ng-template #noDataTemplate>
+    <div class="no-data" *ngIf="data.length === 0">
+      <p>No data available</p>
+    </div>
+    <div class="no-results" *ngIf="data.length > 0 && dataToDisplay.length === 0">
+      <p>No results found for "{{searchText}}"</p>
+    </div>
+  </ng-template>
+
+  <!-- Paginator -->
+  <mat-paginator 
+    *ngIf="total > 0"
+    [length]="total"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25, 100]"
+    [pageIndex]="currentPage"
+    (page)="pageChange($event)"
+    aria-label="Select page">
+  </mat-paginator>
+</div>

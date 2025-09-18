@@ -1,6 +1,8 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using InventoryManagement.Api.Contracts;
+using InventoryManagement.Api.Provider;
 using InventoryManagement.Api.UseCase;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +13,12 @@ namespace InventoryManagement.Api.Controller;
 public class LoginController : ControllerBase
 {
     private readonly LoginService _loginService;
+    private readonly UserServiceProvider _userServiceProvider;
 
-    public LoginController(LoginService loginService)
+    public LoginController(LoginService loginService, UserServiceProvider userServiceProvider)
     {
         _loginService = loginService;
+        _userServiceProvider = userServiceProvider;
     }
 
     [HttpPost]
@@ -27,8 +31,18 @@ public class LoginController : ControllerBase
         }
         return Unauthorized("Invalid credentials");
     }
+    [HttpGet("user")]
+    public async Task<IActionResult> GetUser()
+    {
+        var username = _userServiceProvider.GetUsername();
+        var clientId = _userServiceProvider.GetClientId();
+        var at = await _loginService.GetClient(clientId);
+
+        return Ok(new { Username = username, Client = at });
+    }
+
     [HttpPost("register")]
-    public async Task<IActionResult> Register(UserModel user)
+    public async Task<IActionResult> Register(NewUserModel user)
     {
         await _loginService.Register(user);
         return Ok();

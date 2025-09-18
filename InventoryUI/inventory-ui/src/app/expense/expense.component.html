@@ -2,30 +2,30 @@
   <mat-progress-bar *ngIf="loading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
 <div class="form-column">
     <div class="header">
-      <h2>Expense Details</h2>
-      <p class="text-secondary">Add or edit expense information</p>
+      <h2 translate>Expense Details</h2>
+      <p class="text-secondary" translate>Add or edit expense information</p>
     </div>
 
     <div class="form-card">
       <div class="form-group">
-        <label>Description</label>
+        <label translate>Description</label>
         <input [(ngModel)]="selectedExpense.description" 
                placeholder="Enter expense details" />
       </div>
 
       <div class="form-group">
-        <label>Amount</label>
+        <label translate>Amount</label>
         <input [(ngModel)]="selectedExpense.amount" 
                type="number"
                placeholder="Enter amount" />
       </div>
        <div class="form-group">
-          <label>Payment Mode *</label>
+          <label translate>Payment Mode</label>
           <mat-form-field appearance="outline">
             <mat-select [(ngModel)]="selectedExpense.paymentMode" placeholder="Select payment mode">
-              <mat-option value="CASH">Cash</mat-option>
-              <mat-option value="CARD">Card</mat-option>
-              <mat-option value="UPI">UPI</mat-option>
+              <mat-option value="CASH">{{'Cash' | translate}}</mat-option>
+              <mat-option value="CARD">{{'Card' | translate}}</mat-option>
+              <mat-option value="UPI">{{'UPI' | translate}}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -35,13 +35,13 @@
                 class="btn btn-primary" 
                 (click)="addExpense()">
           <mat-icon>add</mat-icon>
-          Add
+          {{'Add' | translate}}
         </button>
         <button mat-raised-button 
                 class="btn btn-secondary" 
                 (click)="clear()">
           <mat-icon>clear</mat-icon>
-          Clear
+          {{'Clear' | translate}}
         </button>
       </div>
     </div>
@@ -49,17 +49,17 @@
   <!-- Grid Column -->
   <div class="grid-column">
     <div class="header">
-      <h2>Expenses</h2>
-      <p class="text-secondary">Manage your expenses</p>
+      <h2 translate>Expenses</h2>
+      <p class="text-secondary" translate>Manage your expenses</p>
     </div>
 
 <mat-form-field appearance="outline">
-      <mat-label>Time Period</mat-label>
+      <mat-label translate>Time Period</mat-label>
       <mat-select [(ngModel)]="filter" (ngModelChange)="onSelectChange()">
-        <mat-option value="0">Today</mat-option>
-        <mat-option value="7">Last 7 days</mat-option>
-        <mat-option value="30">Last 30 days</mat-option>
-        <mat-option value="-1">Custom</mat-option>
+        <mat-option value="0">{{'Today' | translate}}</mat-option>
+        <mat-option value="7">{{'Last 7 days' | translate}}</mat-option>
+        <mat-option value="30">{{'Last 30 days' | translate}}</mat-option>
+        <mat-option value="-1">{{'Custom' | translate}}</mat-option>
       </mat-select>
     </mat-form-field>
     <span [hidden]="hideCustomDate">
@@ -83,28 +83,13 @@
       aria-label="Example icon button with a menu icon">
       <mat-icon>refresh</mat-icon>
     </button>
-    <div class="search-container">
-      <mat-form-field appearance="outline">
-        <mat-icon matPrefix>search</mat-icon>
-        <input matInput 
-               type="text" 
-               id="filter-text-box" 
-               placeholder="Search expenses..." 
-               (input)="onFilterTextBoxChanged()" />
-      </mat-form-field>
-    </div>
-
+   
     <div class="grid-card">
-      <ag-grid-angular 
-        class="ag-theme-material"
-        [rowData]="expenses" 
-        [columnDefs]="colDefs"
-        [defaultColDef]="defaultColDef"
-        [rowSelection]="rowSelection"
-        (rowSelected)="onRowSelected($event)"
-        [pagination]="true"
-        (gridReady)="onGridReady($event)">
-      </ag-grid-angular>
+      <app-paginated-table 
+      [data]="expenses" 
+      [colDefs]="colDefs" 
+      [rowSelection]="true" 
+      (rowSelectionChange)="onRowSelection($event)"></app-paginated-table>
     </div>
   </div>
 

@@ -1,49 +1,65 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output, output } from '@angular/core';
 import { BillService } from '../services/bill.service';
 import { FormsModule } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef, RowSelectionOptions, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { CommonModule, DecimalPipe, formatDate } from '@angular/common';
 import { MatOptionModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
+import { TranslateDirective, TranslatePipe, TranslateService } from "@ngx-translate/core";
+import { PaginatedTableComponent, TableAction, TableCol } from "../common/paginated-table/paginated-table.component";
 
 @Component({
   selector: 'app-billhistory',
   standalone: true,
   imports: [
-    AgGridAngular,
-        CommonModule,
-        MatProgressBarModule,
-        MatSelectModule,
-        MatIconModule,
-        MatCardModule,
-        FormsModule,
-        MatDatepickerModule,
-        MatFormFieldModule,
-        MatInputModule
-  ],
+    CommonModule,
+    MatProgressBarModule,
+    MatSelectModule,
+    MatIconModule,
+    MatCardModule,
+    FormsModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    TranslateDirective, TranslatePipe,
+    PaginatedTableComponent
+],
   templateUrl: './billhistory.component.html',
   styleUrls: ['./billhistory.component.scss'],
   providers: [provideNativeDateAdapter()]
 })
 export class BillhistoryComponent {
   loading = false;
+  colDefs: TableCol[] = [] 
+
+  @Output() download = new EventEmitter<number>();
+  @Output() print = new EventEmitter<number>();
+  @Output() edit = new EventEmitter<number>();
+
   bills: any[] = [];
   billsList: any[] = [];
    filter: string = "0";
-  defaultColDef = {
-    flex: 1,
-    minWidth: 100,
-    sortable: true,
-    filter: true,
-    resizable: true
-  };
+   rowAction(data:any){
+    let bill = this.bills[data.index];
+    if(data.action=='edit'){
+      this.edit.emit(bill.id);
+    }else if(data.action=='print'){
+      this.print.emit(bill.id)
+    }else if(data.action=='download'){
+      this.download.emit(bill.id);
+    }
+  }
+  rowActions : TableAction[]=[]
+  actions : TableAction[]= [
+    {name:'Edit', action:'edit'},{name:'Print', action:'print'},
+    {name:'Download',action:'download'}
+  ]
+  
   start: Date = new Date();
   end: Date = new Date();
   hideCustomDate: boolean = true;
@@ -71,41 +87,37 @@ export class BillhistoryComponent {
       this.hideCustomDate = false;
     }
   }
-  colDefs: ColDef[] = [
+  
+  setColDefs() {
+    this.colDefs=
+   [
+    
     { 
-      headerName: 'Bill No',
-      field: 'id',
+      name: this.translate.instant('Bill No'),
+      key: 'id',
       width: 100,
-      flex: 0
+      
     },
     { 
-      headerName: 'Date',
-      field: 'billDate',
-      valueFormatter: (params) => {
-        return new Date(params.value).toLocaleDateString();
-      },
-      sortable: true,
-      sort: 'desc' as const,
-      sortIndex: 0
+      name: this.translate.instant('Bill Date'),
+      key: 'billDate',
+      width:100,
     },
     { 
-      headerName: 'Customer',
-      field: 'name'
-    },
-    { 
-      headerName: 'Actions',
-      field: 'action',
-      cellRenderer: this.actionCellRenderer.bind(this),
-      width: 100,
-      flex: 0,
-      sortable: false,
-      filter: false
+      name: this.translate.instant('Customer'),
+      key: 'name',
+      width:200
     }
   ];
+}
     
     showGrid = false;
 
-  constructor(private billService: BillService) {}
+  constructor(private billService: BillService,
+    private translate : TranslateService
+  ) {
+    this.setColDefs()
+  }
 
   ngOnInit() {
     this.onSelectChange();
@@ -125,6 +137,7 @@ onCustomDateSet() {
       next: (bills) => {
         this.bills = bills;
         this.billsList = bills;
+        this.rowActions=[...this.actions]
       },
       error: (error) => {
         console.error('Error loading bills:', error);
@@ -151,9 +164,6 @@ onCustomDateSet() {
     }
   }
 
-  onGridReady(event: GridReadyEvent) {
-    event.api.sizeColumnsToFit();
-  }
 
   actionCellRenderer(params: any) {
     const container = document.createElement('div');
@@ -181,6 +191,9 @@ onCustomDateSet() {
 
   printBill(billId: number) {
     // TODO: Implement print functionality
+    window.dispatchEvent(new CustomEvent('print-bill', { detail: { billId } }));
+  }
+  downloadBill(billId:number){
     window.dispatchEvent(new CustomEvent('print-bill', { detail: { billId } }));
   }
 }

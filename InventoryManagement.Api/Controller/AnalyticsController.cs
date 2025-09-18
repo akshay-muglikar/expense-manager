@@ -56,7 +56,7 @@ public class AnalyticsController : ControllerBase
                 TotalInventoryValue = items.Sum(i => i.Price * i.Quantity),
                 AverageItemValue = items.Any() ? items.Average(i => i.Price) : 0,
                 LowStockCount = items.Count(i => i.Quantity <= 10), // Assuming 10 is low stock threshold
-                OutOfStockCount = items.Count(i => i.Quantity == 0),
+                OutOfStockCount = items.Count(i => i.Quantity <= 0),
                 LowStockItems = items.Where(i => i.Quantity <= 10 && i.Quantity > 0)
                     .Select(i => new 
                     {
@@ -92,7 +92,7 @@ public class AnalyticsController : ControllerBase
             var topProducts = await GetTopProductsFromBills(bills);
             
             // Calculate growth percentage compared to previous period
-            var growthPercentage = await CalculateGrowthPercentage(startDate.Value, endDate.Value, bills.Sum(b => b.TotalAmount));
+            //var growthPercentage = await CalculateGrowthPercentage(startDate.Value, endDate.Value, bills.Sum(b => b.TotalAmount));
             
             var summary = new
             {
@@ -102,7 +102,7 @@ public class AnalyticsController : ControllerBase
                 PeriodStart = startDate,
                 PeriodEnd = endDate,
                 TopProducts = topProducts,
-                GrowthPercentage = growthPercentage
+                //GrowthPercentage = growthPercentage
             };
 
             return Ok(summary);
@@ -133,6 +133,7 @@ public class AnalyticsController : ControllerBase
                 NumberOfOrders = 0,
                 AveragePrice = (decimal)i.Price
             });
+            
 
             // For a simplified version, we'll estimate based on available data
             foreach (var bill in bills.Take(50)) // Limit to prevent too many calls

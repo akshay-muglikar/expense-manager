@@ -3,25 +3,25 @@
   
   <mat-tab-group #tabGroup>
     <!-- Vendor Management Tab -->
-    <mat-tab label="Vendor Management">
+    <mat-tab label="{{'Vendor Management' | translate}}">
       <div class="vendor-management-content">
         <!-- Form Column -->
         <div class="form-column">
           <div class="header">
-            <h2>Vendor Details</h2>
-            <p class="text-secondary">Add or edit vendor information</p>
+            <h2 translate>Vendor Details</h2>
+            <p class="text-secondary" translate>Add or edit vendor information</p>
           </div>
 
           <div class="form-card">
             <div class="form-group">
-              <label>Vendor Name *</label>
+              <label translate>Vendor Name</label>
               <input [(ngModel)]="selectedVendor.name" 
                      placeholder="Enter vendor name" 
                      maxlength="100" />
             </div>
 
             <div class="form-group">
-              <label>Mobile Number *</label>
+              <label translate>Mobile Number</label>
               <input [(ngModel)]="selectedVendor.mobile" 
                      type="tel"
                      placeholder="Enter mobile number" 
@@ -35,21 +35,21 @@
                       [disabled]="loading"
                        *ngIf="!selectedVendor.id">
                 <mat-icon>add</mat-icon>
-                Add Vendor
+                <span translate>Add Vendor</span>
               </button>
               <button mat-raised-button 
                       class="btn btn-secondary" 
                       (click)="updateVendor()"
                       *ngIf="selectedVendor.id">
                 <mat-icon>edit</mat-icon>
-                Update
+               <span translate>Update</span>
               </button>
              
               <button mat-raised-button 
                       class="btn btn-secondary" 
                       (click)="clearVendorForm()">
                 <mat-icon>clear</mat-icon>
-                Clear
+                <span translate>Clear</span>
               </button>
             </div>
           </div>
@@ -58,8 +58,8 @@
         <!-- Cards Column -->
         <div class="cards-column">
           <div class="header">
-            <h2>All Vendors</h2>
-            <p class="text-secondary">Manage your vendor list</p>
+            <h2 translate>All Vendors</h2>
+            <p class="text-secondary" translate>Manage your vendor list</p>
           </div>
 
           <div class="search-container">
@@ -117,18 +117,18 @@
     </mat-tab>
 
     <!-- Vendor Account Tab -->
-    <mat-tab label="Vendor Account" [disabled]="!selectedVendorForAccount">
+    <mat-tab label="{{'Vendor Account' | translate}}" [disabled]="!selectedVendorForAccount">
       <div class="vendor-account-content" *ngIf="selectedVendorForAccount">
          <div class="expense-form-card">
           <div class="expense-form-header">
-            <h3>Add Transaction</h3>
-            <p class="text-secondary">Record a new expense or payment for this vendor</p>
+            <h3 translate>Add Transaction</h3>
+            <p class="text-secondary" translate>Record a new expense or payment for this vendor</p>
           </div>
           
           <div class="expense-form-content">
             <div class="form-row">
               <div class="form-group">
-                <label>Description *</label>
+                <label translate>Description *</label>
                 <input [(ngModel)]="newExpense.description" 
                        placeholder="Enter transaction description" 
                        maxlength="200"
@@ -140,7 +140,7 @@
             </div>
               <div class="form-row">
               <div class="form-group">
-                <label>Amount *</label>
+                <label translate>Amount</label>
                 <input [(ngModel)]="newExpense.amount" 
                        type="number"
                        step="0.01"
@@ -155,16 +155,16 @@
             
             <div class="form-row">
               <div class="form-group">
-                <label>Transaction Type *</label>
+                <label translate>Transaction Type</label>
                 <mat-form-field appearance="outline">
                   <mat-select [(ngModel)]="newExpense.expenseType" placeholder="Select type">
-                    <mat-option value="DEBIT">Payment to Vendor (Debit)</mat-option>
-                    <mat-option value="CREDIT">Payment from Vendor (Credit)</mat-option>
+                    <mat-option value="DEBIT">{{'Payment to Vendor (Debit)'}}</mat-option>
+                    <mat-option value="CREDIT">{{'Payment from Vendor (Credit)'}}</mat-option>
                   </mat-select>
                 </mat-form-field>
               </div>
               <div class="form-group">
-                <label>Payment Mode *</label>
+                <label translate>Payment Mode</label>
                 <mat-form-field appearance="outline">
                   <mat-select [(ngModel)]="newExpense.paymentMode" placeholder="Select payment mode">
                     <mat-option value="CASH">Cash</mat-option>
@@ -183,37 +183,37 @@
                       (click)="addVendorExpense()"
                       [disabled]="loading || !isExpenseFormValid()">
                 <mat-icon>add</mat-icon>
-                Add Transaction
+                <span translate> Transaction</span>
               </button>
               <button mat-raised-button 
                       class="btn btn-secondary" 
                       (click)="clearExpenseForm()">
                 <mat-icon>clear</mat-icon>
-                Clear
+               <span translate> Clear</span>
               </button>
             </div>
           </div>
         </div>
         <div class="account-header">
-          <h2>{{ selectedVendorForAccount.name }} - Account Statement</h2>
-          <p class="text-secondary">Mobile: {{ selectedVendorForAccount.mobile }}</p>
+          <h2>{{ selectedVendorForAccount.name }} - <span translate>Account Statement</span></h2>
+          <p class="text-secondary"><span translate>Mobile</span> {{ selectedVendorForAccount.mobile }}</p>
           
           <div class="account-summary">
             <div class="summary-card">
               <div class="summary-item">
-                <span class="summary-label">Total Transactions</span>
+                <span class="summary-label" translate>Total Transactions</span>
                 <span class="summary-value">{{ vendorAccounts.length }}</span>
               </div>
               <div class="summary-item">
-                <span class="summary-label">Total Credits</span>
+                <span class="summary-label" translate>Total Credits</span>
                 <span class="summary-value credit">₹{{ getTotalCredits().toFixed(2) }}</span>
               </div>
               <div class="summary-item">
-                <span class="summary-label">Total Debits</span>
+                <span class="summary-label" translate>Total Debits</span>
                 <span class="summary-value debit">₹{{ getTotalDebits().toFixed(2) }}</span>
               </div>
               <div class="summary-item">
-                <span class="summary-label">Current Balance</span>
+                <span class="summary-label" translate>Current Balance</span>
                 <span class="summary-value" 
                       [ngClass]="{'positive-balance': getTotalBalance() >= 0, 'negative-balance': getTotalBalance() < 0}">
                   ₹{{ getTotalBalance().toFixed(2) }}
@@ -221,27 +221,13 @@
               </div>
             </div>
           </div>
-            <div class="account-search-container">
-          <mat-form-field appearance="outline">
-            <mat-icon matPrefix>search</mat-icon>
-            <input matInput 
-                   type="text" 
-                   id="account-filter-text-box" 
-                   placeholder="Search transactions..." 
-                   (input)="onAccountFilterTextBoxChanged()" />
-          </mat-form-field>
-        </div>
+            
 
         <div class="account-grid-card">
-          <ag-grid-angular 
-            class="ag-theme-material"
-            [rowData]="vendorAccounts" 
-            [columnDefs]="accountColDefs"
-            [defaultColDef]="defaultColDef"
-            [pagination]="true"
-            [paginationPageSize]="20"
-            (gridReady)="onAccountGridReady($event)">
-          </ag-grid-angular>
+          <app-paginated-table
+          [colDefs]="accountColDefs"
+          [data]="vendorAccounts"
+          ></app-paginated-table>
         </div>
         </div>
 

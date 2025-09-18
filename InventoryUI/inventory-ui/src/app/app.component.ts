@@ -7,12 +7,17 @@ import { AuthService } from './common/AuthService';
 import { HeaderComponent } from './header/header.component';
 import { ShrivoChatComponent } from './shrivo-chat/shrivo-chat.component';
 import { filter } from 'rxjs/operators';
-
+import {
+    TranslateService,
+    TranslateDirective
+} from "@ngx-translate/core";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MatIconModule, MatToolbarModule, HeaderComponent, ShrivoChatComponent],
+  imports: [RouterOutlet, MatIconModule, 
+    MatToolbarModule, HeaderComponent, ShrivoChatComponent,
+     TranslateDirective],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -30,8 +35,8 @@ export class AppComponent {
   sidebarExpanded = false; // Start collapsed
   routes :RoutDetails[] = [
     new RoutDetails('bill','Billing', 'receipt'),
-    new RoutDetails('dashboard','Dashboard', 'dashboard'),
-    new RoutDetails('expense','Expense', 'money_off'),
+    new RoutDetails('dashboard','Dashboard', 'speedometer'),
+    new RoutDetails('expense','Expense', 'shopping_bag'),
     new RoutDetails('inventory','Inventory', 'inventory'),
     new RoutDetails('vendor','Vendors', 'people'),
     new RoutDetails('customer','Customers', 'person'),
@@ -42,12 +47,23 @@ export class AppComponent {
   }
   constructor(private router: Router, 
     private authService : AuthService,
-    private active: ActivatedRoute){}
+    private active: ActivatedRoute,
+    private translate: TranslateService){
+
+    translate.addLangs(['en', 'mr']);
+
+    const savedLang = localStorage.getItem('lang');
+      translate.use(savedLang || 'en');
+    }
   
   navigateToLogin() {
     this.router.navigate(['login']);
   }
-
+  changeLanguage(selectedLang:string) {
+    const lang = selectedLang
+    this.translate.use(lang);
+    localStorage.setItem('lang', lang);
+  }
   onclickRoute(index:number){
     this.selected = index;
     this.sidebarExpanded = false; // Collapse sidebar on route change

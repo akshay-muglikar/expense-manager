@@ -2,7 +2,7 @@
 <button class="chat-toggle-btn" 
         [class.chat-open]="!isMinimized"
         (click)="toggleChat()"
-        [attr.aria-label]="isMinimized ? 'Open Shrivo AI Chat' : 'Close Shrivo AI Chat'">
+        [attr.aria-label]="isMinimized ? 'Open Shrivo Intelligence Chat' : 'Close Shrivo AI Chat'">
   <mat-icon>{{isMinimized ? 'smart_toy' : 'close'}}</mat-icon>
 </button>
 
@@ -15,7 +15,7 @@
         <mat-icon>smart_toy</mat-icon>
       </div>
       <div class="ai-details">
-        <h5>Shrivo AI Assistant</h5>
+        <h5>Shrivo AI</h5>
         <span class="status">Online • Ready to help</span>
       </div>
     </div>

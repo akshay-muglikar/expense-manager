@@ -1,16 +1,16 @@
 <div class="dashboard-container">
   <div class="header">
-    <span class="page-header">Dashboard</span>
+    <span class="page-header" translate>Dashboard</span>
+    <span class="page-right-header">{{clientModel?.name}}</span>
   </div>
-
   <div class="filters-section">
     <mat-form-field appearance="outline">
-      <mat-label>Time Period</mat-label>
+      <mat-label translate>Time Period</mat-label>
       <mat-select [(ngModel)]="filter" (ngModelChange)="onSelectChange()">
-        <mat-option value="0">Today</mat-option>
-        <mat-option value="7">Last 7 days</mat-option>
-        <mat-option value="30">Last 30 days</mat-option>
-        <mat-option value="-1">Custom</mat-option>
+        <mat-option value="0">{{'Today' | translate}}</mat-option>
+        <mat-option value="7">{{'Last 7 days' | translate}}</mat-option>
+        <mat-option value="30">{{'Last 30 days' | translate}}</mat-option>
+        <mat-option value="-1">{{'Custom' | translate}}</mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -39,40 +39,86 @@
   <mat-progress-bar mode="query" *ngIf="!hideFormLoading" class="loading-bar"></mat-progress-bar>
 
   <div class="stats-grid">
-    <mat-card class="stat-card">
+    <div>
+    
+    <h3 translate>Sales Stats</h3>
+    <div class="card-table-data-stats">
+    <div class="stat-card">
       <mat-icon class="stat-icon" color="primary">people</mat-icon>
       <div class="stat-value">{{dashboardStats.billCount}}</div>
-      <div class="stat-label">Customers</div>
-      <mat-progress-bar mode="determinate" [value]="100" color="primary"></mat-progress-bar>
-    </mat-card>
+      <div class="stat-label" translate>Bills</div>
+    </div>
 
-    <mat-card class="stat-card">
+    <div class="stat-card">
       <mat-icon class="stat-icon" color="accent">trending_up</mat-icon>
       <div class="stat-value">₹{{dashboardStats.revenue | number:'1.0-0'}}</div>
-      <div class="stat-label">Net Sales</div>
-      <mat-progress-bar mode="determinate" [value]="80" color="accent"></mat-progress-bar>
-    </mat-card>
+      <div class="stat-label" translate>Net Sales</div>
+    </div>
 
-    <mat-card class="stat-card">
+    <div class="stat-card">
       <mat-icon class="stat-icon" color="warn">account_balance_wallet</mat-icon>
       <div class="stat-value">₹{{dashboardStats.expenses | number:'1.0-0'}}</div>
-      <div class="stat-label">Expenses</div>
-      <mat-progress-bar mode="determinate" [value]="60" color="warn"></mat-progress-bar>
-    </mat-card>
-  </div>
+      <div class="stat-label" translate>Expenses</div>
+    </div>
+    </div>
+    </div>
+     <div class="card-table-data">
+    <h3 translate>Top Selling Products</h3>
+    <table>
+      <tbody>
+        <tr *ngFor="let item of salesSummary?.topProducts">
+          <td>{{item.itemName}}</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+     <div class="card-table-data">
+    <h3 translate>Product Details</h3>
+    <table>
+      <tbody>
+        <tr style="color: red;">
+          <td translate>Low Stock Items</td>
+          <td>{{inventorySummary?.lowStockCount}}</td>
+        </tr>
+         <tr>
+          <td translate>Out of Stock Items</td>
+          <td>{{inventorySummary?.outOfStockCount}}</td>
+        </tr>
+         <tr>
+          <td translate>Total Items</td>
+          <td>{{inventorySummary?.totalItems}}</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    </div>
+   
+  
+  <!-- <div class="stats-grid">
+   
+   
+    <div>
+      <div class="card-table-data">
+    <h3 translate>Low Stock Items</h3>
+    <table>
+      <tbody>
+        <tr *ngFor="let item of inventorySummary?.lowStockItems">
+          <td>{{item.itemName}}</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    </div>
 
-  <div class="grid-section">
+
+  </div> -->
+ <div class="grid-section">
     <mat-card class="grid-card">
       <div class="grid-header">
-        <h2>Transaction History</h2>
+        <h2 translate>Transaction History</h2>
       </div>
-      <ag-grid-angular 
-        class="ag-theme-material"
-        [rowData]="allItems" 
-        [columnDefs]="colDefs"
-        [pagination]="true"
-        (gridReady)="onGridReady($event)">
-      </ag-grid-angular>
-    </mat-card>
-  </div>
+      <app-paginated-table [colDefs]="tableColDefs" [data]="allItems"></app-paginated-table>
+      </mat-card>
+      </div>
+  
 </div>

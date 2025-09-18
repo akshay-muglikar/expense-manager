@@ -7,8 +7,12 @@
     font-weight: 600;
     color: var(--text-primary);
 }
+.page-right-header{
+  right: 20px;
+  position: absolute;
+}
   .header {
-    margin-bottom: clamp(24px, 4vw, 32px);
+    margin-bottom: 15px;
   }
 
   .loading-bar {
@@ -19,7 +23,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 16px;
-    margin-bottom: 24px;
+    margin-bottom: 5px;
     align-items: center;
 
     mat-form-field {
@@ -56,13 +60,35 @@
   }
 
   .stats-grid {
+      @media (max-width: 768px) {
+      display: flex;
+      flex-direction: column;
+      }
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+    grid-template-columns: 600px 300px 300px;
     gap: clamp(16px, 3vw, 24px);
-    margin-bottom: 32px;
-
+    margin-bottom: 10px;
+    .card-table-data-stats{
+      @media (max-width: 768px) {
+        display: flex;
+        flex-direction: column;
+        .stat-card{
+          margin-top: 10px;
+        }
+      }
+      display: grid;
+      grid-template-columns: 200px 200px 200px;
+      .stat-card {
+        background-color: var(--background-light);
+        margin-left: 15px;
+        border: 1px solid var(--background-light);
+        display: flex;
+        flex-direction:column;
+        height: 100px;
+      }
+    }
     .stat-card {
-      padding: clamp(16px, 3vw, 24px);
+      padding: clamp(12px, 2vw, 16px);
       text-align: center;
       border-radius: 12px;
       background: white;
@@ -74,11 +100,6 @@
         box-shadow: var(--shadow-lg);
       }
 
-      .stat-icon {
-        font-size: 2.5rem;
-        margin-bottom: 12px;
-      }
-
       .stat-value {
         font-size: clamp(1.5rem, 4vw, 2rem);
         font-weight: 600;
@@ -88,7 +109,6 @@
       .stat-label {
         color: var(--text-secondary);
         font-size: clamp(0.875rem, 2vw, 1rem);
-        margin-bottom: 16px;
       }
     }
   }
@@ -124,21 +144,7 @@
             border: none;
           }
 
-          .ag-header {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-          }
-
-          .ag-header-cell {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-          }
-
-          .ag-cell {
-            font-size: 0.875rem;
-            color: var(--text-primary);
-            padding: 12px 16px;
-          }
+         
 
           @media (max-width: 768px) {
             .ag-header-cell, .ag-cell {
@@ -148,5 +154,14 @@
         }
       }
     }
+  }
+}
+.card-table-data{
+  border: 1px solid var(--background-light);;
+  border-radius: 12px;
+  h3{
+    background-color: var(--background-light);
+    padding: 7px;
+    margin-bottom: 5px;
   }
 }

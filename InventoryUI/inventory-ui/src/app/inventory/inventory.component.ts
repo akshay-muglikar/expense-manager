@@ -1,4 +1,4 @@
-import { Component, HostListener, inject } from '@angular/core';
+import { Component, HostListener, inject, ViewChild } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, RowSelectionOptions, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -14,13 +14,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
+import { TranslateDirective, TranslatePipe } from "@ngx-translate/core";
+import { PaginatedTableComponent, TableCol } from "../common/paginated-table/paginated-table.component";
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
   imports: [
     CommonModule,
-    AgGridAngular,
     ReactiveFormsModule,
     MatProgressBarModule,
     MatDividerModule,
@@ -29,12 +30,16 @@ import { CommonModule } from '@angular/common';
     MatFormFieldModule,
     MatInputModule,
     MatTabsModule,
-    MatCardModule,FormsModule
-  ],
+    MatCardModule, FormsModule,
+    TranslateDirective, TranslatePipe,
+    PaginatedTableComponent
+],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.scss'
 })
 export class InventoryComponent {
+  @ViewChild(PaginatedTableComponent) table!: PaginatedTableComponent;
+  
   scanMode = false;
   scannedItems: Item[] =[];
 scanToUpdateInventory() {
@@ -152,7 +157,6 @@ downloadInventory() {
     window.URL.revokeObjectURL(url);
   });
 }
-  private gridApi!: GridApi;
   private _snackBar = inject(MatSnackBar);
 
   showFormLoading = false; 
@@ -164,47 +168,30 @@ downloadInventory() {
   };
   
   // Column Definitions: Defines the columns to be displayed.
-  colDefs: ColDef[] = [
+  colDefs: TableCol[] = [
+    
     { 
-      field: "updatedDate",
-      headerName: "Last Updated",
-      flex: 1,
-      minWidth: 150,
-      valueFormatter: (params) => {
-        return params.value ? new Date(params.value).toLocaleDateString() : '';
-      },
-      sortable: true,
-      sort: 'desc' as const,
-      sortIndex: 0
+      key: "name",
+      name: "Name",
+      width: 150
     },
     { 
-      field: "name",
-      headerName: "Name",
-      flex: 2,
-      minWidth: 150
+      key: "car",
+      name: "Car Model",
+      width: 120
     },
     { 
-      field: "car",
-      headerName: "Car Model",
-      flex: 1,
-      minWidth: 120
+      key: "price",
+      name: "Price",
+
+      width: 100,
+
     },
     { 
-      field: "price",
-      headerName: "Price",
-      type: 'numericColumn',
-      flex: 1,
-      minWidth: 100,
-      valueFormatter: (params) => {
-        return params.value ? '₹' + params.value.toLocaleString() : '';
-      }
-    },
-    { 
-      field: "quantity",
-      headerName: "Quantity",
-      type: 'numericColumn',
-      flex: 1,
-      minWidth: 100
+      key: "quantity",
+      name: "Quantity",
+
+      width: 100
     }
   ];
   rowSelection: RowSelectionOptions | "single" | "multiple" = {
@@ -226,16 +213,7 @@ downloadInventory() {
       this.getItems();
     });
   }
-  onFilterTextBoxChanged() {
-    this.gridApi.setGridOption(
-      "quickFilterText",
-      (document.getElementById("filter-text-box") as HTMLInputElement).value,
-    );
-  }
-    onGridReady(params: GridReadyEvent) {
-      this.gridApi = params.api;
-    }
-
+  
   ngOnInit(): void {
 
    this.getItems();
@@ -252,14 +230,15 @@ downloadInventory() {
     this.listenToAddInventory();
   }
   selectedRowId :number=0;
-  onRowSelected(event:any){
-    let nodes= this.gridApi.getSelectedRows();
-    if(nodes.length==0){
+  onRowSelected(id:any){
+    let node= this.items[id];
+    if(id==-1){
       this.selectedRowId=0; 
       this.itemForm.reset();
+      this.table.clearSelection()
       return;
     }
-    this.selectedRowId = nodes[0].id;
+    this.selectedRowId = node.id;
     let itemselected = this.items.find(x=>x.id == this.selectedRowId);
     if(itemselected!==undefined){
       this.itemForm.controls['Car'].setValue(itemselected.car) 
@@ -277,7 +256,7 @@ downloadInventory() {
   resetForm(): void {
     this.selectedRowId = 0;
     this.itemForm.reset();
-    this.gridApi?.deselectAll();
+    this.table.clearSelection();
   }
 
   // Update getItems to handle loading state

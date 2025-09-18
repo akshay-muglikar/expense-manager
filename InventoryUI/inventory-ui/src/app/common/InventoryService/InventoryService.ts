@@ -1,6 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Item } from "../../contracts/item.model";
+import { ItemSummary } from "../../models/item-summary.model";
 
 @Injectable({providedIn: 'root'})
 export class InventoryService {
@@ -29,5 +30,8 @@ export class InventoryService {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post('/api/item/upload', formData);
+  }
+  summary() {
+    return this.http.get<ItemSummary>('/api/analytics/inventory-summary')
   }
 }

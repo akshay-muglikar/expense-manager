@@ -1,1 +1,61 @@
-<span  *ngIf="isLoggedIn">{{clientName}}</span>
+<div class="header-actions" *ngIf="isLoggedIn">
+    <div (click)="openPanel('notification')" class="header-action-button">
+        <mat-icon>notifications</mat-icon>
+    </div>
+    
+    <div (click)="openPanel('share')" class="header-action-button">
+        <mat-icon>share</mat-icon>
+    </div>
+    <div class="header-action-button" (click)="openPanel('user')" >
+         <span class="user-avatar">
+                <mat-icon>person</mat-icon>
+              </span>
+    </div>
+</div>
+<div class="right-panel" *ngIf="showNotification">
+    <div class="panel-body">
+    <div class="header d-flex justify-content-between py-5">
+        <span translate>Notifications</span>
+        <div class="close-icon"><mat-icon (click)="showNotification=!showNotification">close</mat-icon></div>
+    </div>
+    <div class="content">
+        <img src="mail-box.svg"  height="200" width="400"/>
+        <span translate>Uhh... There are no notifications at the moment.</span></div>
+        </div>
+</div>  
+<div  class="right-panel" *ngIf="showSettings">
+     <div class="panel-body" style="bottom: unset;">
+    <div class="header d-flex justify-content-between py-5">
+        <div>
+             <span class="user-avatar">
+                <mat-icon>person</mat-icon>
+              </span>
+        <span>Hi! {{user?.username}}</span>
+        <p>Organization : {{user?.client?.name}}</p>
+        <div class="link" (click)="logout()"><mat-icon>logout</mat-icon> Sign out</div>
+        </div>
+        <div class="close-icon"><mat-icon (click)="showSettings=!showSettings">close</mat-icon></div>
+        </div>
+    </div>
+</div>
+<div class="right-panel" *ngIf="showShareOptions">
+     <div class="panel-body">
+    <div class="header d-flex justify-content-between py-5">
+        <span translate>Share</span>
+        <div class="close-icon"><mat-icon (click)="showShareOptions=!showShareOptions">close</mat-icon></div>
+    </div>
+    <div class="content">
+        <img src="announcement.svg" height="100px" width="300px">
+        <p translate>Know people who would love 'Shrivo'?</p>
+        <p translate>Refer now and earn 1 month free subscription</p>
+
+        <div>
+            <span translate>Copy Link:</span>  <mat-icon style="cursor: pointer;"  (click)="copyInput()" >content_copy</mat-icon>
+        </div>
+        <div>
+            <span translate>Share on</span>  <a href="https://wa.me/?text=Check%20this%20out%20{{ url }}" target="_blank">
+                <img src="whatsapp.svg" height="50" width="50"/>
+            </a>
+        </div>
+        </div>
+</div>

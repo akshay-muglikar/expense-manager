@@ -10,7 +10,7 @@ public interface IBillRepository
     Task AddAsync(Bill bill, string user);
     Task UpdateAsync(Bill bill, string user);
     Task DeleteAsync(int id, string user);
-    Task AddBillItems(List<BillItem> billItems);
+    Task AddBillItems(int billId, List<BillItem> billItems, string user);
     Task RemoveBillItems(int billId);
     Task RemoveBillItem(BillItem billItem);
     Task<List<BillItem>> getBillItems(int id);

@@ -1,6 +1,6 @@
 <header class="app-header p-1 border-bottom">
   <div class="container-fluid">
-    <div class="d-flex align-items-center justify-content-between">
+    <div class="app-header-data align-items-center">
       <!-- Left side: Menu toggle + Logo -->
       <div class="d-flex align-items-center">
         @if (isLoggedIn()) {
@@ -10,30 +10,18 @@
         }
         <span class="d-flex app-name-header align-items-center text-dark text-decoration-none">
           <img class="header-logo-image" src="logo.png"> 
-          <h1 class="mb-0 ms-2">{{clentName}}</h1>
+          <h1 class="mb-0 ms-2 client-name-header">{{clentName}}</h1>
         </span>
       </div>
 
       <!-- Center: Header component -->
-      <div class="header-center">
-        <h4 class="mb-0"><app-header></app-header></h4>
+      <div>
+        <app-header></app-header>
       </div>
 
       <!-- Right side: User controls -->
       <div class="header-controls">
-        @if (isLoggedIn()) {
-          <div class="dropdown">
-            <a href="#" class="d-block link-dark text-decoration-none" 
-               id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-              <span class="user-avatar">
-                <mat-icon>person</mat-icon>
-              </span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end text-small" aria-labelledby="dropdownUser1">
-              <li><a class="dropdown-item" href="#" (click)="logout()">Sign out</a></li>
-            </ul>
-          </div>
-        } @else {
+        @if (!isLoggedIn()) {
           <button class="btn btn-primary" (click)="navigateToLogin()">Login</button>
         }
       </div>
@@ -57,11 +45,12 @@
                (click)="onclickRoute(idx)"
                [title]="inroute.label">
               <mat-icon class="nav-icon">{{inroute.icon}}</mat-icon>
-              <span class="nav-text" [class.d-none]="!sidebarExpanded">{{inroute.label}}</span>
+              <span class="nav-text" [class.d-none]="!sidebarExpanded" translate>{{inroute.label}}</span>
             </a>
           </li>
         }
       </ul>
+      <ul class="lang-select" ><a (click)="changeLanguage('en')">English</a><a (click)="changeLanguage('mr')">मराठी</a></ul>
     </div>
   </nav>
 }
@@ -76,4 +65,3 @@
 @if (isLoggedIn()) {
   <app-shrivo-chat></app-shrivo-chat>
 }
-

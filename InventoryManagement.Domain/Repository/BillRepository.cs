@@ -82,10 +82,29 @@ public class BillRepository : IBillRepository
         }
     }
 
-    public async Task AddBillItems(List<BillItem> billItems)
+    public async Task AddBillItems(int billId, List<BillItem> billItems, string user)
     {
-        await _context.BillItems.AddRangeAsync(billItems);
-        await _context.SaveChangesAsync();
+       using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var bill = await _context.Bills.FindAsync(billId);
+            if (bill == null)
+                throw new Exception("Bill not found");
+            foreach (var item in billItems)
+                {
+                    item.BillId = bill.Id;
+                    _context.Items.Where(x => x.Id == item.ItemId).ExecuteUpdate(x => x.SetProperty(y => y.Quantity, y => y.Quantity - item.Quantity));
+                }
+            await _context.BillItems.AddRangeAsync(billItems);
+            await _historyRepository.AddAsync(bill, "add", user);
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public Task RemoveBillItem(BillItem billItem)
@@ -157,8 +176,8 @@ public class BillRepository : IBillRepository
     public async Task<IEnumerable<(string, string)>> GetAllCustomersAsync()
     {
         var customers = await _context.Bills
-            .Select(c => new { c.Name, c.Mobile })
-            .Distinct()
+            .GroupBy(m => m.Mobile)
+            .Select(g => g.FirstOrDefault())  // take first record per group
             .ToListAsync();
         return customers.Select(c => (c.Name, c.Mobile));
     }
@@ -166,13 +185,14 @@ public class BillRepository : IBillRepository
     {
         var billItems = new List<(Bill, int)>();
         var bills = await _context.Bills
-            .Where(b => b.Name == name && b.Mobile == mobile).ToListAsync();
+            .Where(b => b.Mobile == mobile).ToListAsync();
         foreach (var bill in bills)
         {
             var items = await _context.BillItems
                 .Where(bi => bi.BillId == bill.Id)
                 .ToListAsync();
             var totalAmount = items.Sum(item => item.Quantity * item.Amount);
+            totalAmount = totalAmount - bill.Discount;
             billItems.Add((bill, totalAmount));
         }
         return billItems;

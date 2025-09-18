@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { ExpenseService } from '../common/ExpenseService';
 import { CommonModule, DecimalPipe, formatDate } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -8,19 +8,19 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { FormsModule } from '@angular/forms';
-import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, GridApi, GridReadyEvent, RowSelectedEvent, RowSelectionOptions } from 'ag-grid-community';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { TranslateDirective, TranslatePipe } from "@ngx-translate/core";
+import { PaginatedTableComponent, TableCol } from "../common/paginated-table/paginated-table.component";
 
 
 @Component({
   selector: 'app-expense',
   standalone: true,
   imports: [
-    AgGridAngular,
     CommonModule,
     MatProgressBarModule,
     MatSelectModule,
@@ -29,13 +29,17 @@ import { provideNativeDateAdapter } from '@angular/material/core';
     FormsModule,
     MatDatepickerModule,
     MatFormFieldModule,
-    MatInputModule
-  ],
+    MatInputModule,
+    TranslateDirective, TranslatePipe,
+    PaginatedTableComponent
+],
   templateUrl: './expense.component.html',
   styleUrl: './expense.component.scss',
   providers: [provideNativeDateAdapter()],
 })
 export class ExpenseComponent {
+  @ViewChild(PaginatedTableComponent) table!: PaginatedTableComponent;
+
   rowSelection: RowSelectionOptions | "single" | "multiple" = {
     mode: "singleRow",
   };
@@ -67,17 +71,18 @@ export class ExpenseComponent {
       this.hideCustomDate = false;
     }
   }
-  onRowSelected($event: RowSelectedEvent<any,any>) {
-    let selectedRows = this.gridApi.getSelectedRows();
-    if(selectedRows.length==0){
-      this.clear();
-    }else{
-      this.selectedExpense = selectedRows[0];
-    }
+  onRowSelection(index:number){
+      if(index==-1){
+        this.clear();
+      }else{
+        let selectedRows = this.expenses[index];
+        this.selectedExpense = selectedRows;
+      }
   }
+  
   clear() {
+    this.table.clearSelection()
     this.selectedExpense = { id: "0", description: '', amount: "0", date: formatDate((new Date()), "yyyy-MM-ddThh:mm:ss", "en-US") }
-    this.gridApi.deselectAll();
   }
   getDateString(arg0: string) {
     return formatDate(arg0, "dd MMM yyy hh:ss", "en-US");
@@ -97,42 +102,25 @@ export class ExpenseComponent {
     resizable: true
   };
 
-  colDefs: ColDef[] = [
+  colDefs: TableCol[] = [
     { 
-      field: "description",
-      headerName: "Description",
-      flex: 2,
-      minWidth: 200
+      key: "description",
+      name: "Description",
+      width:200
     },
     { 
-      field: "amount",
-      headerName: "Amount",
-      type: 'numericColumn',
-      flex: 1,
-      minWidth: 120,
-      valueFormatter: (params) => {
-        return params.value ? '₹' + Number(params.value).toLocaleString() : '';
-      }
+      key: "amount",
+      name: "Amount",
+      width: 120,
     },
     { 
-      field: "date",
-      headerName: "Date",
-      flex: 1,
-      minWidth: 180,
-      valueFormatter: (params) => {
-        return this.getDateString(params.value);
-      },
-      sortable: true,
-      sort: 'desc' as const,
-      sortIndex: 0
+      key: "date",
+      name: "Expense Date",
+      width: 180,
     }
   ];
 
-  private gridApi!: GridApi;
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
-
+  
   ngOnInit() {
     //this.getExpenses();
     this.onSelectChange();
@@ -198,7 +186,6 @@ export class ExpenseComponent {
 
   onFilterTextBoxChanged() {
     const filterValue = (document.getElementById('filter-text-box') as HTMLInputElement).value.toLowerCase();
-    this.gridApi.setGridOption('quickFilterText', filterValue);
   }
 }
 

@@ -7,10 +7,7 @@
         Start Billing Now
         <mat-icon>arrow_forward</mat-icon>
       </button>
-      <button mat-stroked-button color="primary" class="cta-secondary">
-        Watch Demo
-        <mat-icon>play_circle</mat-icon>
-      </button>
+      
     </div>
     
   </div>
@@ -20,9 +17,8 @@
   <div class="container">
     <h2>Powerful Features for Your Business</h2>
     <div class="features-grid">
-      <mat-card class="feature-card" *ngFor="let feature of features" [class.coming-soon-card]="feature.isComingSoon">
-        <div class="coming-soon-badge" *ngIf="feature.isComingSoon">Coming Soon!</div>
-        <mat-icon class="feature-icon" [color]="feature.isComingSoon ? 'accent' : 'primary'">{{feature.icon}}</mat-icon>
+      <mat-card class="feature-card" *ngFor="let feature of features" >
+        <mat-icon class="feature-icon" [color]="'primary'">{{feature.icon}}</mat-icon>
         <h3>{{feature.title}}</h3>
         <p>{{feature.description}}</p>
       </mat-card>

@@ -82,7 +82,7 @@ public class LoginService
         return token;
     }
 
-    public async Task Register(UserModel user)
+    public async Task Register(NewUserModel user)
     {
         if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password))
         {
@@ -100,7 +100,7 @@ public class LoginService
         {
             Username = user.Username,
             Password = user.Password,
-            ClientId = Guid.NewGuid()
+            ClientId = user.ClientId
         };
 
         await _loginReporsitory.CreateUser(userModel);
