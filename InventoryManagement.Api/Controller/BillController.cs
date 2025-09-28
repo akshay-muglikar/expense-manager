@@ -117,5 +117,10 @@ public class BillController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("preview")]
+    public async Task<IActionResult> Preview([FromQuery] int? billId)
+    {
+        var result = await _billService.PreviewBillAsync(billId);
+        return Ok(result);
+    }
 }
-

@@ -50,13 +50,10 @@ public class InvoiceDocument : IDocument
             column.Item().AlignCenter().Text(Model.SellerAddress.CompanyName.ToUpper())
                 .SemiBold();
                 
-            column.Item().AlignCenter().Text($"{Model.SellerAddress.Street}")
+            column.Item().AlignCenter().Text($"{Model.SellerAddress.AddressDetails}")
                 ;
-                
-            column.Item().AlignCenter().Text($"{Model.SellerAddress.City} {Model.SellerAddress.State}")
-                ;
-                
-            column.Item().AlignCenter().Text($"Ph:{Model.SellerAddress.Phone}")
+            if(Model.SellerAddress.Phone != null)
+                column.Item().AlignCenter().Text($"Ph:{Model.SellerAddress.Phone}")
                 ;
                 
             // Divider line with "Cash Memo" text
@@ -196,7 +193,7 @@ public class AddressComponent : IComponent
 
             column.Item().Text(Address.CompanyName).SemiBold().AlignCenter();
             column.Item().PaddingBottom(5).LineHorizontal(1);
-            column.Item().Text($"{Address.Street}, {Address.City}, {Address.State} {Address.Phone}").AlignCenter();
+            column.Item().Text($"{Address.AddressDetails}").AlignCenter();
         });
     }
 }

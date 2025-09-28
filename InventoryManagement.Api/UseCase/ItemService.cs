@@ -1,21 +1,25 @@
 using System;
 using System.Text;
+using InventoryManagement.Api.Contracts;
 using InventoryManagement.Api.Provider;
 using InventoryManagement.Domain.Model;
 using InventoryManagement.Domain.Repository;
 using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
 
 namespace InventoryManagement.Api.UseCase;
 
 public class ItemService : IUseCase
 {
     private readonly IItemRepository _itemRepository;
+    private readonly IBillRepository _billRepository;
     private string _user;
     private IMemoryCache _cache;
 
-    public ItemService(IItemRepository itemRepository, UserServiceProvider userServiceProvider, IMemoryCache cache)
+    public ItemService(IItemRepository itemRepository, IBillRepository billRepository, UserServiceProvider userServiceProvider, IMemoryCache cache)
     {
         _itemRepository = itemRepository;
+        _billRepository = billRepository;
         _user = userServiceProvider.GetUsername();
         _cache = cache;
     }
@@ -102,5 +106,45 @@ public class ItemService : IUseCase
             });
         }
         // Here you can add any additional logic for scanning, like logging or updating inventory
+    }
+
+    internal async Task<List<ItemHistory>> GetItemHistoryAsync()
+    {
+        List<ItemHistory> itemHistory = new List<ItemHistory>();
+        var historyList = await _itemRepository.GetHistoryAsync();
+        HashSet<(int, int)> processedItems = new HashSet<(int, int)>();
+        historyList.ForEach(item =>
+        {
+            if (item.Type == "Item")
+            {
+                var itemDetails = JsonConvert.DeserializeObject<Item>(item.Details);
+                itemHistory.Add(new ItemHistory
+                {
+                    Id = itemDetails.Id,
+                    Name = itemDetails.Name,
+                    QuantityUpdated = itemDetails.Quantity,
+                    Type = "Inventory",
+                    Date = item.Date ?? DateTime.Now,
+                    User = item.User
+                });
+            }
+        });
+        var billItems = await _billRepository.GetBillItems();
+        billItems.ForEach(billItem =>
+        {
+            
+                itemHistory.Add(new ItemHistory
+                {
+                    Id = billItem.ItemId,
+                    Name = billItem.Item.Name,
+                    BillId = billItem.BillId,
+                    QuantityUpdated = -billItem.Quantity,
+                    Type = "Bill",
+                    Date = billItem.Bill.BillDate,
+                    User = billItem.Bill.User
+                });
+               
+        });
+        return itemHistory.OrderByDescending(x => x.Date).ToList();
     }
 }

@@ -25,13 +25,14 @@ namespace InventoryManagement.Api.Contracts;
 
         CreateMap<SupplierModel, Supplier>();
         CreateMap<Supplier, SupplierModel>();
-        
+
         CreateMap<ExpenseModel, Expense>()
             .ForMember(dest => dest.PaymentMode, opt => opt.MapFrom(src => Enum.Parse<PaymentMode>(src.PaymentMode)))
             .ForMember(dest => dest.ExpenseType, opt => opt.MapFrom(src => Enum.Parse<ExpenseType>(src.ExpenseType)));
         CreateMap<Expense, ExpenseModel>()
             .ForMember(dest => dest.PaymentMode, opt => opt.MapFrom(src => src.PaymentMode.ToString()))
             .ForMember(dest => dest.ExpenseType, opt => opt.MapFrom(src => src.ExpenseType.ToString()));
-
+        CreateMap<ClientDetailsModel, ClientDetails>();
+        CreateMap<ClientDetails, ClientDetailsModel>();
      }
  }

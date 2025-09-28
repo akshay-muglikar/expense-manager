@@ -94,4 +94,38 @@ public class LoginController : ControllerBase
         }
         return File(stream, "application/octet-stream", "database.db");
     }
+
+    [HttpGet("client-details")]
+    public async Task<IActionResult> GetClientById()
+    {
+        var claims = User?.Claims.SingleOrDefault(c => c.Type == "client_id").Value;
+        Console.WriteLine($"-----------------{claims}");
+        var at = await _loginService.GetClientDetails(Guid.Parse(claims));
+
+        Console.WriteLine($"-------------------{at?.Name ?? "NoName"}");
+        return Ok(at);
+    }
+
+    [HttpPost("client-details")]
+    public async Task<IActionResult> UpdateClientDetails([FromBody] ClientDetailsModel model)
+    {
+        var claims = User?.Claims.SingleOrDefault(c => c.Type == "client_id").Value;
+        Console.WriteLine($"-----------------{claims}");
+        if (model?.ClientId != Guid.Parse(claims))
+        {
+            return BadRequest("Client ID mismatch");
+        }
+        await _loginService.UpdateClientDetails(model);
+        return Ok();
+    }
+    [HttpPost("upload-logo")]
+    public async Task<IActionResult> UploadLogo(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("No file uploaded.");
+        var claims = User?.Claims.SingleOrDefault(c => c.Type == "client_id").Value;
+        using var stream = file.OpenReadStream();
+        await _loginService.UploadLogo(Guid.Parse(claims), stream);
+        return Ok();
+    }
 }

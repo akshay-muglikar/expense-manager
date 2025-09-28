@@ -92,6 +92,12 @@ public class ItemController : ControllerBase
         await _itemService.ScanItemAsync(request.Barcode, clientId);
         return Ok();
     }
+    [HttpGet("history")]
+    public async Task<IActionResult> GetHistory()
+    {
+        var history = await _itemService.GetItemHistoryAsync();
+        return Ok(history);
+    }
 
 }
 

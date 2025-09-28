@@ -39,20 +39,28 @@ public class InvoiceDocumentA5 : IDocument
 
     void ComposeHeader(IContainer container)
     {
+        
         container.Column(column =>
         {
             // Top section with company info and TAX INVOICE
             column.Item().Row(row =>
             {
+                if(Model.SellerAddress.Logo != null)
+                    row.AutoItem().PaddingRight(4, Unit.Millimetre).Element(leftcol =>
+                    {
+                        leftcol.AlignLeft().Height(17, Unit.Millimetre).Image(Model.SellerAddress.Logo);
+                    });
                 // Left side - Company details
                 row.RelativeItem(2).Column(leftColumn =>
                 {
                     leftColumn.Item().Text(Model.SellerAddress.CompanyName)
                         .FontSize(12).SemiBold(); // Reduced from 16
-                    leftColumn.Item().Text($"{Model.SellerAddress.Street}, {Model.SellerAddress.City}, {Model.SellerAddress.State}")
+                    leftColumn.Item().Text($"{Model.SellerAddress.AddressDetails}")
                         .FontSize(8); // Reduced from 10
-                    leftColumn.Item().Text($"Phone: {Model.SellerAddress.Phone}")
-                        .FontSize(8);
+                    if (Model.SellerAddress.Phone != null)
+                        leftColumn.Item().Text($"Phone: {Model.SellerAddress.Phone}")
+                            .FontSize(8);
+                        
                 
                     // leftColumn.Item().Text($"GSTIN: {Model.Comments ?? "N/A"}")
                     //     .FontSize(8);
@@ -85,8 +93,8 @@ public class InvoiceDocumentA5 : IDocument
                 // Bill To
                 row.RelativeItem().Column(billToColumn =>
                 {
-                    billToColumn.Item().Text(Model.CustomerAddress.CompanyName).FontSize(9).SemiBold(); // Reduced from 11
-                    billToColumn.Item().Text($"Phone: {Model.CustomerAddress.Phone}")
+                    billToColumn.Item().Text($"Customer : {Model.CustomerAddress.CompanyName}").FontSize(9).SemiBold(); // Reduced from 11
+                    billToColumn.Item().Text($"Phone    : {Model.CustomerAddress.Phone}")
                         .FontSize(8);
                 });
             });

@@ -10,7 +10,7 @@ namespace InventoryManagement.Api.Provider;
 public class InvoiceProvider
 {
 
-    public static Stream GetInvoiceA5(Bill bill, List<BillItem> billitems)
+    public static Stream GetInvoiceA5(Bill bill, List<BillItem> billitems, Address clientAddress)
     {
         QuestPDF.Settings.License = LicenseType.Community;
         List<OrderItem> items = new List<OrderItem>();
@@ -28,14 +28,7 @@ public class InvoiceProvider
             InvoiceNumber = bill.Id,
             IssueDate = bill.BillDate.DateTime,
             DueDate = DateTime.Now + TimeSpan.FromDays(14),
-            SellerAddress = new Address()
-            {
-                CompanyName = "Sai Car Decor",
-                Phone = "8796148014",
-                State = "Maharashtra",
-                City = "Pune",
-                Street = "Pune Nagar road, Ubale Nagar, Wagholi"
-            },
+            SellerAddress = clientAddress,
             CustomerAddress = new Address()
             {
                 CompanyName = bill.Name,
@@ -54,7 +47,7 @@ public class InvoiceProvider
         Console.WriteLine(tempfile);
         return File.Open(tempfile, FileMode.Open);
     }
-    public static Stream GetInvoice(Bill bill, List<BillItem> billitems)
+    public static Stream GetInvoice(Bill bill, List<BillItem> billitems, Address clientAddress, string invoiceType)
     {
         QuestPDF.Settings.License = LicenseType.Community;
         List<OrderItem> items = new List<OrderItem>();
@@ -72,14 +65,7 @@ public class InvoiceProvider
             InvoiceNumber = bill.Id,
             IssueDate = bill.BillDate.DateTime,
             DueDate = DateTime.Now + TimeSpan.FromDays(14),
-            SellerAddress = new Address()
-            {
-                CompanyName = "Sai Car Decor",
-                Phone = "8796148014",
-                State = "Maharashtra",
-                City = "Pune",
-                Street = "Pune Nagar road, Ubale Nagar, Wagholi"
-            },
+            SellerAddress = clientAddress,
             CustomerAddress = new Address()
             {
                 CompanyName = bill.Name,
@@ -92,12 +78,29 @@ public class InvoiceProvider
             PaymentMode = bill.PaymentMode.ToString(),
             Advance = bill.Advance
         };
-        var document = new InvoiceDocumentA5(model);
-        var tempfile = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
-        File.WriteAllBytes(tempfile, document.GeneratePdf());
-        Console.WriteLine(tempfile);
-        return File.Open(tempfile, FileMode.Open);
+        if (invoiceType == "A5")
+        {
+            var document = new InvoiceDocumentA5(model);
+            var tempfile = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
+            File.WriteAllBytes(tempfile, document.GeneratePdf());
+            Console.WriteLine(tempfile);
+            return File.Open(tempfile, FileMode.Open);
 
+        }
+        else if (invoiceType == "80mm")
+        {
+            var document = new InvoiceDocument(model);
+            var tempfile = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
+            File.WriteAllBytes(tempfile, document.GeneratePdf());
+            Console.WriteLine(tempfile);
+            return File.Open(tempfile, FileMode.Open);
+
+        }
+        else
+        {
+            throw new NotSupportedException($"Invoice type '{invoiceType}' is not supported.");
+        }
+       
     }
     
     

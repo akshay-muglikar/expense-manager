@@ -20,6 +20,7 @@ public class BillService
 {
     private readonly IBillRepository _billRepository;
     private readonly IItemRepository _itemRepository;
+    private readonly ILoginReporsitory loginReporsitory;
     private readonly string _user;
     private readonly Guid _clientId;
 
@@ -27,11 +28,14 @@ public class BillService
     private readonly InventoryConfig _inventoryConfig;
     public BillService(IBillRepository billRepository,
     IMapper mapper, IItemRepository itemRepository,
-    UserServiceProvider userService, IOptions<InventoryConfig> options)
+    UserServiceProvider userService,
+    IOptions<InventoryConfig> options,
+    ILoginReporsitory loginReporsitory)
     {
         _billRepository = billRepository;
         _mapper = mapper;
         _itemRepository = itemRepository;
+        this.loginReporsitory = loginReporsitory;
         _user = userService?.GetUsername();
         _clientId = Guid.Parse(userService?.GetClientId() ?? Guid.Empty.ToString());
         _inventoryConfig = options.Value;
@@ -172,7 +176,15 @@ public class BillService
 
         var billitems = await _billRepository.getBillItems(bill.Id);
         // Generate PDF
-        return InvoiceProvider.GetInvoice(bill, billitems);
+        var clientDetails = await loginReporsitory.GetClientDetails(_clientId);
+        var client = await loginReporsitory.GetClient(_clientId);
+        Address clientAddress = new Address
+        {
+            CompanyName = client?.Name ?? "",
+            AddressDetails = clientDetails?.Address ?? "",
+            Logo = clientDetails?.Logo
+        };
+        return InvoiceProvider.GetInvoice(bill, billitems, clientAddress, clientDetails.InvoiceType);
 
     }
 
@@ -380,6 +392,41 @@ public class BillService
     internal List<Dictionary<string, object>> ExecuteSqlQuery(string sqlQuery)
     {
         return _billRepository.ExecuteSqlQuery(sqlQuery);
+    }
+
+    internal async Task<Stream> PreviewBillAsync(int? billId)
+    {
+        if (!billId.HasValue)
+        {
+            var clientDetails = await loginReporsitory.GetClientDetails(_clientId);
+            var client = await loginReporsitory.GetClient(_clientId);
+            Address clientAddress = new Address
+            {
+                CompanyName = client?.Name ?? "",
+                AddressDetails = clientDetails?.Address ?? "",
+                Logo = clientDetails?.Logo
+            };
+            var bill = new Bill
+            {
+                Id = 1,
+                Name = "John Doe",
+                Mobile = "1234567890",
+                BillDate = DateTimeOffset.Now,
+                Discount = 10,
+                Advance = 50,
+                PaymentMode = PaymentMode.CASH,
+            };
+            var billItems = new List<BillItem>
+            {
+                new BillItem { Item = new Item { Name = "Item1" }, Amount = 100, Quantity = 2 },
+                new BillItem { Item = new Item { Name = "Item2" }, Amount = 200, Quantity = 1 }
+            };
+            return InvoiceProvider.GetInvoice(bill, billItems, clientAddress, clientDetails.InvoiceType);
+        }
+        else
+        {
+            return await GeneratePdf(billId.Value);
+        }
     }
 }
 

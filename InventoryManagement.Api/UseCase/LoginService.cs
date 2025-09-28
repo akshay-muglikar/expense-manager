@@ -18,18 +18,22 @@ public class LoginService
 {
     private readonly ILoginReporsitory _loginReporsitory;
     protected readonly UserServiceProvider userServiceProvider;
+    private readonly AutoMapper.IMapper _mapper;
     private readonly string _connectionString;
     public LoginService(ILoginReporsitory loginReporsitory,
-    UserServiceProvider userServiceProvider, IOptionsSnapshot<InventoryConfig> inventoryConfig)
+    UserServiceProvider userServiceProvider, IOptionsSnapshot<InventoryConfig> inventoryConfig, AutoMapper.IMapper mapper)
     {
         this.userServiceProvider = userServiceProvider;
+        _mapper = mapper;
         _loginReporsitory = loginReporsitory;
         _connectionString = inventoryConfig.Value.ConnectionStrings.Database.Replace("{AppBase}", AppContext.BaseDirectory);
     }
 
-    public async Task<JwtSecurityToken> Login(UserModel user){
+    public async Task<JwtSecurityToken> Login(UserModel user)
+    {
         var userModel = await _loginReporsitory.GetUser(user.Username, user.Password);
-        if(userModel != null){
+        if (userModel != null)
+        {
             Console.WriteLine("test");
             return GenerateAccessToken(user.Username, userModel.ClientId);
         }
@@ -38,21 +42,21 @@ public class LoginService
 
     public async Task<ClientModel> GetClient(string? value)
     {
-        
+
         return await _loginReporsitory.GetClient(Guid.Parse(value));
     }
-    
+
     public async Task<List<ClientModel>> GetAllClients()
     {
-         if(userServiceProvider.GetUsername()== "admin")
+        if (userServiceProvider.GetUsername() == "admin")
         {
             throw new UnauthorizedAccessException("Admin user cannot be registered through this endpoint");
         }
         return await _loginReporsitory.GetAllClients();
-    }   
+    }
     public async Task<List<User>> GetUsersAsync(Guid id)
     {
-         if(userServiceProvider.GetUsername()== "admin")
+        if (userServiceProvider.GetUsername() == "admin")
         {
             throw new UnauthorizedAccessException("Admin user cannot be registered through this endpoint");
         }
@@ -88,7 +92,7 @@ public class LoginService
         {
             throw new ArgumentException("Username and password must be provided");
         }
-        if(userServiceProvider.GetUsername()!= "admin")
+        if (userServiceProvider.GetUsername() != "admin")
         {
             throw new UnauthorizedAccessException("Only admin user can register new users");
         }
@@ -117,7 +121,7 @@ public class LoginService
         {
             throw new ArgumentException("Username, password, and name must be provided");
         }
-        if(userServiceProvider.GetUsername()!= "admin")
+        if (userServiceProvider.GetUsername() != "admin")
         {
             throw new UnauthorizedAccessException("Only admin user can register new clients");
         }
@@ -125,7 +129,7 @@ public class LoginService
         {
             throw new UnauthorizedAccessException("Admin user cannot be registered through this endpoint");
         }
-        
+
         var clientModel = new ClientModel
         {
             Name = client.Name,
@@ -141,7 +145,7 @@ public class LoginService
         var ClientDetails = new ClientDetails
         {
             Address = client.Address,
-            GSTNumber = string.IsNullOrEmpty(client.GSTNumber)?"":client.GSTNumber,
+            GSTNumber = string.IsNullOrEmpty(client.GSTNumber) ? "" : client.GSTNumber,
             RegistrationDate = DateTime.Now,
         };
 
@@ -163,5 +167,39 @@ public class LoginService
         }
 
         return new FileStream(downloadPath, FileMode.Open, FileAccess.Read);
+    }
+
+    internal async Task<ClientDetailsModel> GetClientDetails(Guid clientId)
+    {
+
+
+        var client = await _loginReporsitory.GetClientDetails(clientId);
+        var clientDetails = _mapper.Map<ClientDetailsModel>(client);
+        clientDetails.Name = (await _loginReporsitory.GetClient(clientId))?.Name;
+        return clientDetails;
+    }
+    internal async Task UpdateClientDetails(ClientDetailsModel clientDetails)
+    {
+        var clientDetailsentity = await _loginReporsitory.GetClientDetails(clientDetails.ClientId);
+        clientDetailsentity.Address = clientDetails.Address;
+        clientDetailsentity.GSTNumber = clientDetails.GSTNumber;
+        clientDetailsentity.InvoiceType = clientDetails.InvoiceType;
+        await _loginReporsitory.UpdateClientDetails(clientDetailsentity);
+
+        var client = await _loginReporsitory.GetClient(clientDetails.ClientId);
+        client.Name = clientDetails.Name;
+        await _loginReporsitory.UpdateClient(client);
+    }
+
+    internal async Task UploadLogo(Guid clientId, Stream stream)
+    {
+        //stream to byte array
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+        var logo = memoryStream.ToArray();
+        Console.WriteLine($"Logo size: {logo.Length} bytes");
+        var clientDetailsentity = await _loginReporsitory.GetClientDetails(clientId);
+        clientDetailsentity.Logo = logo;
+        await _loginReporsitory.UpdateClientDetails(clientDetailsentity);
     }
 }
