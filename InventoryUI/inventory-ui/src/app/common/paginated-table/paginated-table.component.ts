@@ -107,6 +107,7 @@ export interface TableCol{
   key? : string|null
   currency?:string|null,
   actions?:string[]|null
+  isDate?:boolean
 }
 export interface TableAction {
   name:string,

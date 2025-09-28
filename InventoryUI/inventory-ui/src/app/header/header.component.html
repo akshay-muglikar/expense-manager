@@ -1,16 +1,21 @@
-<div class="header-actions" *ngIf="isLoggedIn">
-    <div (click)="openPanel('notification')" class="header-action-button">
-        <mat-icon>notifications</mat-icon>
+<div class="header-actions">
+    <div *ngIf="isLoggedIn" (click)="openPanel('notification')" class="header-action-button">
+        <mat-icon>notifications</mat-icon> <span class="notification-count">{{notifications.length}}</span>
     </div>
     
-    <div (click)="openPanel('share')" class="header-action-button">
+    <div *ngIf="isLoggedIn" (click)="openPanel('share')" class="header-action-button">
         <mat-icon>share</mat-icon>
     </div>
-    <div class="header-action-button" (click)="openPanel('user')" >
-         <span class="user-avatar">
-                <mat-icon>person</mat-icon>
-              </span>
+    <div *ngIf="isLoggedIn" class="header-action-button" (click)="openPanel('user')" >
+        <div class="avatar">
+            {{ getInitials() }}
+            </div>
     </div>
+    <div class="header-controls" *ngIf="!isLoggedIn">
+
+        <button class="btn btn-primary" (click)="navigateToLogin()">Login</button>
+    </div>
+      
 </div>
 <div class="right-panel" *ngIf="showNotification">
     <div class="panel-body">
@@ -19,20 +24,31 @@
         <div class="close-icon"><mat-icon (click)="showNotification=!showNotification">close</mat-icon></div>
     </div>
     <div class="content">
-        <img src="mail-box.svg"  height="200" width="400"/>
-        <span translate>Uhh... There are no notifications at the moment.</span></div>
-        </div>
+        <div class="notification-item" *ngFor="let notification of notifications">
+                <div class="d-flex align-items-start" (click)="clickNotification(notification.id)">
+                    <mat-icon class="notification-icon" [ngClass]="notification.type">
+                        {{notification.type === 'info' ? 'info' : 'settings'}}
+                    </mat-icon>
+                    <div class="notification-content">
+                        <h4 class="notification-title">{{notification.title}}</h4>
+                        <p class="notification-message">{{notification.message}}</p>
+                        <small class="notification-time">{{notification.time | date:'short'}}</small>
+                    </div>
+                </div>
+            </div>
+    </div>
 </div>  
+</div>
 <div  class="right-panel" *ngIf="showSettings">
      <div class="panel-body" style="bottom: unset;">
     <div class="header d-flex justify-content-between py-5">
         <div>
-             <span class="user-avatar">
-                <mat-icon>person</mat-icon>
-              </span>
+             
         <span>Hi! {{user?.username}}</span>
         <p>Organization : {{user?.client?.name}}</p>
-        <div class="link" (click)="logout()"><mat-icon>logout</mat-icon> Sign out</div>
+        <div class="link" (click)="settings()"><mat-icon>settings</mat-icon>Settings</div>
+
+        <div class="link" style="margin-top: 10px;" (click)="logout()"><mat-icon>logout</mat-icon> Sign out</div>
         </div>
         <div class="close-icon"><mat-icon (click)="showSettings=!showSettings">close</mat-icon></div>
         </div>
@@ -45,7 +61,6 @@
         <div class="close-icon"><mat-icon (click)="showShareOptions=!showShareOptions">close</mat-icon></div>
     </div>
     <div class="content">
-        <img src="announcement.svg" height="100px" width="300px">
         <p translate>Know people who would love 'Shrivo'?</p>
         <p translate>Refer now and earn 1 month free subscription</p>
 

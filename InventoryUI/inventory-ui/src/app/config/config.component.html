@@ -1,0 +1,47 @@
+<h2>Settings</h2>
+<div class="form">
+    <div class="form-group">
+        <label for="Name" translate>Name</label>
+        <input id="Name"  placeholder="Enter Name" [(ngModel)]="clientDetails!.name"/>
+    </div>
+    <div class="form-group">
+        <label for="address" translate>Address</label>
+        <textarea style="height: 100px;" id="Address"  placeholder="Enter address" [(ngModel)]="clientDetails.address" >
+        </textarea>
+    </div>
+    
+    <div class="form-group">
+        <label for="Invoice" translate>Bill Size</label>
+        <select id="size"  placeholder="Bill Size" [(ngModel)]="clientDetails!.invoiceType">
+            <option value="A5">A5</option>
+            <option value="80mm">80mm</option>
+        </select>
+    </div>
+</div>
+<div style="margin-top: 10px;">
+ <button mat-button (click)="fileInput.click()">Update logo</button>
+
+</div>
+<div style="margin-top: 10px;">
+
+<button mat-button (click)="this.updateClientDetails()">Save Changes</button>
+  
+</div>
+
+
+<div style="margin-top: 10px;">
+
+<button mat-button (click)="this.preview()">Invoice Preview</button>
+  
+</div>
+
+<input 
+  type="file" 
+  #fileInput 
+  (change)="updateLogo($event)" 
+  hidden
+/>
+<div class="preview" *ngIf="pdfUrl">
+  <button style="margin: 15px;" mat-button (click)="pdfUrl=null">Close preview</button>
+  <iframe [src]="pdfUrl" width="100%" height="600px" style="border:1px solid #ccc;"></iframe>
+</div>

@@ -1,6 +1,6 @@
 .header-actions{
     display: grid;
-    grid-template-columns: 40px 40px 40px;
+    grid-template-columns:repeat(4, auto);;
     position: relative;
     align-items: end;
     right: 0px;
@@ -43,20 +43,6 @@
         }
     }
 }
-.user-avatar {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        background-color: #f8f9fa;
-        border-radius: 50%;
-        color: #666;
-        
-        &:hover {
-            background-color: #e9ecef;
-        }
-    }
 .link{
     border: 0;
     background-color: #f7f7fe;
@@ -72,6 +58,79 @@
     }
 
 }
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #3f51b5; /* Material Indigo */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
 .close-icon {
     cursor: pointer;
+}
+// ...existing code...
+.notification-item {
+    cursor: pointer;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.notification-icon {
+    margin-right: 12px;
+    
+    &.info {
+        color: #2196F3;
+    }
+    
+    &.settings {
+        color: #FF9800;
+    }
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-title {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.notification-message {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.notification-time {
+    color: #999;
+    font-size: 12px;
+}
+.notification-count {
+  position: absolute;
+  top: 0px;
+  right: 100px;
+  background-color: #ff4444;
+  color: white;
+  border-radius: 50%;
+  padding: 1px 3px;
+  font-size: 8px;
+  min-width: 18px;
+  height: 18px;
+  text-align: center;
+  line-height: 14px;
+  border: 2px solid #ffffff;
+  font-weight: bold;
 }

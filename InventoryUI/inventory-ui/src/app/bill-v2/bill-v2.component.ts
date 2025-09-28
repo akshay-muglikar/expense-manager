@@ -404,7 +404,7 @@ this.route.queryParams.subscribe(params => {
     this.total = 0;
     this.selectedItem = { quantity: 1 };
     this.myControl.setValue('');
-    this.addIteminBill();
+    //this.addIteminBill();
     this.openSnackBar('Bill closed and reset');
   }
   setItemProps(id: number) {

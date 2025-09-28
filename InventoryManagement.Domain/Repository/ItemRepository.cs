@@ -21,13 +21,13 @@ public class ItemRepository : IItemRepository
     }
     public async Task<List<Item>> GetByIdAsync(List<int> ids)
     {
-        return await _context.Items.Where(x=>ids.Contains(x.Id)).ToListAsync();
+        return await _context.Items.Where(x => ids.Contains(x.Id)).ToListAsync();
     }
 
     public async Task Update(Item item)
     {
         _context.Update(item);
-        await _context.SaveChangesAsync();  
+        await _context.SaveChangesAsync();
     }
 
 
@@ -117,12 +117,20 @@ public class ItemRepository : IItemRepository
         {
             transaction.Rollback();
             throw;
-        }   
+        }
     }
 
     public Task<Item> GetByBarcodeAsync(string barcode)
     {
         return _context.Items.FirstOrDefaultAsync(x => x.Barcode == barcode);
+    }
+    public async Task<List<History>> GetHistoryAsync()
+    {
+        // Assuming HistoryRepository has a method to get history by item
+        return (await _historyRepository.GetAllAsync())
+            .Where(h => h.Type == "Item" || h.Type == "Bill")
+            .OrderByDescending(h => h.Id)
+            .ToList();
     }
 }
 

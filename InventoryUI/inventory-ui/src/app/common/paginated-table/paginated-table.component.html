@@ -31,7 +31,7 @@
             type="checkbox">
         </td>
         <td *ngFor="let col of colDefs">
-        @if(col.key.toLowerCase().includes("date")){
+        @if(col.isDate){
             
             {{row[col.key ?? col.name] ?? "" | date:'dd MMM yyyy HH:mm' }}
           }@else{

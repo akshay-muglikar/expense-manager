@@ -56,9 +56,6 @@ export class AppComponent {
       translate.use(savedLang || 'en');
     }
   
-  navigateToLogin() {
-    this.router.navigate(['login']);
-  }
   changeLanguage(selectedLang:string) {
     const lang = selectedLang
     this.translate.use(lang);

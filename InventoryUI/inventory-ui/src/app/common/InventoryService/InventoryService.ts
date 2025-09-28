@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Item } from "../../contracts/item.model";
 import { ItemSummary } from "../../models/item-summary.model";
-
+import { History } from "../../models/hisotry";
 @Injectable({providedIn: 'root'})
 export class InventoryService {
   constructor(private http: HttpClient) {
@@ -33,5 +33,8 @@ export class InventoryService {
   }
   summary() {
     return this.http.get<ItemSummary>('/api/analytics/inventory-summary')
+  }
+  getHistory() {
+    return this.http.get<History[]>('/api/item/history');
   }
 }

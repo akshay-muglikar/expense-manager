@@ -45,7 +45,7 @@
 
     <!-- Add/Edit Item Tab -->
     <mat-tab>
-      <ng-template mat-tab-label>
+      <ng-template mat-tab-label >
         <mat-icon class="tab-icon">{{selectedRowId ? 'edit' : 'add'}}</mat-icon>
         {{(selectedRowId ? 'Edit Item' : 'New Item' )| translate}}
       </ng-template>
@@ -100,48 +100,16 @@
     </mat-tab>
 
     <!-- Stats Tab -->
+  
     <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon class="tab-icon">insights</mat-icon>
-        <span translate>Insights</span>
+         <ng-template mat-tab-label >
+        <mat-icon class="tab-icon">list</mat-icon>
+        <span translate>Stock Updates</span>
       </ng-template>
 
       <div class="tab-content">
-        <div class="stats-grid">
-          <mat-card class="stat-card">
-            <mat-icon class="stat-icon">inventory_2</mat-icon>
-            <div class="stat-value">{{items.length}}</div>
-            <div class="stat-label" translate>Total Items</div>
-            <mat-progress-bar mode="determinate" [value]="100"></mat-progress-bar>
-          </mat-card>
-
-         
-
-          <mat-card class="stat-card">
-            <mat-icon class="stat-icon">price_check</mat-icon>
-            <div class="stat-value">₹{{totalInventoryValue | number:'1.0-0'}}</div>
-            <div class="stat-label" translate>Total Inventory Value</div>
-          </mat-card>
-          <mat-card class="stat-card">
-            <mat-icon class="stat-icon">warning</mat-icon>
-            <div class="stat-value">{{inventorybelowThreshold}}</div>
-            <div class="stat-label" translate>Restock Needed Inventory</div>
-            <mat-progress-bar mode="determinate" [value]="(inventorybelowThreshold / items.length) * 100"></mat-progress-bar>
-          </mat-card>
-        </div>
-      </div>
-      <div class="item-below-threshold">
-        <h2 translate>Restock Needed Inventory</h2>
-        <p *ngIf="inventorybelowThreshold === 0">All items are above the restock threshold</p>
-        <div class="item-below-threshold-list">
-        <mat-card *ngFor="let item of itembelowThreshold" class="item-card">
-          <div class="item-details">
-            <h3>{{item.name}}</h3>
-            <p>Quantity: {{item.quantity}}</p>
-            <p>Price: ₹{{item.price | number:'1.0-0'}}</p>
-          </div>
-          </mat-card>
-          </div>
+        <app-paginated-table [colDefs]="historyColDef" [data]="historyList">
+        </app-paginated-table>
       </div>
     </mat-tab>
   </mat-tab-group>

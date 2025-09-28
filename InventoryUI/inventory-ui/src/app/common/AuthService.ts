@@ -49,7 +49,7 @@ export class AuthService {
         this.router.navigate(['bill']);
         this.getClient()
         window.dispatchEvent(new CustomEvent('login-success'));
-
+        localStorage.setItem('username', username)
     }, (error) => {
       //check for 401 Unauthorized error
       let message = "Login failed.";

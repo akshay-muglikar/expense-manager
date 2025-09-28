@@ -16,7 +16,8 @@ import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { TranslateDirective, TranslatePipe } from "@ngx-translate/core";
 import { PaginatedTableComponent, TableCol } from "../common/paginated-table/paginated-table.component";
-
+import { History } from '../models/hisotry';
+import { DashboardComponent } from "../dashboard/dashboard.component";
 @Component({
   selector: 'app-inventory',
   standalone: true,
@@ -32,7 +33,8 @@ import { PaginatedTableComponent, TableCol } from "../common/paginated-table/pag
     MatTabsModule,
     MatCardModule, FormsModule,
     TranslateDirective, TranslatePipe,
-    PaginatedTableComponent
+    PaginatedTableComponent,
+    DashboardComponent
 ],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.scss'
@@ -319,6 +321,9 @@ downloadInventory() {
     if (index !== 1 && this.selectedRowId !== 0) {
       this.resetForm();
     }
+    if(this.selectedTabIndex==2){
+      this.getHistory()
+    }
   }
 
   SetStats() {
@@ -327,6 +332,50 @@ downloadInventory() {
     this.totalInventoryValue = this.items.reduce((total, item) => total + (item.price || 0) * item.quantity, 0);
     this.inventorybelowThreshold = this.items.filter(item => item.quantity < 2).length;
     this.itembelowThreshold = this.items.filter(item => item.quantity < 2);
+  }
+  historyList : History[] = [];
+  historyColDef : TableCol[] = [{
+    name:"Id",
+    key:'id',
+    width:50
+  },
+  {
+    name: "Name",
+    key:'name',
+    width:100
+  },
+   {
+    name: "Qty",
+    key:'quantityUpdated',
+    width:100
+  },
+  {
+    name: "Action From",
+    key:'type',
+    width:100
+  },
+  {
+    name: "Bill",
+    key:'billId',
+    width:100
+  },
+  {
+    name: "Date",
+    key:'date',
+    width:100,
+    isDate :true
+  },
+  {
+    name: "User",
+    key:'user',
+    width:100
+  }]
+  getHistory(){
+    let newHistory:History[]=[];
+    let billItemsHistory:any[] =[]
+    this.inventoryService.getHistory().subscribe((res)=>{
+      this.historyList = [...res]
+    })
   }
 }
 

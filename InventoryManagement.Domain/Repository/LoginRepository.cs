@@ -9,9 +9,12 @@ public interface ILoginReporsitory{
     Task CreateUser(User userModel);
     Task<List<ClientModel>> GetAllClients();
     Task<ClientModel> GetClient(Guid guid);
+    Task<ClientDetails> GetClientDetails(Guid clientId);
     public Task<Model.User> GetUser(string username, string password);
     Task<List<User>> GetUsersAsync(Guid id);
     Task RegisterClient(ClientModel clientModel, User userModel, ClientDetails clientDetails);
+    Task UpdateClient(ClientModel client);
+    Task UpdateClientDetails(ClientDetails client);
 }
 public class LoginRepository : ILoginReporsitory
 {
@@ -45,6 +48,11 @@ public class LoginRepository : ILoginReporsitory
         return clients.FirstOrDefault(x=> x.Id == guid);
     }
 
+    public Task<ClientDetails> GetClientDetails(Guid clientId)
+    {
+        return _context.ClientDetails.AsNoTracking().FirstOrDefaultAsync(x=> x.ClientId == clientId);
+    }
+
     public async Task<Model.User> GetUser(string username, string password)
     {
         return await _context.Users.FirstOrDefaultAsync(x => x.Username == username && x.Password == password);
@@ -73,5 +81,17 @@ public class LoginRepository : ILoginReporsitory
             transaction.Rollback();
             throw;
         }
+    }
+
+    public Task UpdateClient(ClientModel client)
+    {
+        _context.Clients.Update(client);
+        return _context.SaveChangesAsync();
+    }
+
+    public Task UpdateClientDetails(ClientDetails client)
+    {
+        _context.ClientDetails.Update(client);
+        return _context.SaveChangesAsync();
     }
 }

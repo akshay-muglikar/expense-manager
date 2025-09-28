@@ -14,6 +14,7 @@ public interface IBillRepository
     Task RemoveBillItems(int billId);
     Task RemoveBillItem(BillItem billItem);
     Task<List<BillItem>> getBillItems(int id);
+    Task<List<BillItem>> GetBillItems();
     Task<List<(Bill, int TotalAmount)>> GetAllAsync(DateTime? start, DateTime? end);
     Task AddBillWithItemsAsync(Bill bill, List<BillItem> billItems, string user);
     Task<IEnumerable<(string, string)>> GetAllCustomersAsync();

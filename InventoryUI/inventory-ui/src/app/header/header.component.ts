@@ -1,4 +1,4 @@
-import { NgIf } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService, UserModel } from '../common/AuthService';
@@ -6,10 +6,11 @@ import { Subscription } from 'rxjs';
 import { MatIcon, MatIconModule } from "@angular/material/icon";
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateDirective } from "@ngx-translate/core";
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-header',
-  imports: [MatIconModule, NgIf, TranslateDirective],
+  imports: [MatIconModule, NgIf, TranslateDirective, FormsModule, CommonModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
@@ -36,6 +37,9 @@ copyInput() {
     this.snakbar.open("Link Copied...",'Close', { duration: 3000 })
   });
 }
+getInitials(){
+  return localStorage.getItem('username')?.charAt(0).toUpperCase()??"U"
+}
   isLoggedIn : boolean = false;
   private sub!: Subscription;
   showNotification = false;
@@ -43,8 +47,13 @@ copyInput() {
   showShareOptions = false
   url = window.location.origin
   user : UserModel | null = null
-  constructor(private authService: AuthService, private snakbar : MatSnackBar){
+  constructor(private authService: AuthService, private snakbar : MatSnackBar,
+    private router: Router
+  ){
     
+  }
+  navigateToLogin() {
+    this.router.navigate(['login']);
   }
   ngOnInit(){
       this.isLoggedIn = this.authService.isLoggedIn()
@@ -66,6 +75,10 @@ copyInput() {
       this.user = res;
     })
   }
+  settings(){
+    this.showSettings=false;
+    this.router.navigate(['config']);
+  }
   logout() {
     this.showSettings=false;
     this.authService.logout();
@@ -75,5 +88,37 @@ copyInput() {
       this.sub.unsubscribe();
     }
   }
-
+notifications: Notification[] = [
+    {
+      id: 1,
+      type: 'settings',
+      title: 'New Configuration Settings',
+      message: 'Configure your organization settings, user permissions and more in the new settings page.',
+      time: new Date()
+    },
+    {
+      id: 2,
+      type: 'info',
+      title: 'Welcome to Shrivo',
+      message: 'Get started by exploring our features and setting up your inventory.',
+      time: new Date()
+    }
+  ];
+  clickNotification(id:number){
+    if(id==1){
+      this.showNotification = false;
+      this.router.navigate(['config'])
+    }
+    if(id==2){
+      this.showNotification = false;
+      this.router.navigate(['dashboard'])
+    }
+  }
+}
+interface Notification {
+  id: number;
+  type: 'info' | 'settings';
+  title: string;
+  message: string;
+  time: Date;
 }

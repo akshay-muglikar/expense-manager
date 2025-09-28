@@ -222,5 +222,13 @@ public class BillRepository : IBillRepository
             }
         }
     }
+
+    public Task<List<BillItem>> GetBillItems()
+    {
+        return _context.BillItems
+        .Include(x => x.Item)
+        .Include(x => x.Bill)
+        .ToListAsync();
+    }
 }
 

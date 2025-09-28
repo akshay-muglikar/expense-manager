@@ -1,13 +1,17 @@
 using System.Text.Json;
 using InventoryManagement.Domain.Model;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace InventoryManagement.Domain.Repository;
 
-public interface IHistoryRepository{
+public interface IHistoryRepository
+{
     Task AddAsync(History history);
 
     Task AddAsync<T>(T bill, string action, string user);
+
+    Task<List<History>> GetAllAsync();
 
 }
 public class HistoryRepository : IHistoryRepository
@@ -34,5 +38,10 @@ public class HistoryRepository : IHistoryRepository
             Action = action
         };
         await AddAsync(hs);
+    }
+
+    public async Task<List<History>> GetAllAsync()
+    {
+        return await applicationDbContext.Histories.ToListAsync();
     }
 }
